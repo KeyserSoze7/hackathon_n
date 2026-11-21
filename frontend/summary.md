@@ -52,6 +52,12 @@ Every screen has skeleton loading and an error box with retry if the backend is 
 
 ₹13.43 Cr spent of ₹14.91 Cr budget across 24 wards. ₹60.3L billed under warranty (259 bills). 496 bills need explanation: 259 under warranty, 116 heavy-rain-day work, 109 above rate card, 47 overlapping work orders.
 
+## Mobile and report workflow
+
+- Phones: bottom navigation, single-row header, card layouts, no horizontal overflow (verified at 390 px on all five screens).
+- Report workflow (verified end to end in a 390 px browser against the live API): choose the situation and problem type, optional photo (preview only), landmark and optional GPS, review, send, then a tracker that can be refreshed.
+- Hosting on Vercel: the app is a static build (`npm run build`, output `dist`, hash routing needs no rewrites). Set `VITE_API_BASE` in Vercel to an **https** address for the backend. The current `http://10.10.38.50:8000` is blocked by browsers on an https page even on the same Wi-Fi. For a same-Wi-Fi demo without Vercel, run `npm run dev -- --host` and open `http://<laptop-ip>:5173` on the phones (the "Use my location" button needs https and will fall back to the landmark field there).
+
 ## Verification done
 
 - `tsc -b` and `vite build` pass.
@@ -132,3 +138,19 @@ Recent citizen reports on a road (`report_id`, `kind`, `issue_type`, `created_at
 ## Also still requested from backend
 
 Road list/search (`GET /api/roads?q=&ward=&limit=`), localities list, 1.5 km livability per locality, `POST /api/draft-notice` (Claude, EN/हिं/मराठी, template fallback), `POST /api/citizen-query` (Claude), city totals for failed repairs and counts, `segment_no` and `length_m` on roads, `ward_code=ALL` for the planner. The backend has since added typed response models (commit `d6f6568`); the frontend types were written from observed responses and should be checked against them.
+
+## Citizen "My reports" and the ward office (added 21 Nov, evening)
+
+- **`#me` My reports** (profile icon in the header): reports sent from this device, with stat cards, report cards, a tracker per report, and "Yes, fixed" / "Still broken". Until `GET /api/me` exists, the list is the report ids saved on this device (`localStorage` key `marg-my-reports`), each loaded with `GET /api/citizen-reports/{id}`.
+- **`#admin` Ward office** (link at the bottom of My reports, not in the public nav):
+  - **Sign-in and access:** sign-in, a request-access form, and a preview mode.
+  - **Dashboard:** KPI cards, a citizen-report inbox, and "open a report by number".
+  - **Live actions:** a status stepper with allowed next steps and Notify contractor, and a "flags awaiting reply" tab with a reply form, which works today.
+- **`api.ts` normalises the two report shapes** the backend returns (POST: `id`, `road_id`; GET: `report_id`, `road{}`; tracker items with `status: done|current|pending`).
+- **Flow check:** `python frontend/scripts/qa_flows.py` runs 31 checks on 390 px and 1280 px (needs `npm run dev` and the API). The last run passed 31 of 31. It creates one "FRONTEND TEST" report per run.
+
+### Still needed from the backend for these screens
+
+Citizen identity: `POST /api/citizens` (device token), store `citizen_id` on reports, `GET /api/me`, `GET /api/me/reports`, `POST /api/citizen-reports/{id}/confirm`, and `events[]` history on a report. Insert should stop at `matched_to_contract`; officers move it on.
+Ward office: `POST /api/admin/access-requests`, `GET` + approve/reject, `POST /api/admin/login` + `GET /api/admin/me`, `GET /api/admin/summary`, `GET /api/admin/reports`, `GET`/`PATCH /api/admin/reports/{id}`, `POST /api/admin/reports/{id}/notify-contractor`, `GET /api/admin/flags?awaiting_reply=true`.
+Shipped by the backend but not yet wired in the frontend: `GET /api/roads` (search), `/api/localities`, `/api/livability`, `/api/roads/{id}/reports`, `POST /api/uploads/photo`, `POST /api/draft-notice`, `POST /api/citizen-query`.

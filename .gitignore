@@ -2,3 +2,5 @@
 __pycache__/
 .DS_Store
 uploads/
+# Demo video + scene clips: too large for git, shared outside the repo (see docs/demo_video_script.md)
+assets/video/

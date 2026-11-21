@@ -1,10 +1,4 @@
-// The MARG milestone emblem (vectorised from assets/main logo.jpeg) beside the product wordmark.
-// At header size the emblem's own lettering is too small to read, so the wordmark carries the name.
+// The MARG milestone emblem (vectorised from assets/main logo.jpeg). The emblem carries the name itself, so there is no separate wordmark.
 export default function Logo() {
-  return (
-    <span className="flex shrink-0 items-center gap-2.5">
-      <img src="/brand/marg-mark.svg" alt="" width={38} height={40} className="h-10 w-[38px]" />
-      <span className="text-base font-bold tracking-tight">MARG·LEDGER</span>
-    </span>
-  )
+  return <img src="/brand/marg-mark.svg" alt="MARG, हर रुपये का हिसाब" width={46} height={48} className="h-12 w-[46px] shrink-0" />
 }

@@ -19,6 +19,7 @@ export const DETECTOR: Record<string, string> = {
   RATE_INFLATION: 'Billed above rate card',
   OVERLAPPING_WORK_ORDER: 'Overlapping work order',
   RAIN_DAY_WORK: 'Work logged on a heavy-rain day',
+  REPEAT_BILL_NO_COMPLAINT: 'Repeat bill with no new complaint',
 }
 export const REASON: Record<string, string> = {
   FLOOD_SPOT: 'Flood spot nearby', AMBULANCE_ROUTE: 'Hospital access road', HIGH_TRAFFIC: 'Heavy traffic',

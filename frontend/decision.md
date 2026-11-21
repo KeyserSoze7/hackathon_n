@@ -31,6 +31,17 @@ Hackathon build (Claude Impact Lab Mumbai, 21 Nov 2026), "Follow the Rupee: Mumb
 | Boot splash plays the animation once per session; closes when data is ready and the logo has formed (≈4.6 s), or after a 6.1 s safety timeout, or on Skip. Reduced motion shows the still SVG | Branding without holding the app hostage on slow 4G or blocked autoplay | Use the 10 s animation for per-screen loading; screens use skeletons |
 | Right of reply posts to the backend; citizen "Still broken? Report it" posts to `/api/citizen-reports` | Both endpoints exist; replies are now on the record | Fake a local-only save |
 
+## Later decisions (final polish)
+
+| Decision | Why | Do not |
+|---|---|---|
+| Header is one row: emblem only (no "MARG·LEDGER" text), ward pill, language toggle (EN / हिं / मरा). | The user asked to remove the English wordmark and move the toggle up. The emblem carries the name. | Re-add the wordmark text |
+| Phones (< 640 px): navigation is a fixed bottom bar with 5 equal items; the top nav row is hidden. From 640 px up the nav sits under the header. | Thumb reach on mobile. | Put the nav back at the top on phones |
+| Cards, not lists or tables, everywhere (flagged bills, contractors, flags, timeline, wards). | Lists were too cluttered on mobile. | Reintroduce `<table>` or divided lists |
+| The report is a four-step workflow in `components/ReportFlow.tsx` (What, Photo, Where, Review) ending in a live tracker; opened from the lookup result and the road receipt; deep link `#receipt?road=RD0220&report=1`. | The user wanted a full workflow, not one click. | Collapse it back to a single button |
+| Report details (issue type, landmark, GPS) are packed into the report `text` field; the photo is chosen and previewed but NOT uploaded. | `POST /api/citizen-reports` accepts only text-level fields and no upload endpoint exists yet. | Pretend the photo was sent |
+| All dialogs render through a portal to `<body>` and lock page scroll. | A fade-in ancestor made `position: fixed` relative to the page, so the dialog appeared off-screen under a dim overlay. | Render a `Modal` inside an animated container without the portal |
+
 ## Data facts worth knowing
 
 - Real ID formats: roads `RD0220`, work orders `WO25-00007`, complaints `BMC25-000020`, contractors `CT01`–`CT08`, wards `K/W` (with a slash; encode it in URLs).
@@ -38,6 +49,8 @@ Hackathon build (Claude Impact Lab Mumbai, 21 Nov 2026), "Follow the Rupee: Mumb
 - The dataset has **no DLP end date**, no maintenance records, no payment-hold status, no QR codes.
 - Contractor names carry " (synthetic)"; `cleanName()` strips it for display.
 - `/api/lookup` returns 404 on no match; the UI treats that as "No road matched".
+- `POST /api/citizen-reports` returns `id` (not `report_id`), `status`, `flag_id` and `tracker: [{step, done}]` with steps `reported`, `matched_to_contract`, `payment_held`, `contractor_notified`. Test reports titled "FRONTEND TEST" (ids 6 to 9) were created while verifying; they can be deleted.
+- Hosting: the API is plain http on a LAN address. An https page (for example Vercel) cannot call it (mixed content). Serve from the laptop (`npm run dev -- --host`) or expose the API over https and set `VITE_API_BASE`.
 
 ## Open items (see summary.md for the endpoint spec)
 
