@@ -1,0 +1,818 @@
+{
+  "info": {
+    "name": "Follow the Rupee - Backend (local)",
+    "description": "All four views + writes. Start the API (see view3/README.md), then run in order: later requests reuse IDs captured by earlier ones.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "ward",
+      "value": "K/W"
+    },
+    {
+      "key": "flagId",
+      "value": ""
+    },
+    {
+      "key": "dlpRoadId",
+      "value": ""
+    },
+    {
+      "key": "reportId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('data loaded', () => { pm.expect(b.work_orders).to.eql(2499); pm.expect(b.flags).to.be.above(0); pm.expect(b.v3_items).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "OpenAPI spec (Swagger)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/openapi.json"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(15));",
+              "pm.test('every operation tagged + summarized', () => Object.values(b.paths).forEach(p => Object.values(p).forEach(op => { pm.expect(op.tags.length).to.be.above(0); pm.expect(op.summary).to.be.a('string'); })));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "View 1",
+      "item": [
+        {
+          "name": "City KPIs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/city"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('KPI strip fields', () => { ['total_budget_inr','total_spend_inr','recoverable_dlp_inr','flagged_bills_count','flags_by_detector'].forEach(k => pm.expect(b).to.have.property(k)); });",
+                  "pm.test('recoverable <= spend', () => pm.expect(b.recoverable_dlp_inr).to.be.below(b.total_spend_inr));",
+                  "pm.test('whole rupees', () => pm.expect(Number.isInteger(b.total_spend_inr)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wards (map)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('24 wards', () => pm.expect(b.length).to.eql(24));",
+                  "pm.test('map colour field', () => b.forEach(w => pm.expect(w.dlp_leakage_rate).to.be.within(0, 1)));",
+                  "pm.test('under-reported flag present', () => pm.expect(b.some(w => w.under_reported_flag)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward (single, query param)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/wards?ward={{ward}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wards"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "{{ward}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('one ward object', () => { pm.expect(b).to.be.an('object'); pm.expect(b.ward_code).to.eql(pm.collectionVariables.get('ward')); });",
+                  "pm.test('ward-level fields', () => ['budget_inr','spend_inr','recoverable_dlp_inr','dlp_leakage_rate','under_reported_flag','ward_name'].forEach(k => pm.expect(b).to.have.property(k)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward (single, X-Ward-Code header)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Ward-Code",
+                "value": "{{ward}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wards"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('one ward object from header', () => pm.expect(pm.response.json().ward_code).to.eql(pm.collectionVariables.get('ward')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward (query param wins over header, case-insensitive)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Ward-Code",
+                "value": "A"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wards?ward=f/s",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wards"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "f/s"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('query param used, normalized', () => pm.expect(pm.response.json().ward_code).to.eql('F/S'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward (unknown, 404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/wards?ward=ZZ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wards"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "ZZ"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue (all)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/flagged-queue?limit=500",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "flagged-queue"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "500"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('sorted by rupees at stake', () => { for (let i = 1; i < b.length; i++) pm.expect(b[i-1].rupees_at_stake).to.be.at.least(b[i].rupees_at_stake); });",
+                  "pm.test('neutral labels only', () => b.forEach(q => pm.expect(['Needs Explanation','Recoverable under DLP']).to.include(q.status_label)));",
+                  "const dlp = b.find(q => q.detectors.includes('DLP_PAID_TWICE'));",
+                  "pm.collectionVariables.set('flagId', dlp.flag_ids[0]);",
+                  "pm.collectionVariables.set('dlpRoadId', dlp.road_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue (ward, tier 1)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/flagged-queue?ward={{ward}}&tier=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "flagged-queue"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "{{ward}}"
+                },
+                {
+                  "key": "tier",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('filters applied', () => b.forEach(q => { pm.expect(q.ward_code).to.eql(pm.collectionVariables.get('ward')); pm.expect(q.top_tier).to.eql(1); }));",
+                  "pm.test('limit respected', () => pm.expect(b.length).to.be.at.most(10));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue - invalid tier (422)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/flagged-queue?tier=9",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "flagged-queue"
+              ],
+              "query": [
+                {
+                  "key": "tier",
+                  "value": "9"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "View 2",
+      "item": [
+        {
+          "name": "Road receipt",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/roads/{{dlpRoadId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('under warranty', () => pm.expect(b.under_dlp).to.be.true);",
+                  "pm.test('has work orders + flags', () => { pm.expect(b.work_orders.length).to.be.above(0); pm.expect(b.flags.length).to.be.above(0); });",
+                  "pm.test('billed = sum of work orders', () => pm.expect(Math.round(b.total_billed_inr)).to.eql(Math.round(b.work_orders.reduce((s, w) => s + Number(w.cost_inr), 0))));",
+                  "pm.test('flags carry evidence row ids', () => b.flags.forEach(f => pm.expect(f.evidence_row_ids.length).to.be.above(0)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Road timeline",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/roads/{{dlpRoadId}}/timeline"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('chronological', () => { for (let i = 1; i < b.length; i++) pm.expect(b[i-1].event_at <= b[i].event_at).to.be.true; });",
+                  "pm.test('has work order events', () => pm.expect(b.some(e => e.event_type === 'work_order_completed')).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flag detail",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/flags/{{flagId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('DLP flag', () => { pm.expect(b.detector).to.eql('DLP_PAID_TWICE'); pm.expect(b.status_label).to.eql('Recoverable under DLP'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Right-of-Reply (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/flags/{{flagId}}/replies",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author_role\": \"ward_engineer\",\n  \"author_name\": \"AE Roads (test)\",\n  \"body\": \"MGL utility trench reopened this stretch; requesting contractor be held liable under DLP.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('stored on flag', () => pm.expect(pm.response.json().flag_id).to.eql(pm.collectionVariables.get('flagId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Right-of-Reply - invalid role (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/flags/{{flagId}}/replies",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"author_role\": \"admin\", \"body\": \"x\" }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown road (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/roads/RD9999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "View 3",
+      "item": [
+        {
+          "name": "Contractor scorecard",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractors"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('8 contractors, sorted by score', () => { pm.expect(b.length).to.eql(8); for (let i = 1; i < b.length; i++) pm.expect(b[i-1].risk_adjusted_score).to.be.at.least(b[i].risk_adjusted_score); });",
+                  "pm.test('context-adjusted fields', () => b.forEach(c => { pm.expect(c).to.have.property('expected_reopen_rate_30d'); pm.expect(c.drivers).to.be.an('array'); pm.expect(c.context).to.be.an('object'); }));",
+                  "pm.test('no letter grades', () => b.forEach(c => pm.expect(c).to.not.have.property('grade')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward allocation",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/wards"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('24 wards', () => pm.expect(pm.response.json().length).to.eql(24));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Next rupee (ward)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/next-rupee/{{ward}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const a = b.filter(x => x.bucket === 'A_OWED_BY_CONTRACTOR_DLP');",
+                  "pm.test('bucket A costs BMC 0', () => a.forEach(x => pm.expect(x.cost_to_bmc_inr).to.eql(0)));",
+                  "pm.test('bucket A = DLP surface defects only', () => a.forEach(x => { pm.expect(x.under_dlp).to.be.true; pm.expect(['Pothole','Broken paver blocks']).to.include(x.issue); }));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget slider re-solve",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v3/allocate",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"ward_code\": \"{{ward}}\", \"budget_inr\": 500000 }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('within budget', () => pm.expect(b.spend_inr).to.be.at.most(500000));",
+                  "pm.test('funded items have reasons', () => b.funded.forEach(f => pm.expect(f).to.have.property('reason_codes')));",
+                  "pm.test('fast', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget slider - unknown ward (404)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v3/allocate",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"ward_code\": \"ZZ\", \"budget_inr\": 500000 }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "View 4",
+      "item": [
+        {
+          "name": "Lookup - Hinglish road mention",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/lookup?q=Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('matched Andheri Subway', () => { pm.expect(b.matched_via).to.eql('road_name'); pm.expect(b.road.road_name).to.eql('Andheri Subway'); });",
+                  "pm.test('warranty status', () => pm.expect(['UNDER_DLP','OUT_OF_DLP']).to.include(b.warranty_status));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lookup - Devanagari locality",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/lookup?q=हिंदमाता",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "हिंदमाता"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('matched Hindmata', () => pm.expect(pm.response.json().matched_locality).to.eql('Hindmata'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lookup - no match (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/lookup?q=zzzz qqqq",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "zzzz qqqq"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen report - still broken on DLP road (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"still_broken\",\n  \"input_mode\": \"voice\",\n  \"language\": \"hi\",\n  \"text\": \"wapas khadda ho gaya\",\n  \"road_id\": \"{{dlpRoadId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('payment auto-held on DLP road', () => pm.expect(b.status).to.eql('payment_held'));",
+                  "pm.test('linked to DLP flag', () => pm.expect(b.flag_id).to.match(/^DLP_PAID_TWICE:/));",
+                  "pm.test('tracker 3 of 4 done', () => pm.expect(b.tracker.filter(s => s.done).length).to.eql(3));",
+                  "pm.collectionVariables.set('reportId', b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen report - status (tracker)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/citizen-reports/{{reportId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('same status', () => pm.expect(pm.response.json().status).to.eql('payment_held'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen report - client cannot set status (ignored)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"kind\": \"new_issue\", \"text\": \"test\", \"status\": \"contractor_notified\" }"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('status set by server', () => pm.expect(pm.response.json().status).to.eql('reported'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

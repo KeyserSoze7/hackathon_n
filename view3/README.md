@@ -1,30 +1,38 @@
 # View 3 backend: fair scorecard (3A) + next-rupee planner (3B)
 
 ## Run locally (no database)
+From the repo root:
 ```bash
-pip install -r requirements.txt
-python view3_pipeline.py --csv-dir ../Claude-Impact-Labs-data-2/data     # DuckDB runs the same SQL on the CSVs
+pip install -r view3/requirements.txt      # Python 3.12/3.13; macOS: xgboost needs libomp (`brew install libomp`)
+python3 pipeline/build.py                  # audit engine first: writes exports/ward_audit.csv (UNDER_REPORTED_WARD)
+python view3/view3_pipeline.py --csv-dir data   # DuckDB runs the same SQL on the CSVs
 ```
 
-## Supabase integration
-1. **Connection string:** Supabase → Connect → *Session pooler* URI (port 5432; works on IPv4, unlike the direct host).
-   URL-encode special characters in the password (`@` → `%40`).
-   `export DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"`
-2. **Load raw data:** `python load_to_supabase.py --csv-dir ../Claude-Impact-Labs-data-2/data` (13 tables, about a minute; safe to re-run).
-3. **Build results:** `python view3_pipeline.py` creates the feature views, trains, solves, and writes
-   `v3_contractor_scorecard`, `v3_next_rupee`, `v3_ward_allocation`, `v3_job_expected_risk`.
-   Nested fields are `jsonb`. RLS is switched on: `v3_*` tables are public **read-only**, raw tables are closed to the anon key.
-4. **Serve:**
-   - Read-only screens can query Supabase directly from the frontend:
-     `supabase.from('v3_ward_allocation').select('*').order('harm_avoided_per_next_lakh', {ascending:false})`
-   - The budget slider needs Python: `uvicorn api:app --port 8000`
-     - `GET  /api/v3/contractors`
-     - `GET  /api/v3/wards`
-     - `GET  /api/v3/next-rupee/{ward}` (e.g. `/api/v3/next-rupee/K/W`)
-     - `POST /api/v3/allocate {"ward_code":"K/W","budget_inr":500000}` → exact re-solve, about 0.01 s
-5. **Refresh** after any data change: re-run steps 2 and 3. The API picks up new inputs on restart.
-
-Tested end to end on Postgres 16 (load → pipeline → re-run → API).
+## Supabase / Postgres integration
+The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipeline only writes rows into the `v3_*` tables.
+1. **Connection string:** Supabase → Connect → *Session pooler* URI (port 5432; works on IPv4).
+   URL-encode special characters in the password (`@` → `%40`). Put it in `.env` as `DATABASE_URL=...` (gitignored).
+2. **Schema + data** (repo root):
+   ```bash
+   python3 pipeline/build.py
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000000_schema.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000100_audit_views.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit.sql
+   ```
+3. **Build View 3 results:** `python view3/view3_pipeline.py` creates the feature views, trains, solves, and
+   truncates + inserts `v3_contractor_scorecard`, `v3_next_rupee`, `v3_ward_allocation`, `v3_job_expected_risk`
+   in one transaction. Y/N flags are booleans in the DB; `load()` maps them back to 'Y'/'N' for this code.
+4. **Serve** (one FastAPI app for all four views, in `backend/`, see `backend/README.md`): `cd backend && uvicorn api:app --port 8000`
+   - View 1: `GET /api/city`, `GET /api/wards`, `GET /api/flagged-queue?ward=K/W&tier=1&limit=20`
+   - View 2: `GET /api/roads/{road_id}`, `GET /api/roads/{road_id}/timeline`, `GET /api/flags/{flag_id}`,
+     `POST /api/flags/{flag_id}/replies` (Right-of-Reply)
+   - View 3: `GET /api/v3/contractors`, `GET /api/v3/wards`, `GET /api/v3/next-rupee/{ward}`,
+     `POST /api/v3/allocate {"ward_code":"K/W","budget_inr":500000}` → exact re-solve, about 0.01 s
+   - View 4: `GET /api/lookup?q=...` (road name, locality, alias or Devanagari), `POST /api/citizen-reports`,
+     `GET /api/citizen-reports/{id}` (tracker status is set by the server)
+   - Tests: `postman collection run postman/backend.postman_collection.json` (23 requests, 59 assertions)
+5. **Refresh** after any data change: `build.py` + `load_audit.sql`, then this pipeline. Restart the API.
 
 ## Split of work
 | Layer | Where | What |
@@ -59,19 +67,19 @@ impact (1 + flood hotspot within 800 m, emergency-hospital ambulance road, schoo
 
 **Exact MILP** (SciPy HiGHS, no extra solver): maximise harm avoided; at most one method per item; total cost ≤ budget;
 **equity floor**: every ward gets at least 50% of its proportional share if it has the demand (`EQUITY_FLOOR`).
-Roads under DLP are excluded from the budget and go to **Bucket A** (₹0 to BMC, contractor owes the fix).
+Surface defects (potholes, paver blocks) on roads under DLP are excluded from the budget and go to **Bucket A** (₹0 to BMC, contractor owes the fix). Drainage, manhole, waterlogging and cave-in (utility) items on those roads are not DLP liability, so they stay in Bucket B.
 
 **Result on this data** (same money, harm avoided):
 | Budget | Optimizer | Most-complained first, cheapest patch | Highest stakes first, cheapest patch |
 |---|---|---|---|
-| ₹1.77 Cr (2025 money left in wards, the default) | 4,567 | 2,340 | 2,359 → **+95%** |
-| ₹1.2 Cr (10% of need) | 3,549 | 1,524 | 1,625 |
-| ₹6.1 Cr (50%) | 9,707 | 7,778 | 7,350 |
-| ₹12.1 Cr (100%) | 13,340 | 12,867 | 12,868 |
+| ₹1.77 Cr (2025 money left in wards, the default) | 4,708 | 2,492 | 2,294 → **+89%** vs volume-first |
+| ₹1.44 Cr (10% of need) | 4,096 | 2,033 | 2,024 |
+| ₹7.21 Cr (50% of need) | 11,381 | 9,100 | 8,925 |
+| ₹14.43 Cr (100% of need) | 15,562 | 15,097 | 15,097 |
 
 The optimizer helps most when money is tight. At full budget only method choice differs.
 Method choice falls out of the maths: hot mix on high-stakes roads, cold mix on quiet ones.
-Fixing every non-warranty issue at rate card costs ₹12.1 Cr; warranty roads hold another ₹2.9 Cr owed by contractors.
+Fixing every issue BMC pays for at rate card costs ₹14.43 Cr; DLP surface defects hold another ₹76.5L owed by contractors.
 
 **Outputs:** `next_rupee.json` (items: bucket, funded, method, cost, harm avoided, harm per lakh, reason codes, inputs, WO ids, explanation),
 `ward_allocation.json` (2025 budget / spend / remaining, recommended budget, harm avoided, **harm avoided per next ₹1 lakh** = where the next rupee does most good, DLP value owed),
@@ -86,6 +94,7 @@ Each row already carries `explanation` (a deterministic sentence), `drivers` (SH
 
 ## Known gaps / easy upgrades
 - Complaints without GPS are placed via exact locality match only; aliases and Devanagari are the linker team's job.
-  Swap `v_complaint_road` for their table when it's ready.
-- `UNDER_REPORTED_WARD` is not computed yet: ward risk vs complaint volume would be a 10-line SQL add.
+  On Supabase, `locality_aliases` (aliases + Devanagari) is available to swap into `v_complaint_road`.
+- `UNDER_REPORTED_WARD` comes from the audit engine's `ward_audit.under_reported_flag` (adds 0.3 to impact and a reason code).
+- `dlp_value_owed_inr` here = future surface fixes owed (rate card). The View 1 `recoverable_dlp_inr` = money BMC already paid for DLP-covered repairs. Label them differently in the UI.
 - Impact weights are judgment calls, all in `impact_table()`. Crew capacity isn't constrained (it never binds at these volumes).

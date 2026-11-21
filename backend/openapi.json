@@ -1,0 +1,894 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Follow the Rupee: Backend",
+    "description": "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\nEvery number is computed by the audit pipelines (`pipeline/build.py`, `view3/view3_pipeline.py`); endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v3/contractors": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Contractor scorecard (context-adjusted)",
+        "operationId": "contractors_api_v3_contractors_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/wards": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Ward allocation: where the next lakh does most good",
+        "operationId": "wards_api_v3_wards_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/next-rupee/{ward_code}": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Next-rupee items for one ward (Bucket A = DLP, Rs 0)",
+        "operationId": "next_rupee_api_v3_next_rupee__ward_code__get",
+        "parameters": [
+          {
+            "name": "ward_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "K/W"
+              ],
+              "title": "Ward Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/allocate": {
+      "post": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Budget slider: exact re-solve for one ward",
+        "operationId": "allocate_api_v3_allocate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AllocateReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Meta"
+        ],
+        "summary": "Health + row counts",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/city": {
+      "get": {
+        "tags": [
+          "View 1: City & Ward Overview"
+        ],
+        "summary": "City KPI strip",
+        "description": "View 1 KPI strip.",
+        "operationId": "city_api_city_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/wards": {
+      "get": {
+        "tags": [
+          "View 1: City & Ward Overview"
+        ],
+        "summary": "All wards, or one ward via ?ward= / X-Ward-Code",
+        "description": "View 1 ward map: all wards as a list, or one ward as an object when a ward code is given\n(query param or X-Ward-Code header). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code.",
+        "operationId": "ward_list_api_wards_get",
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ward code, e.g. K/W. Returns that ward only.",
+              "title": "Ward"
+            },
+            "description": "Ward code, e.g. K/W. Returns that ward only."
+          },
+          {
+            "name": "x-ward-code",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Same as ?ward=; the query param wins if both are sent.",
+              "title": "X-Ward-Code"
+            },
+            "description": "Same as ?ward=; the query param wins if both are sent."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/flagged-queue": {
+      "get": {
+        "tags": [
+          "View 1: City & Ward Overview"
+        ],
+        "summary": "Flagged bills ranked by rupees at stake",
+        "description": "View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&limit=20",
+        "operationId": "flagged_queue_api_flagged_queue_get",
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ward code filter",
+              "examples": [
+                "K/W"
+              ],
+              "title": "Ward"
+            },
+            "description": "Ward code filter"
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 3,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Top tier filter: 1 contractual, 2 implausible, 3 lead",
+              "title": "Tier"
+            },
+            "description": "Top tier filter: 1 contractual, 2 implausible, 3 lead"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/roads/{road_id}": {
+      "get": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Road receipt: header, work orders, flags + replies",
+        "description": "View 2 header card + work orders + flags (with replies).",
+        "operationId": "road_api_roads__road_id__get",
+        "parameters": [
+          {
+            "name": "road_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "RD0058"
+              ],
+              "title": "Road Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/roads/{road_id}/timeline": {
+      "get": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Connected trail: complaints -> work orders -> accidents -> reports",
+        "description": "View 2 connected trail, chronological.",
+        "operationId": "road_timeline_api_roads__road_id__timeline_get",
+        "parameters": [
+          {
+            "name": "road_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "RD0058"
+              ],
+              "title": "Road Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/flags/{flag_id}": {
+      "get": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "One flag with its replies",
+        "operationId": "flag_api_flags__flag_id__get",
+        "parameters": [
+          {
+            "name": "flag_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "<DETECTOR>:<work_order_id>",
+              "examples": [
+                "DLP_PAID_TWICE:WO25-01994"
+              ],
+              "title": "Flag Id"
+            },
+            "description": "<DETECTOR>:<work_order_id>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/flags/{flag_id}/replies": {
+      "post": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Add Right-of-Reply to a flag",
+        "description": "View 2 Right-of-Reply.",
+        "operationId": "add_reply_api_flags__flag_id__replies_post",
+        "parameters": [
+          {
+            "name": "flag_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Flag Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplyReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookup": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Free-text landmark/road lookup -> road receipt",
+        "description": "View 4 deterministic lookup: free text -> road receipt.\nTries a road name in the text first (\"Andheri subway ke bahar...\"), then any locality name/alias/Devanagari.\nFuzzy/vernacular parsing beyond this is the Claude /api/citizen-query layer's job.",
+        "operationId": "lookup_api_lookup_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 200,
+              "description": "Free text: road name, locality, alias or Devanagari",
+              "examples": [
+                "Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?"
+              ],
+              "title": "Q"
+            },
+            "description": "Free text: road name, locality, alias or Devanagari"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen-reports": {
+      "post": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Submit citizen report (server sets tracker status)",
+        "description": "View 4 report. Tracker status is set deterministically here (anon clients cannot set it).",
+        "operationId": "add_citizen_report_api_citizen_reports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CitizenReportReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen-reports/{report_id}": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Citizen report status + tracker",
+        "operationId": "citizen_report_api_citizen_reports__report_id__get",
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AllocateReq": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "budget_inr": {
+            "type": "number",
+            "maximum": 500000000.0,
+            "minimum": 0.0,
+            "title": "Budget Inr"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ward_code",
+          "budget_inr"
+        ],
+        "title": "AllocateReq",
+        "examples": [
+          {
+            "budget_inr": 500000,
+            "ward_code": "K/W"
+          }
+        ]
+      },
+      "CitizenReportReq": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": [
+              "text",
+              "voice",
+              "photo",
+              "qr"
+            ],
+            "title": "Input Mode",
+            "default": "text"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "en",
+                  "hi",
+                  "mr"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "road_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Id"
+          },
+          "work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Order Id"
+          },
+          "matched_locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Locality"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "CitizenReportReq",
+        "examples": [
+          {
+            "input_mode": "voice",
+            "kind": "still_broken",
+            "language": "hi",
+            "road_id": "RD0153",
+            "text": "Andheri subway ke bahar wapas khadda ho gaya"
+          }
+        ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ReplyReq": {
+        "properties": {
+          "author_role": {
+            "type": "string",
+            "enum": [
+              "ward_engineer",
+              "contractor",
+              "other"
+            ],
+            "title": "Author Role"
+          },
+          "author_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Name"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "author_role",
+          "body"
+        ],
+        "title": "ReplyReq",
+        "examples": [
+          {
+            "author_name": "AE Roads K/W",
+            "author_role": "ward_engineer",
+            "body": "MGL utility trench reopened this stretch; contractor liable under DLP."
+          }
+        ]
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Meta",
+      "description": "Health check."
+    },
+    {
+      "name": "View 1: City & Ward Overview",
+      "description": "KPI strip, ward map, flagged bills queue."
+    },
+    {
+      "name": "View 2: Road Story",
+      "description": "Rupee receipt, connected trail, flags, Right-of-Reply."
+    },
+    {
+      "name": "View 3: Scorecard & Next Rupee",
+      "description": "Context-adjusted contractor scorecard, budget allocation, live slider."
+    },
+    {
+      "name": "View 4: Citizen Layer",
+      "description": "Landmark lookup and citizen reports with accountability tracker."
+    }
+  ]
+}

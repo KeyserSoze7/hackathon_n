@@ -15,7 +15,8 @@ harm avoided within a budget. A multiple-choice knapsack, solved exactly as a MI
   s.t. sum_m x_im <= 1                        one method per item
        sum cost_im x_im <= B                  budget
        sum_{i in ward w} cost x >= floor_w    equity floor per ward (optional)
-  Roads under DLP are not in the budget: they go to Bucket A (contractor owes the fix, Rs 0 to BMC).
+  Surface defects on roads under DLP are not in the budget: they go to Bucket A (contractor owes the fix,
+  Rs 0 to BMC). Drainage/manhole/utility issues on those roads are not DLP liability, so BMC still pays (Bucket B).
 """
 import json, pathlib
 import numpy as np, pandas as pd
@@ -24,11 +25,17 @@ from scipy.sparse import lil_matrix
 
 MIN_METHOD_JOBS = 15
 EQUITY_FLOOR = 0.5   # each ward gets >= 50% of its proportional share of the budget (if it has the demand)
+# Issue types the original contractor's DLP covers (road-surface defects). Matches the audit engine's
+# DLP_PAID_TWICE detector (pipeline/build.py: cold/hot mix, mastic, paver relaid). Cave-ins are excluded:
+# they are excavation/pipeline (utility) jobs in this data.
+DLP_WORK_TYPES = {"Pothole", "Broken paver blocks"}
+UNDER_REPORTED_IMPACT = 0.3  # silence-adjusted need: wards with high physical risk but few complaints
 
 
 # ------------------------------------------------------------------ build items
-def impact_table(st, act):
+def impact_table(st, act, under_reported=frozenset()):
     s = st.merge(act, on="road_id")
+    s["under_reported"] = s.ward_code.isin(under_reported)
     p90 = lambda c: max(float(s[c].quantile(.9)), 1.0)
     s["impact"] = (1
                    + 0.8 * (s.hotspot_dist_m < 800)
@@ -37,7 +44,8 @@ def impact_table(st, act):
                    + 0.5 * s.peak_hour_vehicles / s.peak_hour_vehicles.max()
                    + 0.3 * (s.bus_route == "Y")
                    + 0.6 * np.minimum(s.road_accident_harm / p90("road_accident_harm"), 1)
-                   + 0.4 * np.minimum(s.open_complaints / p90("open_complaints"), 1))
+                   + 0.4 * np.minimum(s.open_complaints / p90("open_complaints"), 1)
+                   + UNDER_REPORTED_IMPACT * s.under_reported)
     q75 = {c: s[c].quantile(.75) for c in ["peak_hour_vehicles", "road_accident_harm"]}
     def codes(r):
         c = []
@@ -48,6 +56,7 @@ def impact_table(st, act):
         if r.road_accident_harm > 0 and r.road_accident_harm >= q75["road_accident_harm"]: c.append("ACCIDENT_PRONE")
         if r.all_reopens >= 2: c.append("REPEAT_FAILURE")
         if r.open_complaints > 0: c.append("OPEN_COMPLAINTS")
+        if r.under_reported: c.append("UNDER_REPORTED_WARD")
         if r.under_dlp == "Y": c.append("UNDER_DLP")
         return c
     s["reason_codes"] = s.apply(codes, axis=1)
@@ -57,7 +66,7 @@ def impact_table(st, act):
 def build_items(d):
     wo = d["v_wo_context"]
     rc = d["rate_card"].set_index("repair_method")
-    roads = impact_table(d["v_road_static"], d["v_road_activity"])
+    roads = impact_table(d["v_road_static"], d["v_road_activity"], d.get("under_reported", frozenset()))
 
     meth = (wo.groupby(["work_type", "repair_method"])
               .agg(jobs=("cost_inr", "size"), reopen=("reopened_within_30d", lambda s: (s == "Y").mean()))
@@ -77,6 +86,7 @@ def build_items(d):
     it["severity"] = 168.0 / it.sla_hours          # 24h SLA -> 7, 168h -> 1
     it["H"] = it.severity * it.impact
     it["item_id"] = it.road_id + "|" + it.work_type
+    it["dlp_owed"] = (it.under_dlp == "Y") & it.work_type.isin(DLP_WORK_TYPES)
 
     opts = []
     for i, r in it.iterrows():
@@ -142,6 +152,8 @@ def explain(r, alt):
         s += "High stakes: " + ", ".join(c.replace("_", " ").lower() for c in r.reason_codes if c != "UNDER_DLP") + ". "
     if r.bucket == "A_OWED_BY_CONTRACTOR_DLP":
         return s + "Road is under warranty, so the original contractor must fix it at no cost to BMC."
+    if r.under_dlp == "Y":
+        s += "Road is under warranty, but this is not a surface defect, so BMC pays. "
     if r.funded:
         s += f"Funded with {r.method} ({r.method_reopen:.0%} fail rate)"
         if alt is not None and alt.method != r.method:
@@ -153,7 +165,7 @@ def explain(r, alt):
 
 def run(d, budget=None, out_dir=None):
     items, opts, meth = build_items(d)
-    dlp = items.under_dlp == "Y"
+    dlp = items.dlp_owed
     a_items, b_items = items[dlp], items[~dlp]
     b_opts = opts[opts.item_id.isin(b_items.item_id)]
     full_need = float(b_opts.groupby("item_id").cost.min().sum())
@@ -220,7 +232,7 @@ def run(d, budget=None, out_dir=None):
     dom = items.sort_values("jobs", ascending=False).drop_duplicates("road_id").set_index("road_id").work_type
     rows = []
     for _, r in items.iterrows():
-        a = r.under_dlp == "Y"
+        a = bool(r.dlp_owed)
         f = r.item_id in pick.index
         sel = pick.loc[r.item_id] if f else (best_durable.loc[r.item_id] if a and r.item_id in best_durable.index else None)
         rr = r.copy()
@@ -232,7 +244,7 @@ def run(d, budget=None, out_dir=None):
         alt = cheapest.loc[r.item_id] if r.item_id in cheapest.index else None
         rows.append({
             "item_id": r.item_id, "road_id": r.road_id, "road_name": rr.road_name, "ward_code": r.ward_code,
-            "issue": r.work_type, "under_dlp": a, "bucket": rr.bucket, "funded": bool(f),
+            "issue": r.work_type, "under_dlp": r.under_dlp == "Y", "bucket": rr.bucket, "funded": bool(f),
             "recommended_method": rr.method, "method_reopen_rate": None if rr.method_reopen is None else round(float(rr.method_reopen), 3),
             "estimated_repair_cost_inr": None if rr.cost is None else int(round(rr.cost, -2)),
             "cost_to_bmc_inr": 0 if a else (None if rr.cost is None else int(round(rr.cost, -2))),
@@ -254,7 +266,9 @@ def run(d, budget=None, out_dir=None):
     rows.sort(key=lambda x: (x["bucket"] != "A_OWED_BY_CONTRACTOR_DLP", not x["funded"], -x["priority_score"]))
 
     summary = {"budget_inr": int(budget), "rate_card_cost_to_fix_everything_inr": int(full_need),
-               "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints) x share of fixes that hold",
+               "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints, under-reported ward) x share of fixes that hold",
+               # Future surface fixes owed by DLP contractors (rate card). Not the same as the audit engine's
+               # recoverable_dlp_inr, which is money BMC already paid for DLP-covered repairs.
                "budget_curve": curve,
                "equity_floor_share": EQUITY_FLOOR, "comparison_same_budget": comparison,
                "method_failure_rates": meth.round(3).to_dict(orient="records"),
@@ -270,7 +284,7 @@ def run(d, budget=None, out_dir=None):
 
 def allocate_ward(items, opts, ward_code, budget_inr):
     """Slider endpoint: exact re-solve for one ward at any budget (<1 s)."""
-    wi = items[(items.ward_code == ward_code) & (items.under_dlp != "Y")]
+    wi = items[(items.ward_code == ward_code) & ~items.dlp_owed]
     wo_ = opts[opts.item_id.isin(wi.item_id)]
     ch = solve(wi, wo_, budget_inr)
     return {"ward_code": ward_code, "budget_inr": budget_inr, "spend_inr": int(ch.cost.sum()),

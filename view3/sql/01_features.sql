@@ -1,7 +1,8 @@
 -- View 3 feature layer. Runs unchanged on Supabase (Postgres) and on DuckDB locally.
 -- Assumes the CSVs are loaded as tables with the same names and column names
 -- (work_orders, wards, roads, rate_card, rainfall_daily, tides, traffic,
---  accidents, facilities, flood_hotspots, complaints, localities).
+--  accidents, facilities, flood_hotspots, complaints, localities, contractors).
+-- On Supabase these come from supabase/migrations (Y/N stored as boolean; comparisons to 'Y' still work in SQL).
 
 -- Ward -> rain gauge. Island city wards use Colaba, suburbs use Santacruz.
 CREATE OR REPLACE VIEW v_ward_station AS
@@ -55,7 +56,7 @@ tide AS (
     ON CAST(t.date AS DATE) > b.done_date AND CAST(t.date AS DATE) <= b.done_date + 7
   GROUP BY b.work_order_id
 )
-SELECT b.work_order_id, b.contractor_id, b.contractor_name, b.ward_code, b.road_id,
+SELECT b.work_order_id, b.contractor_id, ct.contractor_name, b.ward_code, b.road_id,
        b.work_type, b.repair_method, b.area_sqm, b.cost_inr, b.sla_hours, b.sla_met,
        b.reopened_within_30d, b.done_date,
        EXTRACT(MONTH FROM b.done_date)                      AS month,
@@ -70,6 +71,7 @@ SELECT b.work_order_id, b.contractor_id, b.contractor_name, b.ward_code, b.road_
        b.cost_inr / (rc.standard_rate_inr *
          CASE WHEN rc.unit = 'per sqm' THEN b.area_sqm ELSE 1 END) AS cost_vs_rate
 FROM base b
+JOIN contractors ct ON ct.contractor_id = b.contractor_id  -- canonical name (work_orders repeats it)
 JOIN wards w        USING (ward_code)
 JOIN v_road_geo g   USING (road_id)
 LEFT JOIN traffic tr USING (road_id)
