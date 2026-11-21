@@ -192,3 +192,7 @@ We state these openly so they can be challenged:
 - **Not built yet:** the two Claude endpoints for drafting a defect notice (View 2) and answering free-text citizen queries (View 4).
   The deterministic lookup they would build on (`/api/lookup`) exists and is tested.
 - **A flag is a reason to ask, not a verdict.** The Right-of-Reply exists because some flags will have good explanations (for example, utility trenching).
+
+---
+
+📺 **Video walkthrough:** [https://youtu.be/xVHGD5RvDek](https://youtu.be/xVHGD5RvDek)
