@@ -3,7 +3,7 @@
 --
 -- Dumped from Supabase (Postgres 17) with:
 --   pg_dump "$DATABASE_URL" --schema-only --schema=public --no-owner --no-privileges --restrict-key=schemadump
--- Contains: 28 tables, 16 views, 29 RLS policies, constraints and indexes, as they exist after
+-- Contains: 30 tables, 16 views, 29 RLS policies, constraints and indexes, as they exist after
 --   supabase/migrations/*.sql  (source tables, flags, user writes, engine outputs, v3_*, read views, RLS)
 --   scorecard_planner/run_pipeline.py    (runtime feature views v_*, security_invoker + read-only)
 --
@@ -15,6 +15,7 @@
 --   supabase/migrations/20261121000400_city_kpis_extra.sql
 --   supabase/migrations/20261121000500_frontend_contract.sql
 --   supabase/migrations/20261121000600_report_form.sql
+--   supabase/migrations/20261121000700_contractor_monthly_scorecards.sql
 --   supabase/load_source_data.sql, supabase/load_audit_outputs.sql, then python -m scorecard_planner.run_pipeline
 -- Regenerate this snapshot after any schema change (same pg_dump command, prepend this header).
 -- =============================================================================================
@@ -390,6 +391,93 @@ CREATE VIEW public.city_kpis WITH (security_invoker='true') AS
 CREATE TABLE public.complaint_work_orders (
     complaint_id text NOT NULL,
     work_order_id text NOT NULL
+);
+
+
+--
+-- Name: contractor_monthly_scorecards; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.contractor_monthly_scorecards (
+    contractor_id text NOT NULL,
+    month date NOT NULL,
+    methodology_version text NOT NULL,
+    computed_at timestamp with time zone NOT NULL,
+    completed_jobs integer NOT NULL,
+    total_billed_inr numeric NOT NULL,
+    sla_known integer NOT NULL,
+    sla_met integer NOT NULL,
+    sla_missing integer NOT NULL,
+    sla_rate numeric,
+    sla_rank smallint,
+    reopen_known integer NOT NULL,
+    reopened integer NOT NULL,
+    reopen_missing integer NOT NULL,
+    reopen_rate numeric,
+    durability_rank smallint,
+    speed_sample integer NOT NULL,
+    speed_missing integer NOT NULL,
+    speed_raw_sample integer NOT NULL,
+    speed_median_hours numeric,
+    speed_cohort_median_hours numeric,
+    speed_relative_index numeric,
+    speed_rank smallint,
+    assigned_to_completed_median_hours numeric,
+    cost_sample integer NOT NULL,
+    cost_missing integer NOT NULL,
+    cost_median_abs_pct_dev numeric,
+    cost_over_tolerance_count integer NOT NULL,
+    cost_over_tolerance_share numeric,
+    cost_under_tolerance_count integer NOT NULL,
+    cost_rank smallint,
+    rank_eligibility jsonb NOT NULL,
+    rank_cohort_sizes jsonb NOT NULL,
+    workload_mix jsonb NOT NULL,
+    context jsonb NOT NULL,
+    data_quality jsonb NOT NULL,
+    evidence_work_order_ids text[] NOT NULL,
+    CONSTRAINT contractor_monthly_scorecards_check CHECK (((sla_met >= 0) AND (sla_met <= sla_known))),
+    CONSTRAINT contractor_monthly_scorecards_check1 CHECK (((reopened >= 0) AND (reopened <= reopen_known))),
+    CONSTRAINT contractor_monthly_scorecards_check2 CHECK (((sla_known + sla_missing) = completed_jobs)),
+    CONSTRAINT contractor_monthly_scorecards_check3 CHECK (((reopen_known + reopen_missing) = completed_jobs)),
+    CONSTRAINT contractor_monthly_scorecards_check4 CHECK (((speed_sample + speed_missing) = completed_jobs)),
+    CONSTRAINT contractor_monthly_scorecards_check5 CHECK (((cost_sample + cost_missing) = completed_jobs)),
+    CONSTRAINT contractor_monthly_scorecards_check6 CHECK ((cardinality(evidence_work_order_ids) = completed_jobs)),
+    CONSTRAINT contractor_monthly_scorecards_completed_jobs_check CHECK ((completed_jobs > 0)),
+    CONSTRAINT contractor_monthly_scorecards_cost_median_abs_pct_dev_check CHECK ((cost_median_abs_pct_dev >= (0)::numeric)),
+    CONSTRAINT contractor_monthly_scorecards_cost_missing_check CHECK ((cost_missing >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_cost_over_tolerance_count_check CHECK ((cost_over_tolerance_count >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_cost_over_tolerance_share_check CHECK (((cost_over_tolerance_share >= (0)::numeric) AND (cost_over_tolerance_share <= (1)::numeric))),
+    CONSTRAINT contractor_monthly_scorecards_cost_rank_check CHECK ((cost_rank >= 1)),
+    CONSTRAINT contractor_monthly_scorecards_cost_sample_check CHECK ((cost_sample >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_cost_under_tolerance_count_check CHECK ((cost_under_tolerance_count >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_durability_rank_check CHECK ((durability_rank >= 1)),
+    CONSTRAINT contractor_monthly_scorecards_month_check CHECK ((month = (date_trunc('month'::text, (month)::timestamp with time zone))::date)),
+    CONSTRAINT contractor_monthly_scorecards_reopen_known_check CHECK ((reopen_known >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_reopen_missing_check CHECK ((reopen_missing >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_reopen_rate_check CHECK (((reopen_rate >= (0)::numeric) AND (reopen_rate <= (1)::numeric))),
+    CONSTRAINT contractor_monthly_scorecards_sla_known_check CHECK ((sla_known >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_sla_missing_check CHECK ((sla_missing >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_sla_rank_check CHECK ((sla_rank >= 1)),
+    CONSTRAINT contractor_monthly_scorecards_sla_rate_check CHECK (((sla_rate >= (0)::numeric) AND (sla_rate <= (1)::numeric))),
+    CONSTRAINT contractor_monthly_scorecards_speed_missing_check CHECK ((speed_missing >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_speed_rank_check CHECK ((speed_rank >= 1)),
+    CONSTRAINT contractor_monthly_scorecards_speed_raw_sample_check CHECK ((speed_raw_sample >= 0)),
+    CONSTRAINT contractor_monthly_scorecards_speed_relative_index_check CHECK ((speed_relative_index >= (0)::numeric)),
+    CONSTRAINT contractor_monthly_scorecards_speed_sample_check CHECK ((speed_sample >= 0))
+);
+
+
+--
+-- Name: contractor_scorecard_runs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.contractor_scorecard_runs (
+    methodology_version text NOT NULL,
+    computed_at timestamp with time zone NOT NULL,
+    params jsonb NOT NULL,
+    source_counts jsonb NOT NULL,
+    data_quality jsonb NOT NULL
 );
 
 
@@ -1288,6 +1376,22 @@ ALTER TABLE ONLY public.complaints
 
 
 --
+-- Name: contractor_monthly_scorecards contractor_monthly_scorecards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contractor_monthly_scorecards
+    ADD CONSTRAINT contractor_monthly_scorecards_pkey PRIMARY KEY (contractor_id, month, methodology_version);
+
+
+--
+-- Name: contractor_scorecard_runs contractor_scorecard_runs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contractor_scorecard_runs
+    ADD CONSTRAINT contractor_scorecard_runs_pkey PRIMARY KEY (methodology_version);
+
+
+--
 -- Name: contractors contractors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1464,6 +1568,13 @@ ALTER TABLE ONLY public.work_orders
 
 
 --
+-- Name: contractor_monthly_scorecards_version_month_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX contractor_monthly_scorecards_version_month_idx ON public.contractor_monthly_scorecards USING btree (methodology_version, month);
+
+
+--
 -- Name: accidents accidents_road_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1581,6 +1692,22 @@ ALTER TABLE ONLY public.complaints
 
 ALTER TABLE ONLY public.complaints
     ADD CONSTRAINT complaints_ward_code_fkey FOREIGN KEY (ward_code) REFERENCES public.wards(ward_code);
+
+
+--
+-- Name: contractor_monthly_scorecards contractor_monthly_scorecards_contractor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contractor_monthly_scorecards
+    ADD CONSTRAINT contractor_monthly_scorecards_contractor_id_fkey FOREIGN KEY (contractor_id) REFERENCES public.contractors(contractor_id);
+
+
+--
+-- Name: contractor_monthly_scorecards contractor_monthly_scorecards_methodology_version_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contractor_monthly_scorecards
+    ADD CONSTRAINT contractor_monthly_scorecards_methodology_version_fkey FOREIGN KEY (methodology_version) REFERENCES public.contractor_scorecard_runs(methodology_version) ON DELETE CASCADE;
 
 
 --
@@ -1816,6 +1943,18 @@ ALTER TABLE public.complaint_work_orders ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.complaints ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: contractor_monthly_scorecards; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.contractor_monthly_scorecards ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: contractor_scorecard_runs; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.contractor_scorecard_runs ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: contractors; Type: ROW SECURITY; Schema: public; Owner: -
