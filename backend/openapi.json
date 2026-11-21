@@ -291,6 +291,108 @@
         }
       }
     },
+    "/api/roads": {
+      "get": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Road search / picker",
+        "description": "Roads matching q (road_name ILIKE %q% or road_id ILIKE q%), optionally in one ward.",
+        "operationId": "roads_api_roads_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Road name substring or road_id prefix",
+              "examples": [
+                "Andheri"
+              ],
+              "title": "Q"
+            },
+            "description": "Road name substring or road_id prefix"
+          },
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "examples": [
+                "K-W"
+              ],
+              "title": "Ward"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadListItem"
+                  },
+                  "title": "Response Roads Api Roads Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/roads/{road_id}": {
       "get": {
         "tags": [
@@ -320,6 +422,78 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RoadReceipt"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/roads/{road_id}/reports": {
+      "get": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Citizen reports on a road, newest first",
+        "description": "Each report with its first photo (by position), if any.",
+        "operationId": "road_reports_api_roads__road_id__reports_get",
+        "parameters": [
+          {
+            "name": "road_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "RD0048"
+              ],
+              "title": "Road Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoadReport"
+                  },
+                  "title": "Response Road Reports Api Roads  Road Id  Reports Get"
                 }
               }
             }
@@ -527,6 +701,58 @@
         }
       }
     },
+    "/api/draft-notice": {
+      "post": {
+        "tags": [
+          "View 2: Road Story"
+        ],
+        "summary": "Draft a defect notice or RTI for a flag (Claude, template fallback)",
+        "description": "Facts come from the DB; Claude only writes prose. Slow/failed/invalid Claude output -> template.",
+        "operationId": "draft_notice_api_draft_notice_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftNoticeReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftNotice"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v3/contractors": {
       "get": {
         "tags": [
@@ -582,7 +808,7 @@
         "tags": [
           "View 3: Scorecard & Next Rupee"
         ],
-        "summary": "Next-rupee items for one ward (Bucket A = DLP, Rs 0)",
+        "summary": "Next-rupee items for one ward, or ALL (Bucket A = DLP, Rs 0)",
         "operationId": "next_rupee_api_v3_next_rupee__ward_code__get",
         "parameters": [
           {
@@ -592,7 +818,8 @@
             "schema": {
               "type": "string",
               "examples": [
-                "K/W"
+                "K/W",
+                "ALL"
               ],
               "title": "Ward Code"
             }
@@ -673,7 +900,7 @@
         "tags": [
           "View 3: Scorecard & Next Rupee"
         ],
-        "summary": "Budget slider: exact re-solve for one ward",
+        "summary": "Budget slider: exact re-solve for one ward, or ALL (city-wide with equity floors)",
         "operationId": "allocate_api_v3_allocate_post",
         "requestBody": {
           "content": {
@@ -719,13 +946,128 @@
         }
       }
     },
+    "/api/v3/budget-range/{ward_code}": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Budget slider bounds for one ward, or ALL",
+        "description": "max = rate-card cost to fix every bucket-B item (cheapest method each); default = 2025 money left,\nelse the optimizer's recommendation, else 10% of max.",
+        "operationId": "budget_range_api_v3_budget_range__ward_code__get",
+        "parameters": [
+          {
+            "name": "ward_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "K/W",
+                "ALL"
+              ],
+              "title": "Ward Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetRange"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/localities": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Localities (with aliases) for the citizen picker",
+        "operationId": "localities_api_localities_get",
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ward code, e.g. K-W",
+              "examples": [
+                "K-W"
+              ],
+              "title": "Ward"
+            },
+            "description": "Ward code, e.g. K-W"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Locality"
+                  },
+                  "title": "Response Localities Api Localities Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/lookup": {
       "get": {
         "tags": [
           "View 4: Citizen Layer"
         ],
         "summary": "Free-text landmark/road lookup -> road receipt",
-        "description": "View 4 deterministic lookup: free text -> road receipt.\nTries a road name in the text first (\"Andheri subway ke bahar...\"), then any locality name/alias/Devanagari.\nFuzzy/vernacular parsing beyond this is the Claude /api/citizen-query layer's job.",
+        "description": "View 4 deterministic lookup: free text -> road receipt + the 3 nearest roads with their latest work order.\nTries a road name in the text first (\"Andheri subway ke bahar...\"), then any locality name/alias/Devanagari.\nFuzzy/vernacular parsing beyond this is the Claude /api/citizen-query layer's job.",
         "operationId": "lookup_api_lookup_get",
         "parameters": [
           {
@@ -743,6 +1085,29 @@
               "title": "Q"
             },
             "description": "Free text: road name, locality, alias or Devanagari"
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "en",
+                    "hi",
+                    "mr"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Echoed back (en|hi|mr)",
+              "title": "Language"
+            },
+            "description": "Echoed back (en|hi|mr)"
           }
         ],
         "responses": {
@@ -779,13 +1144,114 @@
         }
       }
     },
+    "/api/livability": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "'Moving here': livability within 1.5 km of a locality",
+        "operationId": "livability_api_livability_get",
+        "parameters": [
+          {
+            "name": "locality",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Locality name or alias (any case, Devanagari ok)",
+              "examples": [
+                "Hindmata"
+              ],
+              "title": "Locality"
+            },
+            "description": "Locality name or alias (any case, Devanagari ok)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Livability"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen-query": {
+      "post": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Citizen question -> plain-language answer (Claude, template fallback)",
+        "description": "Resolves the text like /api/lookup, then Claude rewrites the precomputed facts as a 3-5 sentence answer in the\nrequested language. Falls back to a template if Claude is slow/unavailable or cites an ID not in the facts.",
+        "operationId": "citizen_query_api_citizen_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CitizenQueryReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitizenQueryReply"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/citizen-reports": {
       "post": {
         "tags": [
           "View 4: Citizen Layer"
         ],
         "summary": "Submit citizen report (server sets tracker status)",
-        "description": "View 4 report. Tracker status is set deterministically here (anon clients cannot set it).",
+        "description": "View 4 report. The server resolves the road (road_id -> location within 500 m -> landmark/text), links the latest\nmatching work order, detects a duplicate (same road + issue in 7 days) and sets the tracker status; anon clients\ncannot set it. contact_phone is stored privately and never returned.",
         "operationId": "add_citizen_report_api_citizen_reports_post",
         "requestBody": {
           "content": {
@@ -882,6 +1348,120 @@
           }
         }
       }
+    },
+    "/api/uploads/photo": {
+      "post": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Upload a report photo (JPEG/PNG/WebP/HEIC, max 8 MB; EXIF read, then stripped)",
+        "operationId": "upload_photo_api_uploads_photo_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_photo_api_uploads_photo_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoUpload"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request Entity Too Large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/uploads/photo/{photo_id}": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Serve an uploaded report photo (metadata-free image bytes)",
+        "operationId": "get_photo_api_uploads_photo__photo_id__get",
+        "parameters": [
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Photo Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The photo bytes (local storage)",
+            "content": {
+              "image/jpeg": {},
+              "image/png": {},
+              "image/webp": {}
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "307": {
+            "description": "Redirect to the Supabase Storage public URL"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -954,7 +1534,86 @@
           "funded",
           "bucket_a_dlp"
         ],
-        "title": "Allocation"
+        "title": "Allocation",
+        "examples": [
+          {
+            "bucket_a_dlp": [
+              {
+                "estimated_repair_cost_inr": 36400,
+                "explanation": "Pothole on JP Road (K/W): needed 3 repairs this season. High stakes: accident prone, open complaints. Road is under warranty, so the original contractor must fix it at no cost to BMC.",
+                "issue": "Pothole",
+                "item_id": "RD0152|Pothole",
+                "road_name": "JP Road"
+              }
+            ],
+            "budget_inr": 500000.0,
+            "funded": [
+              {
+                "benefit": 20.3,
+                "cost": 59144.7,
+                "evidence_wo_ids": [
+                  "WO25-00025",
+                  "WO25-01442",
+                  "WO25-01525",
+                  "WO25-01654",
+                  "WO25-01809",
+                  "WO25-02236"
+                ],
+                "issue": "Pothole",
+                "item_id": "RD0143|Pothole",
+                "method": "Cold mix patch",
+                "reason_codes": [
+                  "SCHOOL_ZONE",
+                  "ACCIDENT_PRONE",
+                  "REPEAT_FAILURE",
+                  "OPEN_COMPLAINTS"
+                ],
+                "road_name": "SV Road",
+                "ward_code": "K/W"
+              },
+              {
+                "benefit": 27.4,
+                "cost": 92108.6,
+                "evidence_wo_ids": [
+                  "WO25-00396",
+                  "WO25-00477",
+                  "WO25-00754",
+                  "WO25-00918",
+                  "WO25-01582",
+                  "WO25-01672",
+                  "WO25-02185"
+                ],
+                "issue": "Pothole",
+                "item_id": "RD0147|Pothole",
+                "method": "Cold mix patch",
+                "reason_codes": [
+                  "FLOOD_SPOT",
+                  "REPEAT_FAILURE",
+                  "OPEN_COMPLAINTS"
+                ],
+                "road_name": "Juhu Tara Road",
+                "ward_code": "K/W"
+              }
+            ],
+            "harm_avoided": 132.2,
+            "spend_inr": 499138,
+            "ward_code": "K/W"
+          }
+        ]
+      },
+      "Body_upload_photo_api_uploads_photo_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_photo_api_uploads_photo_post"
       },
       "BucketAItem": {
         "properties": {
@@ -1010,11 +1669,255 @@
         ],
         "title": "BucketAItem"
       },
+      "BudgetRange": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "min_inr": {
+            "type": "integer",
+            "title": "Min Inr"
+          },
+          "max_inr": {
+            "type": "integer",
+            "title": "Max Inr"
+          },
+          "default_inr": {
+            "type": "integer",
+            "title": "Default Inr"
+          },
+          "step_inr": {
+            "type": "integer",
+            "title": "Step Inr"
+          },
+          "remaining_2025_inr": {
+            "type": "integer",
+            "title": "Remaining 2025 Inr"
+          },
+          "default_basis": {
+            "type": "string",
+            "enum": [
+              "remaining_2025",
+              "optimizer_recommendation",
+              "share_of_need"
+            ],
+            "title": "Default Basis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ward_code",
+          "min_inr",
+          "max_inr",
+          "default_inr",
+          "step_inr",
+          "remaining_2025_inr",
+          "default_basis"
+        ],
+        "title": "BudgetRange"
+      },
+      "CitizenQueryReply": {
+        "properties": {
+          "matched_locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Locality"
+          },
+          "matched_road_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Road Id"
+          },
+          "plain_language_reply": {
+            "type": "string",
+            "title": "Plain Language Reply"
+          },
+          "warranty_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "UNDER_DLP",
+                  "OUT_OF_DLP"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warranty Status"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "street_check",
+              "move_in"
+            ],
+            "title": "Mode"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "mr"
+            ],
+            "title": "Language"
+          },
+          "generated_by": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "template"
+            ],
+            "title": "Generated By"
+          },
+          "lookup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Lookup"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "livability": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Livability"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "matched_locality",
+          "matched_road_id",
+          "plain_language_reply",
+          "warranty_status",
+          "mode",
+          "language",
+          "generated_by"
+        ],
+        "title": "CitizenQueryReply",
+        "examples": [
+          {
+            "generated_by": "template",
+            "language": "en",
+            "lookup": {
+              "candidates": [
+                {
+                  "latest_work_order": {
+                    "completed_at": "2025-09-17T14:53:00+05:30",
+                    "contractor_id": "CT03",
+                    "contractor_name": "Mahalaxmi Civil Contractors (synthetic)",
+                    "cost_inr": 26794,
+                    "reopened_within_30d": true,
+                    "sla_met": true,
+                    "work_order_id": "WO25-02257"
+                  },
+                  "road_distance_m": 0,
+                  "road_id": "RD0153",
+                  "road_name": "Andheri Subway",
+                  "under_dlp": false,
+                  "ward_code": "K/W"
+                }
+              ],
+              "language": "en",
+              "matched_locality": "Andheri West",
+              "matched_road_id": "RD0153",
+              "matched_text": "Andheri Subway",
+              "matched_via": "road_name",
+              "road": {
+                "flagged_bills_count": 2,
+                "last_resurfaced": "2021-02-27",
+                "length_m": 434.0,
+                "road_id": "RD0153",
+                "road_name": "Andheri Subway",
+                "road_type": "Local",
+                "rupees_at_stake": 136031,
+                "segment_no": 1,
+                "surface": "Concrete (CC)",
+                "total_billed_inr": 344529,
+                "under_dlp": false,
+                "ward_code": "K/W",
+                "work_orders_count": 6
+              },
+              "road_distance_m": 0,
+              "ward_code": "K/W",
+              "warranty_status": "OUT_OF_DLP"
+            },
+            "matched_locality": "Andheri West",
+            "matched_road_id": "RD0153",
+            "mode": "street_check",
+            "plain_language_reply": "Andheri Subway (RD0153) is out of its Defect Liability Period (warranty). The latest work order WO25-02257 by Mahalaxmi Civil Contractors (synthetic) cost Rs 26,794, completed 2025-09-17; SLA met: yes, reopened within 30 days: yes. If it is broken again, tap 'Still broken' to report it, or draft an RTI request for the work-order records.",
+            "warranty_status": "OUT_OF_DLP"
+          }
+        ]
+      },
+      "CitizenQueryReq": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 2,
+            "title": "Text"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "mr"
+            ],
+            "title": "Language",
+            "default": "en"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "street_check",
+              "move_in"
+            ],
+            "title": "Mode",
+            "default": "street_check"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "CitizenQueryReq",
+        "examples": [
+          {
+            "language": "hi",
+            "mode": "street_check",
+            "text": "Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?"
+          }
+        ]
+      },
       "CitizenReport": {
         "properties": {
-          "id": {
+          "report_id": {
             "type": "integer",
-            "title": "Id"
+            "title": "Report Id"
           },
           "kind": {
             "type": "string",
@@ -1025,6 +1928,135 @@
             ],
             "title": "Kind"
           },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified"
+            ],
+            "title": "Status"
+          },
+          "road": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportRoad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of"
+          },
+          "linked_work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linked Work Order Id"
+          },
+          "responsible": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Responsible"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sla_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Hours"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/ReportPhoto"
+            },
+            "type": "array",
+            "title": "Photos"
+          },
+          "tracker": {
+            "items": {
+              "$ref": "#/components/schemas/TrackerStepDetail"
+            },
+            "type": "array",
+            "title": "Tracker"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "input_mode": {
             "type": "string",
             "enum": [
@@ -1034,17 +2066,6 @@
               "qr"
             ],
             "title": "Input Mode"
-          },
-          "text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Text"
           },
           "language": {
             "anyOf": [
@@ -1062,7 +2083,7 @@
             ],
             "title": "Language"
           },
-          "photo_url": {
+          "text": {
             "anyOf": [
               {
                 "type": "string"
@@ -1071,7 +2092,7 @@
                 "type": "null"
               }
             ],
-            "title": "Photo Url"
+            "title": "Text"
           },
           "matched_locality": {
             "anyOf": [
@@ -1084,6 +2105,175 @@
             ],
             "title": "Matched Locality"
           },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_id",
+          "kind",
+          "issue_type",
+          "status",
+          "road",
+          "duplicate_of",
+          "linked_work_order_id",
+          "responsible",
+          "sla_hours",
+          "photos",
+          "tracker",
+          "flag_id",
+          "landmark",
+          "location",
+          "input_mode",
+          "language",
+          "text",
+          "matched_locality",
+          "created_at"
+        ],
+        "title": "CitizenReport",
+        "examples": [
+          {
+            "created_at": "2026-11-21T16:14:01+05:30",
+            "flag_id": "DLP_PAID_TWICE:WO25-01947",
+            "input_mode": "photo",
+            "issue_type": "pothole",
+            "kind": "still_broken",
+            "landmark": "opposite KEM Hospital gate",
+            "language": "en",
+            "linked_work_order_id": "WO25-02017",
+            "location": {
+              "accuracy_m": 12.0,
+              "lat": 19.0058,
+              "lon": 72.8425,
+              "source": "gps"
+            },
+            "photos": [
+              {
+                "height": 600,
+                "photo_id": "1aee300d99da4b9b8078e80913f5903c",
+                "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
+                "width": 800
+              }
+            ],
+            "report_id": 24,
+            "responsible": {
+              "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2026-02-18), so surface defects are the contractor's to fix at no cost to BMC.",
+              "name": "Konkan Roadcon Pvt Ltd (synthetic)",
+              "party": "contractor_under_dlp",
+              "ward_office": "F/S Ward Office (synthetic)"
+            },
+            "road": {
+              "road_id": "RD0048",
+              "road_name": "Dr Babasaheb Ambedkar Road",
+              "under_dlp": true,
+              "ward_code": "F/S"
+            },
+            "sla_hours": 72,
+            "status": "payment_held",
+            "text": "Pothole is back after the repair",
+            "tracker": [
+              {
+                "at": "2026-11-21T16:14:01+05:30",
+                "label": "Reported",
+                "status": "done",
+                "step": "reported"
+              },
+              {
+                "at": "2026-11-21T16:14:01+05:30",
+                "label": "Matched to contract",
+                "status": "done",
+                "step": "matched_to_contract"
+              },
+              {
+                "at": "2026-11-21T16:14:01+05:30",
+                "label": "Payment auto-held (DLP)",
+                "status": "current",
+                "step": "payment_held"
+              },
+              {
+                "label": "Contractor notified",
+                "status": "pending",
+                "step": "contractor_notified"
+              }
+            ]
+          }
+        ]
+      },
+      "CitizenReportReq": {
+        "properties": {
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "still_broken",
+                  "verified_fixed",
+                  "new_issue"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "still_broken: repair failed / problem back (on a DLP road, a surface issue auto-holds payment); verified_fixed: citizen confirms the repair holds (two-key verification); new_issue: a problem with no existing work order. Default: still_broken if a matching work order exists, else new_issue"
+          },
+          "photo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Photo Ids",
+            "description": "Up to 3 ids from POST /api/uploads/photo",
+            "default": []
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
           "road_id": {
             "anyOf": [
               {
@@ -1093,18 +2283,8 @@
                 "type": "null"
               }
             ],
-            "title": "Road Id"
-          },
-          "work_order_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Work Order Id"
+            "title": "Road Id",
+            "description": "Known road. Otherwise resolved from location, then landmark/text"
           },
           "flag_id": {
             "anyOf": [
@@ -1117,63 +2297,29 @@
             ],
             "title": "Flag Id"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "reported",
-              "matched_to_contract",
-              "payment_held",
-              "contractor_notified"
+          "work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "title": "Status"
+            "title": "Work Order Id"
           },
-          "status_updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Status Updated At"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          },
-          "tracker": {
-            "items": {
-              "$ref": "#/components/schemas/TrackerStep"
-            },
-            "type": "array",
-            "title": "Tracker"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "kind",
-          "input_mode",
-          "text",
-          "language",
-          "photo_url",
-          "matched_locality",
-          "road_id",
-          "work_order_id",
-          "flag_id",
-          "status",
-          "status_updated_at",
-          "created_at",
-          "tracker"
-        ],
-        "title": "CitizenReport"
-      },
-      "CitizenReportReq": {
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "still_broken",
-              "verified_fixed",
-              "new_issue"
+          "contact_phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\+?[0-9 -]{6,20}$"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "title": "Kind"
+            "title": "Contact Phone",
+            "description": "Stored privately; never returned by the API or readable with the public key"
           },
           "input_mode": {
             "type": "string",
@@ -1214,40 +2360,6 @@
             ],
             "title": "Language"
           },
-          "photo_url": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 1000
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Photo Url"
-          },
-          "road_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Road Id"
-          },
-          "work_order_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Work Order Id"
-          },
           "matched_locality": {
             "anyOf": [
               {
@@ -1261,16 +2373,24 @@
           }
         },
         "type": "object",
-        "required": [
-          "kind"
-        ],
         "title": "CitizenReportReq",
         "examples": [
           {
-            "input_mode": "voice",
+            "contact_phone": "+91 98200 00000",
+            "input_mode": "photo",
+            "issue_type": "pothole",
             "kind": "still_broken",
+            "landmark": "Andheri subway, west exit",
             "language": "hi",
-            "road_id": "RD0153",
+            "location": {
+              "accuracy_m": 12,
+              "lat": 19.1197,
+              "lon": 72.8468,
+              "source": "gps"
+            },
+            "photo_ids": [
+              "<photo_id from POST /api/uploads/photo>"
+            ],
             "text": "Andheri subway ke bahar wapas khadda ho gaya"
           }
         ]
@@ -1314,6 +2434,30 @@
             },
             "type": "array",
             "title": "Under Reported Wards"
+          },
+          "work_orders_count": {
+            "type": "integer",
+            "title": "Work Orders Count"
+          },
+          "complaints_count": {
+            "type": "integer",
+            "title": "Complaints Count"
+          },
+          "reopened_within_30d_count": {
+            "type": "integer",
+            "title": "Reopened Within 30D Count"
+          },
+          "sla_met_rate": {
+            "type": "number",
+            "title": "Sla Met Rate"
+          },
+          "dlp_road_spend_inr": {
+            "type": "integer",
+            "title": "Dlp Road Spend Inr"
+          },
+          "recoverable_dlp_rule": {
+            "type": "string",
+            "title": "Recoverable Dlp Rule"
           }
         },
         "type": "object",
@@ -1325,7 +2469,13 @@
           "flags_by_detector",
           "rupees_at_stake_total",
           "wards_over_budget",
-          "under_reported_wards"
+          "under_reported_wards",
+          "work_orders_count",
+          "complaints_count",
+          "reopened_within_30d_count",
+          "sla_met_rate",
+          "dlp_road_spend_inr",
+          "recoverable_dlp_rule"
         ],
         "title": "CityKPIs"
       },
@@ -1534,6 +2684,141 @@
         ],
         "title": "ContractorScore"
       },
+      "DraftNotice": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "cited_row_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Cited Row Ids"
+          },
+          "flag_id": {
+            "type": "string",
+            "title": "Flag Id"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "mr"
+            ],
+            "title": "Language"
+          },
+          "doc_type": {
+            "type": "string",
+            "enum": [
+              "defect_notice",
+              "rti"
+            ],
+            "title": "Doc Type"
+          },
+          "generated_by": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "template"
+            ],
+            "title": "Generated By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "body",
+          "cited_row_ids",
+          "flag_id",
+          "road_id",
+          "language",
+          "doc_type",
+          "generated_by"
+        ],
+        "title": "DraftNotice",
+        "examples": [
+          {
+            "body": "To: Konkan Roadcon Pvt Ltd (synthetic)\nThrough: Executive Engineer (Roads), Ward M/W, Brihanmumbai Municipal Corporation\n\nSubject: Defect notice for work order WO25-01994 on Sion Trombay Road (RD0240), Ward M/W\n\nThe road audit has flagged work order WO25-01994 as \"Recoverable under DLP\".\n\nWork: Paver blocks relaid, cost ₹1,48,557, completed on 2025-09-03.\nFinding: Paver blocks relaid billed at ₹14 ...",
+            "cited_row_ids": [
+              "WO25-01994",
+              "RD0240"
+            ],
+            "doc_type": "defect_notice",
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "generated_by": "template",
+            "language": "en",
+            "road_id": "RD0240",
+            "title": "Defect notice: Paver blocks relaid on Sion Trombay Road (RD0240), work order WO25-01994"
+          }
+        ]
+      },
+      "DraftNoticeReq": {
+        "properties": {
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id",
+            "description": "Flag to draft for. Either flag_id or road_id is required."
+          },
+          "road_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Id",
+            "description": "Road to draft for: uses its highest-stakes flag (DLP first)."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "mr"
+            ],
+            "title": "Language",
+            "default": "en"
+          },
+          "doc_type": {
+            "type": "string",
+            "enum": [
+              "defect_notice",
+              "rti"
+            ],
+            "title": "Doc Type",
+            "default": "defect_notice"
+          }
+        },
+        "type": "object",
+        "title": "DraftNoticeReq",
+        "examples": [
+          {
+            "doc_type": "defect_notice",
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "language": "en"
+          }
+        ]
+      },
       "Driver": {
         "properties": {
           "feature": {
@@ -1691,14 +2976,15 @@
             "title": "Repair Method"
           },
           "cost_inr": {
-            "type": "number",
+            "type": "integer",
             "title": "Cost Inr"
           },
           "completed_at": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
               },
               {
                 "type": "null"
@@ -1773,6 +3059,17 @@
           "item_id": {
             "type": "string",
             "title": "Item Id"
+          },
+          "ward_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ward Code"
           },
           "method": {
             "type": "string",
@@ -1919,6 +3216,188 @@
         ],
         "title": "ItemInputs"
       },
+      "LatestWorkOrder": {
+        "properties": {
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "cost_inr": {
+            "type": "integer",
+            "title": "Cost Inr"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "sla_met": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Met"
+          },
+          "reopened_within_30d": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reopened Within 30D"
+          }
+        },
+        "type": "object",
+        "required": [
+          "work_order_id",
+          "contractor_id",
+          "contractor_name",
+          "cost_inr",
+          "completed_at",
+          "sla_met",
+          "reopened_within_30d"
+        ],
+        "title": "LatestWorkOrder"
+      },
+      "Livability": {
+        "properties": {
+          "locality": {
+            "type": "string",
+            "title": "Locality"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "radius_m": {
+            "type": "integer",
+            "title": "Radius M"
+          },
+          "flood_hotspots_1500m": {
+            "type": "integer",
+            "title": "Flood Hotspots 1500M"
+          },
+          "failure_rate_30d_1500m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Rate 30D 1500M"
+          },
+          "jobs_1500m": {
+            "type": "integer",
+            "title": "Jobs 1500M"
+          },
+          "hospital_access_roads_1500m": {
+            "type": "integer",
+            "title": "Hospital Access Roads 1500M"
+          },
+          "ward_dlp_leakage_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ward Dlp Leakage Rate"
+          },
+          "nearby_road_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nearby Road Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "locality",
+          "ward_code",
+          "lat",
+          "lon",
+          "radius_m",
+          "flood_hotspots_1500m",
+          "failure_rate_30d_1500m",
+          "jobs_1500m",
+          "hospital_access_roads_1500m",
+          "ward_dlp_leakage_rate",
+          "nearby_road_ids"
+        ],
+        "title": "Livability"
+      },
+      "Locality": {
+        "properties": {
+          "locality": {
+            "type": "string",
+            "title": "Locality"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "aliases": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Aliases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "locality",
+          "ward_code",
+          "lat",
+          "lon",
+          "aliases"
+        ],
+        "title": "Locality"
+      },
       "Lookup": {
         "properties": {
           "matched_via": {
@@ -1966,6 +3445,30 @@
           },
           "road": {
             "$ref": "#/components/schemas/RoadSummary"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "en",
+                  "hi",
+                  "mr"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/RoadCandidate"
+            },
+            "type": "array",
+            "title": "Candidates",
+            "default": []
           }
         },
         "type": "object",
@@ -2167,6 +3670,97 @@
         ],
         "title": "NextRupeeItem"
       },
+      "PhotoUpload": {
+        "properties": {
+          "photo_id": {
+            "type": "string",
+            "title": "Photo Id"
+          },
+          "photo_url": {
+            "type": "string",
+            "title": "Photo Url"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          },
+          "taken_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taken At"
+          },
+          "exif_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exif Lat"
+          },
+          "exif_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exif Lon"
+          }
+        },
+        "type": "object",
+        "required": [
+          "photo_id",
+          "photo_url",
+          "width",
+          "height",
+          "taken_at",
+          "exif_lat",
+          "exif_lon"
+        ],
+        "title": "PhotoUpload",
+        "examples": [
+          {
+            "exif_lat": 19.0049,
+            "exif_lon": 72.8463,
+            "height": 600,
+            "photo_id": "1aee300d99da4b9b8078e80913f5903c",
+            "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
+            "taken_at": "2025-08-01T09:15:00+05:30",
+            "width": 800
+          }
+        ]
+      },
       "Reply": {
         "properties": {
           "id": {
@@ -2204,7 +3798,8 @@
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Created At"
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
           }
         },
         "type": "object",
@@ -2216,7 +3811,17 @@
           "body",
           "created_at"
         ],
-        "title": "Reply"
+        "title": "Reply",
+        "examples": [
+          {
+            "author_name": "AE Roads K/W",
+            "author_role": "ward_engineer",
+            "body": "MGL utility trench reopened this stretch; contractor liable under DLP.",
+            "created_at": "2026-11-21T16:01:15+05:30",
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "id": 4
+          }
+        ]
       },
       "ReplyReq": {
         "properties": {
@@ -2261,6 +3866,267 @@
             "body": "MGL utility trench reopened this stretch; contractor liable under DLP."
           }
         ]
+      },
+      "ReportLocation": {
+        "properties": {
+          "lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Lon"
+          },
+          "accuracy_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy M"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "gps",
+              "map_pin",
+              "exif",
+              "landmark",
+              "manual"
+            ],
+            "title": "Source",
+            "default": "gps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "title": "ReportLocation"
+      },
+      "ReportPhoto": {
+        "properties": {
+          "photo_id": {
+            "type": "string",
+            "title": "Photo Id"
+          },
+          "photo_url": {
+            "type": "string",
+            "title": "Photo Url"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width"
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height"
+          }
+        },
+        "type": "object",
+        "required": [
+          "photo_id",
+          "photo_url",
+          "width",
+          "height"
+        ],
+        "title": "ReportPhoto"
+      },
+      "ReportRoad": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "road_id",
+          "road_name",
+          "ward_code",
+          "under_dlp"
+        ],
+        "title": "ReportRoad"
+      },
+      "Responsible": {
+        "properties": {
+          "party": {
+            "type": "string",
+            "enum": [
+              "contractor_under_dlp",
+              "bmc_ward"
+            ],
+            "title": "Party"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "ward_office": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ward Office"
+          },
+          "basis": {
+            "type": "string",
+            "title": "Basis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "party",
+          "name",
+          "ward_office",
+          "basis"
+        ],
+        "title": "Responsible"
+      },
+      "RoadCandidate": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          },
+          "road_distance_m": {
+            "type": "integer",
+            "title": "Road Distance M"
+          },
+          "latest_work_order": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LatestWorkOrder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "road_id",
+          "road_name",
+          "ward_code",
+          "under_dlp",
+          "road_distance_m",
+          "latest_work_order"
+        ],
+        "title": "RoadCandidate"
+      },
+      "RoadListItem": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "segment_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segment No"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          },
+          "total_billed_inr": {
+            "type": "integer",
+            "title": "Total Billed Inr"
+          },
+          "rupees_at_stake": {
+            "type": "integer",
+            "title": "Rupees At Stake"
+          },
+          "flagged_bills_count": {
+            "type": "integer",
+            "title": "Flagged Bills Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "road_id",
+          "road_name",
+          "segment_no",
+          "ward_code",
+          "under_dlp",
+          "total_billed_inr",
+          "rupees_at_stake",
+          "flagged_bills_count"
+        ],
+        "title": "RoadListItem"
       },
       "RoadReceipt": {
         "properties": {
@@ -2315,7 +4181,7 @@
             "title": "Last Resurfaced"
           },
           "total_billed_inr": {
-            "type": "number",
+            "type": "integer",
             "title": "Total Billed Inr"
           },
           "work_orders_count": {
@@ -2323,12 +4189,59 @@
             "title": "Work Orders Count"
           },
           "rupees_at_stake": {
-            "type": "number",
+            "type": "integer",
             "title": "Rupees At Stake"
           },
           "flagged_bills_count": {
             "type": "integer",
             "title": "Flagged Bills Count"
+          },
+          "segment_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segment No"
+          },
+          "length_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length M"
+          },
+          "dlp_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dlp Months",
+            "description": "DLP length. Assumed 36 months (dataset has no expiry); null when not under DLP"
+          },
+          "dlp_expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dlp Expires On",
+            "description": "Estimate: last_resurfaced + dlp_months; null when not under DLP"
           },
           "work_orders": {
             "items": {
@@ -2343,6 +4256,10 @@
             },
             "type": "array",
             "title": "Flags"
+          },
+          "dlp_rule": {
+            "type": "string",
+            "title": "Dlp Rule"
           }
         },
         "type": "object",
@@ -2359,9 +4276,85 @@
           "rupees_at_stake",
           "flagged_bills_count",
           "work_orders",
-          "flags"
+          "flags",
+          "dlp_rule"
         ],
         "title": "RoadReceipt"
+      },
+      "RoadReport": {
+        "properties": {
+          "report_id": {
+            "type": "integer",
+            "title": "Report Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified"
+            ],
+            "title": "Status"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_id",
+          "kind",
+          "issue_type",
+          "created_at",
+          "status",
+          "photo_url"
+        ],
+        "title": "RoadReport",
+        "examples": [
+          {
+            "created_at": "2026-11-21T16:14:01+05:30",
+            "issue_type": "pothole",
+            "kind": "still_broken",
+            "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
+            "report_id": 24,
+            "status": "payment_held"
+          }
+        ]
       },
       "RoadSummary": {
         "properties": {
@@ -2416,7 +4409,7 @@
             "title": "Last Resurfaced"
           },
           "total_billed_inr": {
-            "type": "number",
+            "type": "integer",
             "title": "Total Billed Inr"
           },
           "work_orders_count": {
@@ -2424,12 +4417,59 @@
             "title": "Work Orders Count"
           },
           "rupees_at_stake": {
-            "type": "number",
+            "type": "integer",
             "title": "Rupees At Stake"
           },
           "flagged_bills_count": {
             "type": "integer",
             "title": "Flagged Bills Count"
+          },
+          "segment_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segment No"
+          },
+          "length_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length M"
+          },
+          "dlp_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dlp Months",
+            "description": "DLP length. Assumed 36 months (dataset has no expiry); null when not under DLP"
+          },
+          "dlp_expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dlp Expires On",
+            "description": "Estimate: last_resurfaced + dlp_months; null when not under DLP"
           }
         },
         "type": "object",
@@ -2478,14 +4518,15 @@
             "title": "Repair Method"
           },
           "cost_inr": {
-            "type": "number",
+            "type": "integer",
             "title": "Cost Inr"
           },
           "assigned_at": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
               },
               {
                 "type": "null"
@@ -2497,7 +4538,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
               },
               {
                 "type": "null"
@@ -2537,6 +4579,10 @@
               }
             ],
             "title": "Engineer Remark"
+          },
+          "under_dlp_at_billing": {
+            "type": "boolean",
+            "title": "Under Dlp At Billing"
           }
         },
         "type": "object",
@@ -2551,7 +4597,8 @@
           "completed_at",
           "sla_met",
           "reopened_within_30d",
-          "engineer_remark"
+          "engineer_remark",
+          "under_dlp_at_billing"
         ],
         "title": "RoadWorkOrder"
       },
@@ -2564,7 +4611,8 @@
           "event_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Event At"
+            "title": "Event At",
+            "example": "2025-06-22T02:59:00+05:30"
           },
           "event_type": {
             "type": "string",
@@ -2597,7 +4645,7 @@
         ],
         "title": "TimelineEvent"
       },
-      "TrackerStep": {
+      "TrackerStepDetail": {
         "properties": {
           "step": {
             "type": "string",
@@ -2609,17 +4657,41 @@
             ],
             "title": "Step"
           },
-          "done": {
-            "type": "boolean",
-            "title": "Done"
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "done",
+              "current",
+              "pending"
+            ],
+            "title": "Status"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
           }
         },
         "type": "object",
         "required": [
           "step",
-          "done"
+          "label",
+          "status",
+          "at"
         ],
-        "title": "TrackerStep"
+        "title": "TrackerStepDetail"
       },
       "V3Summary": {
         "properties": {
@@ -2636,7 +4708,8 @@
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "title": "Updated At"
+            "title": "Updated At",
+            "example": "2025-06-22T02:59:00+05:30"
           }
         },
         "type": "object",

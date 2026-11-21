@@ -4,11 +4,30 @@ Field names/types mirror the SQL views and v3_* tables. When you change a view o
 change the model here too. Run the API with STRICT_MODELS=1 (as the Postman run does) to make any
 undeclared or mistyped field a 500 instead of being silently dropped.
 """
+import json
 import os
-from datetime import date, datetime
-from typing import Any, Literal, Optional
+import pathlib
+from datetime import date, datetime, timedelta, timezone
+from typing import Annotated, Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, WithJsonSchema, model_validator
+
+IST = timezone(timedelta(hours=5, minutes=30))
+# Real responses captured from the API, shown as examples in /openapi.json (POST endpoints).
+_EXAMPLES = json.loads((pathlib.Path(__file__).parent / "response_examples.json").read_text(encoding="utf-8"))
+
+
+def _example(name):
+    return ConfigDict(json_schema_extra={"examples": [_EXAMPLES[name]]})
+
+
+def _to_ist(d: datetime) -> str:
+    """One timestamp format everywhere: ISO 8601 in IST with offset. Naive values are IST (dataset convention)."""
+    return (d if d.tzinfo else d.replace(tzinfo=IST)).astimezone(IST).isoformat(timespec="seconds")
+
+
+ISTDateTime = Annotated[datetime, PlainSerializer(_to_ist, return_type=str),
+                        WithJsonSchema({"type": "string", "format": "date-time", "example": "2025-06-22T02:59:00+05:30"})]
 
 
 class Out(BaseModel):
@@ -46,6 +65,12 @@ class CityKPIs(Out):
     rupees_at_stake_total: int  # every flagged bill once (flagged_queue grain)
     wards_over_budget: int
     under_reported_wards: list[str]
+    work_orders_count: int
+    complaints_count: int
+    reopened_within_30d_count: int  # failed-repairs tile
+    sla_met_rate: float
+    dlp_road_spend_inr: int  # everything paid on DLP roads; recoverable_dlp_inr is the surface-repair part
+    recoverable_dlp_rule: str  # one sentence: why recoverable < dlp_road_spend
 
 
 class Ward(Out):
@@ -76,8 +101,8 @@ class FlaggedBill(Out):
     contractor_id: str
     contractor_name: str
     repair_method: str
-    cost_inr: float
-    completed_at: Optional[datetime]
+    cost_inr: int  # whole rupees
+    completed_at: Optional[ISTDateTime]
     top_tier: int
     rupees_at_stake: int  # max over the bill's flags (never double-counted)
     status_label: StatusLabel
@@ -88,12 +113,13 @@ class FlaggedBill(Out):
 
 # ── View 2 ──────────────────────────────────────────────────────────────────
 class Reply(Out):
+    model_config = _example("Reply")
     id: int
     flag_id: str
     author_role: AuthorRole
     author_name: Optional[str]
     body: str
-    created_at: datetime
+    created_at: ISTDateTime
 
 
 class FlagWithReplies(Out):
@@ -119,9 +145,24 @@ class RoadSummary(Out):
     surface: Optional[str]
     under_dlp: bool
     last_resurfaced: Optional[date]
-    total_billed_inr: float
+    total_billed_inr: int  # whole rupees
     work_orders_count: int
-    rupees_at_stake: float
+    rupees_at_stake: int  # whole rupees
+    flagged_bills_count: int
+    segment_no: Optional[int] = None
+    length_m: Optional[float] = None
+    dlp_months: Optional[int] = Field(None, description="DLP length. Assumed 36 months (dataset has no expiry); null when not under DLP")
+    dlp_expires_on: Optional[date] = Field(None, description="Estimate: last_resurfaced + dlp_months; null when not under DLP")
+
+
+class RoadListItem(Out):
+    road_id: str
+    road_name: str
+    segment_no: Optional[int]
+    ward_code: str
+    under_dlp: bool
+    total_billed_inr: int  # whole rupees
+    rupees_at_stake: int  # whole rupees
     flagged_bills_count: int
 
 
@@ -131,22 +172,34 @@ class RoadWorkOrder(Out):
     contractor_name: str
     work_type: Optional[str]
     repair_method: str
-    cost_inr: float
-    assigned_at: Optional[datetime]
-    completed_at: Optional[datetime]
+    cost_inr: int  # whole rupees
+    assigned_at: Optional[ISTDateTime]
+    completed_at: Optional[ISTDateTime]
     sla_met: Optional[bool]
     reopened_within_30d: Optional[bool]
     engineer_remark: Optional[str]
+    under_dlp_at_billing: bool  # road was under DLP when this job was completed (completed_at <= dlp_expires_on)
 
 
 class RoadReceipt(RoadSummary):
     work_orders: list[RoadWorkOrder]
     flags: list[FlagWithReplies]
+    dlp_rule: str  # one line: how dlp_months / dlp_expires_on are derived
+
+
+class RoadReport(Out):
+    model_config = _example("RoadReport")
+    report_id: int
+    kind: ReportKind
+    issue_type: Optional[str]
+    created_at: ISTDateTime
+    status: TrackerStatus
+    photo_url: Optional[str]  # first photo, if any
 
 
 class TimelineEvent(Out):
     road_id: str
-    event_at: datetime
+    event_at: ISTDateTime
     event_type: Literal["complaint", "work_order_assigned", "work_order_completed", "accident", "citizen_report"]
     ref_id: str  # complaint_id / work_order_id / accident_id / citizen report id
     detail: dict[str, Any]  # keys depend on event_type (see road_timeline view)
@@ -241,6 +294,7 @@ class NextRupeeItem(Out):
 
 class FundedItem(Out):
     item_id: str
+    ward_code: Optional[str] = None  # which ward the item is in (needed for ward_code=ALL allocations)
     method: str
     cost: float
     benefit: float
@@ -259,6 +313,7 @@ class BucketAItem(Out):
 
 
 class Allocation(Out):
+    model_config = _example("Allocation")
     ward_code: str
     budget_inr: float
     spend_inr: int
@@ -267,38 +322,168 @@ class Allocation(Out):
     bucket_a_dlp: list[BucketAItem]
 
 
+class BudgetRange(Out):
+    ward_code: str  # ward code or "ALL"
+    min_inr: int
+    max_inr: int  # rate-card cost to fix every BMC-paid (bucket B) item
+    default_inr: int
+    step_inr: int
+    remaining_2025_inr: int
+    default_basis: Literal["remaining_2025", "optimizer_recommendation", "share_of_need"]
+
+
+# ── View 2: Claude-written documents ────────────────────────────────────────
+class DraftNotice(Out):
+    model_config = _example("DraftNotice")
+    title: str
+    body: str
+    cited_row_ids: list[str]  # computed from the flag's evidence, never by the model
+    flag_id: str
+    road_id: str
+    language: Language
+    doc_type: Literal["defect_notice", "rti"]
+    generated_by: Literal["claude", "template"]  # "template" when Claude is slow, failing or not configured
+
+
 # ── View 4 ──────────────────────────────────────────────────────────────────
+class Locality(Out):
+    locality: str
+    ward_code: str
+    lat: float
+    lon: float
+    aliases: list[str]
+
+
+class LatestWorkOrder(Out):
+    work_order_id: str
+    contractor_id: str
+    contractor_name: str
+    cost_inr: int  # whole rupees
+    completed_at: Optional[ISTDateTime]
+    sla_met: Optional[bool]
+    reopened_within_30d: Optional[bool]
+
+
+class RoadCandidate(Out):
+    road_id: str
+    road_name: str
+    ward_code: str
+    under_dlp: bool
+    road_distance_m: int
+    latest_work_order: Optional[LatestWorkOrder]
+
+
 class Lookup(Out):
     matched_via: Literal["road_name", "locality"]
     matched_text: str
-    matched_locality: Optional[str]
+    matched_locality: Optional[str]  # always set when a locality can be resolved (also for road-name matches)
     ward_code: str
     matched_road_id: str
     road_distance_m: int
     warranty_status: Literal["UNDER_DLP", "OUT_OF_DLP"]
     road: RoadSummary
+    language: Optional[Language] = None
+    candidates: list[RoadCandidate] = []  # nearest 3 roads to the matched point, each with its latest work order
 
 
-class TrackerStep(Out):
+class Livability(Out):
+    locality: str
+    ward_code: str
+    lat: float
+    lon: float
+    radius_m: int
+    flood_hotspots_1500m: int
+    failure_rate_30d_1500m: Optional[float]  # share of repair jobs within 1.5 km that failed within 30 days
+    jobs_1500m: int
+    hospital_access_roads_1500m: int  # roads within 1.5 km that are a hospital's ambulance entry road
+    ward_dlp_leakage_rate: Optional[float]
+    nearby_road_ids: list[str]  # nearest first
+
+
+class CitizenQueryReply(Out):
+    model_config = _example("CitizenQueryReply")
+    matched_locality: Optional[str]
+    matched_road_id: Optional[str]
+    plain_language_reply: str
+    warranty_status: Optional[Literal["UNDER_DLP", "OUT_OF_DLP"]]
+    mode: Literal["street_check", "move_in"]
+    language: Language
+    generated_by: Literal["claude", "template"]
+    lookup: Optional[Lookup] = None
+    livability: Optional[Livability] = None
+
+
+class TrackerStepDetail(Out):
     step: TrackerStatus
-    done: bool
+    label: str
+    status: Literal["done", "current", "pending"]
+    at: Optional[ISTDateTime]
+
+
+IssueType = Literal["pothole", "waterlogging", "open_manhole", "broken_paver", "cave_in", "choked_drain", "other"]
+LocationSource = Literal["gps", "map_pin", "exif", "landmark", "manual"]
+
+
+class PhotoUpload(Out):
+    model_config = _example("PhotoUpload")
+    photo_id: str
+    photo_url: str
+    width: Optional[int]
+    height: Optional[int]
+    taken_at: Optional[ISTDateTime]  # EXIF DateTimeOriginal
+    exif_lat: Optional[float]
+    exif_lon: Optional[float]
+
+
+class ReportLocation(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    accuracy_m: Optional[float] = Field(None, ge=0)
+    source: LocationSource = "gps"
+
+
+class ReportRoad(Out):
+    road_id: str
+    road_name: str
+    ward_code: str
+    under_dlp: bool
+
+
+class Responsible(Out):
+    party: Literal["contractor_under_dlp", "bmc_ward"]
+    name: Optional[str]  # contractor who last billed this issue on the road (DLP case), or the ward office
+    ward_office: Optional[str]
+    basis: str  # one line: why this party is responsible
+
+
+class ReportPhoto(Out):
+    photo_id: str
+    photo_url: str
+    width: Optional[int]
+    height: Optional[int]
 
 
 class CitizenReport(Out):
-    id: int
+    model_config = _example("CitizenReport")
+    report_id: int
     kind: ReportKind
-    input_mode: InputMode
-    text: Optional[str]
-    language: Optional[Language]
-    photo_url: Optional[str]
-    matched_locality: Optional[str]
-    road_id: Optional[str]
-    work_order_id: Optional[str]
-    flag_id: Optional[str]
+    issue_type: Optional[IssueType]
     status: TrackerStatus
-    status_updated_at: datetime
-    created_at: datetime
-    tracker: list[TrackerStep]
+    road: Optional[ReportRoad]
+    duplicate_of: Optional[int]  # earlier open report for the same road + issue in the last 7 days
+    linked_work_order_id: Optional[str]  # latest work order for this road + issue
+    responsible: Optional[Responsible]
+    sla_hours: Optional[int]  # typical SLA for this issue type (median of matching work orders)
+    photos: list[ReportPhoto]
+    tracker: list[TrackerStepDetail]
+    flag_id: Optional[str]
+    landmark: Optional[str]
+    location: Optional[ReportLocation]
+    input_mode: InputMode
+    language: Optional[Language]
+    text: Optional[str]
+    matched_locality: Optional[str]
+    created_at: ISTDateTime
 
 
 class Error(Out):
@@ -321,7 +506,7 @@ class WardMap(Out):
 class V3Summary(Out):
     scorecard: dict[str, Any]   # model quality (out-of-fold AUCs, prior)
     allocation: dict[str, Any]  # budget curve + optimizer vs simple-rule comparison
-    updated_at: datetime
+    updated_at: ISTDateTime
 
 
 NOT_FOUND = {404: {"model": Error}}  # shared `responses=` for routes that can 404
@@ -343,13 +528,47 @@ class ReplyReq(BaseModel):
 
 
 class CitizenReportReq(BaseModel):
-    model_config = {"json_schema_extra": {"examples": [{"kind": "still_broken", "input_mode": "voice", "language": "hi",
-                                                         "text": "Andheri subway ke bahar wapas khadda ho gaya", "road_id": "RD0153"}]}}
-    kind: Literal["still_broken", "verified_fixed", "new_issue"]
-    input_mode: Literal["text", "voice", "photo", "qr"] = "text"
-    text: Optional[str] = Field(None, max_length=4000)
-    language: Optional[Literal["en", "hi", "mr"]] = None
-    photo_url: Optional[str] = Field(None, max_length=1000)
-    road_id: Optional[str] = None
+    model_config = {"json_schema_extra": {"examples": [{
+        "issue_type": "pothole", "kind": "still_broken", "photo_ids": ["<photo_id from POST /api/uploads/photo>"],
+        "location": {"lat": 19.1197, "lon": 72.8468, "accuracy_m": 12, "source": "gps"},
+        "landmark": "Andheri subway, west exit", "input_mode": "photo", "language": "hi",
+        "text": "Andheri subway ke bahar wapas khadda ho gaya", "contact_phone": "+91 98200 00000"}]}}
+    issue_type: Optional[IssueType] = None
+    kind: Optional[ReportKind] = Field(None, description=(
+        "still_broken: repair failed / problem back (on a DLP road, a surface issue auto-holds payment); "
+        "verified_fixed: citizen confirms the repair holds (two-key verification); "
+        "new_issue: a problem with no existing work order. Default: still_broken if a matching work order exists, else new_issue"))
+    photo_ids: list[str] = Field([], max_length=3, description="Up to 3 ids from POST /api/uploads/photo")
+    location: Optional[ReportLocation] = None
+    landmark: Optional[str] = Field(None, max_length=200)
+    road_id: Optional[str] = Field(None, description="Known road. Otherwise resolved from location, then landmark/text")
+    flag_id: Optional[str] = None
     work_order_id: Optional[str] = None
+    contact_phone: Optional[str] = Field(None, pattern=r"^\+?[0-9 -]{6,20}$",
+                                         description="Stored privately; never returned by the API or readable with the public key")
+    input_mode: InputMode = "text"
+    text: Optional[str] = Field(None, max_length=4000)
+    language: Optional[Language] = None
     matched_locality: Optional[str] = None
+
+
+class DraftNoticeReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"flag_id": "DLP_PAID_TWICE:WO25-01994", "language": "en", "doc_type": "defect_notice"}]}}
+    flag_id: Optional[str] = Field(None, description="Flag to draft for. Either flag_id or road_id is required.")
+    road_id: Optional[str] = Field(None, description="Road to draft for: uses its highest-stakes flag (DLP first).")
+    language: Language = "en"
+    doc_type: Literal["defect_notice", "rti"] = "defect_notice"
+
+    @model_validator(mode="after")
+    def _one_target(self):
+        if not (self.flag_id or self.road_id):
+            raise ValueError("flag_id or road_id is required")
+        return self
+
+
+class CitizenQueryReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"text": "Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?",
+                                                         "language": "hi", "mode": "street_check"}]}}
+    text: str = Field(min_length=2, max_length=1000)
+    language: Language = "en"
+    mode: Literal["street_check", "move_in"] = "street_check"

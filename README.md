@@ -22,7 +22,7 @@ and every flag carries the row IDs that prove it.
 | `supabase/load_source_data.sql`, `supabase/load_audit_outputs.sql` | Load `data/` and the audit outputs into the database |
 | `supabase/schema_snapshot.sql` | Whole schema in one readable file (reference only, don't run) |
 | `postman/` | API test collection |
-| `docs/` | Dataset readme, data dictionary, project context, frontend/backend handoff plan, DB mapping |
+| `docs/` | API reference for the frontend, dataset readme, data dictionary, project context, handoff plan, DB mapping |
 
 ## Quick start (from the repo root)
 
@@ -39,4 +39,4 @@ python -m scorecard_planner.run_pipeline   # 3. View 3 tables
 uvicorn backend.main:app --port 8000       # 4. API; Swagger at http://127.0.0.1:8000/docs
 ```
 
-More detail: `backend/README.md` (endpoints, how to change one), `scorecard_planner/README.md` (View 3 method).
+More detail: `docs/api_reference.md` (every endpoint for the frontend), `backend/README.md` (backend code, how to change an endpoint), `scorecard_planner/README.md` (View 3 method).

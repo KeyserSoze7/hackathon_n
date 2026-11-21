@@ -3,7 +3,7 @@
 --
 -- Dumped from Supabase (Postgres 17) with:
 --   pg_dump "$DATABASE_URL" --schema-only --schema=public --no-owner --no-privileges --restrict-key=schemadump
--- Contains: 24 tables, 13 views, 26 RLS policies, constraints and indexes, as they exist after
+-- Contains: 28 tables, 16 views, 29 RLS policies, constraints and indexes, as they exist after
 --   supabase/migrations/*.sql  (source tables, flags, user writes, engine outputs, v3_*, read views, RLS)
 --   scorecard_planner/run_pipeline.py    (runtime feature views v_*, security_invoker + read-only)
 --
@@ -11,10 +11,16 @@
 --   supabase/migrations/20261121000000_schema.sql
 --   supabase/migrations/20261121000100_audit_views.sql
 --   supabase/migrations/20261121000200_revoke_truncate.sql
+--   supabase/migrations/20261121000300_v3_model_meta.sql
+--   supabase/migrations/20261121000400_city_kpis_extra.sql
+--   supabase/migrations/20261121000500_frontend_contract.sql
+--   supabase/migrations/20261121000600_report_form.sql
 --   supabase/load_source_data.sql, supabase/load_audit_outputs.sql, then python -m scorecard_planner.run_pipeline
 -- Regenerate this snapshot after any schema change (same pg_dump command, prepend this header).
 -- =============================================================================================
 
+--
+-- PostgreSQL database dump
 --
 -- PostgreSQL database dump
 --
@@ -50,6 +56,17 @@ CREATE SCHEMA public;
 COMMENT ON SCHEMA public IS 'standard public schema';
 
 
+--
+-- Name: approx_m(double precision, double precision, double precision, double precision); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.approx_m(lat1 double precision, lon1 double precision, lat2 double precision, lon2 double precision) RETURNS double precision
+    LANGUAGE sql IMMUTABLE
+    AS $$
+  select sqrt(power((lat2 - lat1) * 110540, 2) + power((lon2 - lon1) * 111320 * cos(radians((lat1 + lat2) / 2)), 2))
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -72,6 +89,29 @@ CREATE TABLE public.accidents (
 
 
 --
+-- Name: citizen_report_contacts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.citizen_report_contacts (
+    report_id bigint NOT NULL,
+    contact_phone text NOT NULL,
+    CONSTRAINT citizen_report_contacts_contact_phone_check CHECK ((contact_phone ~ '^\+?[0-9 -]{6,20}$'::text))
+);
+
+
+--
+-- Name: citizen_report_photos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.citizen_report_photos (
+    report_id bigint NOT NULL,
+    photo_id text NOT NULL,
+    "position" smallint NOT NULL,
+    CONSTRAINT citizen_report_photos_position_check CHECK ((("position" >= 1) AND ("position" <= 3)))
+);
+
+
+--
 -- Name: citizen_reports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -89,9 +129,23 @@ CREATE TABLE public.citizen_reports (
     status text DEFAULT 'reported'::text NOT NULL,
     status_updated_at timestamp with time zone DEFAULT now() NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
+    issue_type text,
+    location_lat double precision,
+    location_lon double precision,
+    location_accuracy_m numeric,
+    location_source text,
+    landmark text,
+    duplicate_of bigint,
+    linked_work_order_id text,
     CONSTRAINT citizen_reports_input_mode_check CHECK ((input_mode = ANY (ARRAY['text'::text, 'voice'::text, 'photo'::text, 'qr'::text]))),
+    CONSTRAINT citizen_reports_issue_type_check CHECK ((issue_type = ANY (ARRAY['pothole'::text, 'waterlogging'::text, 'open_manhole'::text, 'broken_paver'::text, 'cave_in'::text, 'choked_drain'::text, 'other'::text]))),
     CONSTRAINT citizen_reports_kind_check CHECK ((kind = ANY (ARRAY['still_broken'::text, 'verified_fixed'::text, 'new_issue'::text]))),
+    CONSTRAINT citizen_reports_landmark_check CHECK ((char_length(landmark) <= 200)),
     CONSTRAINT citizen_reports_language_check CHECK ((language = ANY (ARRAY['en'::text, 'hi'::text, 'mr'::text]))),
+    CONSTRAINT citizen_reports_location_accuracy_m_check CHECK ((location_accuracy_m >= (0)::numeric)),
+    CONSTRAINT citizen_reports_location_lat_check CHECK (((location_lat >= ('-90'::integer)::double precision) AND (location_lat <= (90)::double precision))),
+    CONSTRAINT citizen_reports_location_lon_check CHECK (((location_lon >= ('-180'::integer)::double precision) AND (location_lon <= (180)::double precision))),
+    CONSTRAINT citizen_reports_location_source_check CHECK ((location_source = ANY (ARRAY['gps'::text, 'map_pin'::text, 'exif'::text, 'landmark'::text, 'manual'::text]))),
     CONSTRAINT citizen_reports_photo_url_check CHECK ((char_length(photo_url) <= 1000)),
     CONSTRAINT citizen_reports_status_check CHECK ((status = ANY (ARRAY['reported'::text, 'matched_to_contract'::text, 'payment_held'::text, 'contractor_notified'::text]))),
     CONSTRAINT citizen_reports_text_check CHECK ((char_length(text) <= 4000))
@@ -109,76 +163,6 @@ ALTER TABLE public.citizen_reports ALTER COLUMN id ADD GENERATED ALWAYS AS IDENT
     NO MINVALUE
     NO MAXVALUE
     CACHE 1
-);
-
-
---
--- Name: flags; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.flags (
-    flag_id text NOT NULL,
-    tier smallint NOT NULL,
-    detector text NOT NULL,
-    status_label text NOT NULL,
-    ward_code text NOT NULL,
-    road_id text NOT NULL,
-    work_order_id text NOT NULL,
-    contractor_id text NOT NULL,
-    rupees_at_stake bigint NOT NULL,
-    evidence_row_ids text[] NOT NULL,
-    rule_text text NOT NULL,
-    CONSTRAINT flags_rupees_at_stake_check CHECK ((rupees_at_stake > 0)),
-    CONSTRAINT flags_status_label_check CHECK ((status_label = ANY (ARRAY['Needs Explanation'::text, 'Recoverable under DLP'::text]))),
-    CONSTRAINT flags_tier_check CHECK (((tier >= 1) AND (tier <= 3)))
-);
-
-
---
--- Name: ward_audit; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.ward_audit (
-    ward_code text NOT NULL,
-    budget_inr bigint NOT NULL,
-    spend_inr bigint NOT NULL,
-    recoverable_dlp_inr bigint NOT NULL,
-    flagged_bills_count integer NOT NULL,
-    warranty_enforcement_rate numeric,
-    dlp_eligible_jobs integer NOT NULL,
-    dlp_leakage_rate numeric NOT NULL,
-    physical_risk_score numeric NOT NULL,
-    complaints_per_lakh numeric NOT NULL,
-    under_reported_flag boolean NOT NULL,
-    flood_hotspots_count integer NOT NULL,
-    accidents_count integer NOT NULL
-);
-
-
---
--- Name: city_kpis; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.city_kpis WITH (security_invoker='true') AS
- SELECT (sum(budget_inr))::bigint AS total_budget_inr,
-    (sum(spend_inr))::bigint AS total_spend_inr,
-    (sum(recoverable_dlp_inr))::bigint AS recoverable_dlp_inr,
-    sum(flagged_bills_count) AS flagged_bills_count,
-    ( SELECT jsonb_object_agg(d.detector, d.n) AS jsonb_object_agg
-           FROM ( SELECT flags.detector,
-                    count(*) AS n
-                   FROM public.flags
-                  GROUP BY flags.detector) d) AS flags_by_detector
-   FROM public.ward_audit;
-
-
---
--- Name: complaint_work_orders; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.complaint_work_orders (
-    complaint_id text NOT NULL,
-    work_order_id text NOT NULL
 );
 
 
@@ -221,23 +205,6 @@ CREATE TABLE public.contractors (
 
 
 --
--- Name: facilities; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.facilities (
-    facility_id text NOT NULL,
-    type text NOT NULL,
-    name text NOT NULL,
-    ward_code text NOT NULL,
-    lat double precision,
-    lon double precision,
-    beds_or_students integer,
-    emergency_services boolean,
-    ambulance_entry_road text
-);
-
-
---
 -- Name: flag_replies; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -255,16 +222,24 @@ CREATE TABLE public.flag_replies (
 
 
 --
--- Name: flag_replies_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: flags; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER TABLE public.flag_replies ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.flag_replies_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
+CREATE TABLE public.flags (
+    flag_id text NOT NULL,
+    tier smallint NOT NULL,
+    detector text NOT NULL,
+    status_label text NOT NULL,
+    ward_code text NOT NULL,
+    road_id text NOT NULL,
+    work_order_id text NOT NULL,
+    contractor_id text NOT NULL,
+    rupees_at_stake bigint NOT NULL,
+    evidence_row_ids text[] NOT NULL,
+    rule_text text NOT NULL,
+    CONSTRAINT flags_rupees_at_stake_check CHECK ((rupees_at_stake > 0)),
+    CONSTRAINT flags_status_label_check CHECK ((status_label = ANY (ARRAY['Needs Explanation'::text, 'Recoverable under DLP'::text]))),
+    CONSTRAINT flags_tier_check CHECK (((tier >= 1) AND (tier <= 3)))
 );
 
 
@@ -349,6 +324,107 @@ CREATE VIEW public.flagged_queue WITH (security_invoker='true') AS
 
 
 --
+-- Name: ward_audit; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ward_audit (
+    ward_code text NOT NULL,
+    budget_inr bigint NOT NULL,
+    spend_inr bigint NOT NULL,
+    recoverable_dlp_inr bigint NOT NULL,
+    flagged_bills_count integer NOT NULL,
+    warranty_enforcement_rate numeric,
+    dlp_eligible_jobs integer NOT NULL,
+    dlp_leakage_rate numeric NOT NULL,
+    physical_risk_score numeric NOT NULL,
+    complaints_per_lakh numeric NOT NULL,
+    under_reported_flag boolean NOT NULL,
+    flood_hotspots_count integer NOT NULL,
+    accidents_count integer NOT NULL
+);
+
+
+--
+-- Name: city_kpis; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.city_kpis WITH (security_invoker='true') AS
+ SELECT (sum(budget_inr))::bigint AS total_budget_inr,
+    (sum(spend_inr))::bigint AS total_spend_inr,
+    (sum(recoverable_dlp_inr))::bigint AS recoverable_dlp_inr,
+    sum(flagged_bills_count) AS flagged_bills_count,
+    ( SELECT jsonb_object_agg(d.detector, d.n) AS jsonb_object_agg
+           FROM ( SELECT flags.detector,
+                    count(*) AS n
+                   FROM public.flags
+                  GROUP BY flags.detector) d) AS flags_by_detector,
+    ( SELECT (COALESCE(sum(flagged_queue.rupees_at_stake), (0)::numeric))::bigint AS "coalesce"
+           FROM public.flagged_queue) AS rupees_at_stake_total,
+    (count(*) FILTER (WHERE (spend_inr > budget_inr)))::integer AS wards_over_budget,
+    COALESCE(array_agg(ward_code ORDER BY ward_code) FILTER (WHERE under_reported_flag), '{}'::text[]) AS under_reported_wards,
+    (( SELECT count(*) AS count
+           FROM public.work_orders))::integer AS work_orders_count,
+    (( SELECT count(*) AS count
+           FROM public.complaints))::integer AS complaints_count,
+    (( SELECT count(*) AS count
+           FROM public.work_orders
+          WHERE work_orders.reopened_within_30d))::integer AS reopened_within_30d_count,
+    ( SELECT round(avg(
+                CASE
+                    WHEN work_orders.sla_met THEN 1.0
+                    ELSE 0.0
+                END), 4) AS round
+           FROM public.work_orders) AS sla_met_rate,
+    ( SELECT (COALESCE(sum(wo.cost_inr), (0)::numeric))::bigint AS "coalesce"
+           FROM (public.work_orders wo
+             JOIN public.roads r USING (road_id))
+          WHERE r.under_dlp) AS dlp_road_spend_inr,
+    (('Only road-surface repairs (cold mix, hot mix, mastic asphalt, paver blocks) billed on roads still under the '::text || 'original contractor''s Defect Liability Period count as recoverable; drainage, pumping, manhole and utility '::text) || 'work on those roads is not a surface defect, so the warranty does not cover it.'::text) AS recoverable_dlp_rule
+   FROM public.ward_audit;
+
+
+--
+-- Name: complaint_work_orders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.complaint_work_orders (
+    complaint_id text NOT NULL,
+    work_order_id text NOT NULL
+);
+
+
+--
+-- Name: facilities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.facilities (
+    facility_id text NOT NULL,
+    type text NOT NULL,
+    name text NOT NULL,
+    ward_code text NOT NULL,
+    lat double precision,
+    lon double precision,
+    beds_or_students integer,
+    emergency_services boolean,
+    ambulance_entry_road text
+);
+
+
+--
+-- Name: flag_replies_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.flag_replies ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.flag_replies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: flood_hotspots; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -365,6 +441,19 @@ CREATE TABLE public.flood_hotspots (
     pumping_station_nearby boolean,
     years_flagged_last_5 integer
 );
+
+
+--
+-- Name: issue_sla; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.issue_sla WITH (security_invoker='true') AS
+ SELECT issue_type,
+    work_type,
+    ( SELECT percentile_disc((0.5)::double precision) WITHIN GROUP (ORDER BY w.sla_hours) AS percentile_disc
+           FROM public.work_orders w
+          WHERE (w.work_type = i.work_type)) AS sla_hours
+   FROM ( VALUES ('pothole'::text,'Pothole'::text), ('waterlogging'::text,'Waterlogging'::text), ('open_manhole'::text,'Open or broken manhole'::text), ('broken_paver'::text,'Broken paver blocks'::text), ('cave_in'::text,'Road cave-in'::text), ('choked_drain'::text,'Choked drain / nullah overflow'::text), ('other'::text,NULL::text)) i(issue_type, work_type);
 
 
 --
@@ -391,6 +480,65 @@ CREATE TABLE public.locality_aliases (
 
 
 --
+-- Name: locality_list; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.locality_list WITH (security_invoker='true') AS
+ SELECT locality,
+    ward_code,
+    lat,
+    lon,
+    COALESCE(ARRAY( SELECT TRIM(BOTH FROM a.a) AS btrim
+           FROM unnest(string_to_array(l.aliases, ';'::text)) a(a)
+          WHERE (TRIM(BOTH FROM a.a) <> ''::text)), '{}'::text[]) AS aliases
+   FROM public.localities l;
+
+
+--
+-- Name: locality_livability; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.locality_livability WITH (security_invoker='true') AS
+ WITH near_roads AS (
+         SELECT l_1.locality,
+            r.road_id,
+            public.approx_m(l_1.lat, l_1.lon, ((r.start_lat + r.end_lat) / (2)::double precision), ((r.start_lon + r.end_lon) / (2)::double precision)) AS m
+           FROM (public.localities l_1
+             CROSS JOIN public.roads r)
+        )
+ SELECT l.locality,
+    l.ward_code,
+    l.lat,
+    l.lon,
+    1500 AS radius_m,
+    (( SELECT count(*) AS count
+           FROM public.flood_hotspots h
+          WHERE (public.approx_m(l.lat, l.lon, h.lat, h.lon) <= (1500)::double precision)))::integer AS flood_hotspots_1500m,
+    (( SELECT count(*) AS count
+           FROM (public.work_orders wo
+             JOIN near_roads n USING (road_id))
+          WHERE ((n.locality = l.locality) AND (n.m <= (1500)::double precision))))::integer AS jobs_1500m,
+    ( SELECT round(avg(
+                CASE
+                    WHEN wo.reopened_within_30d THEN 1.0
+                    ELSE 0.0
+                END), 4) AS round
+           FROM (public.work_orders wo
+             JOIN near_roads n USING (road_id))
+          WHERE ((n.locality = l.locality) AND (n.m <= (1500)::double precision))) AS failure_rate_30d_1500m,
+    (( SELECT count(DISTINCT f.ambulance_entry_road) AS count
+           FROM (public.facilities f
+             JOIN near_roads n ON ((n.road_id = f.ambulance_entry_road)))
+          WHERE ((n.locality = l.locality) AND (n.m <= (1500)::double precision) AND (f.type = 'Hospital'::text))))::integer AS hospital_access_roads_1500m,
+    wa.dlp_leakage_rate AS ward_dlp_leakage_rate,
+    COALESCE(( SELECT array_agg(n.road_id ORDER BY n.m) AS array_agg
+           FROM near_roads n
+          WHERE ((n.locality = l.locality) AND (n.m <= (1500)::double precision))), '{}'::text[]) AS nearby_road_ids
+   FROM (public.localities l
+     LEFT JOIN public.ward_audit wa USING (ward_code));
+
+
+--
 -- Name: locality_nearest_road; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -410,6 +558,30 @@ CREATE VIEW public.locality_nearest_road WITH (security_invoker='true') AS
           WHERE (r.ward_code = l.ward_code)
           ORDER BY ((round(sqrt((power(((((r.start_lat + r.end_lat) / (2)::double precision) - l.lat) * (110540)::double precision), (2)::double precision) + power(((((r.start_lon + r.end_lon) / (2)::double precision) - l.lon) * (105200)::double precision), (2)::double precision)))))::integer)
          LIMIT 1) nr);
+
+
+--
+-- Name: photos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.photos (
+    photo_id text NOT NULL,
+    storage text NOT NULL,
+    content_type text NOT NULL,
+    original_content_type text NOT NULL,
+    size_bytes integer NOT NULL,
+    width integer,
+    height integer,
+    taken_at timestamp without time zone,
+    exif_lat double precision,
+    exif_lon double precision,
+    storage_path text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT photos_content_type_check CHECK ((content_type = ANY (ARRAY['image/jpeg'::text, 'image/png'::text, 'image/webp'::text]))),
+    CONSTRAINT photos_original_content_type_check CHECK ((original_content_type = ANY (ARRAY['image/jpeg'::text, 'image/png'::text, 'image/webp'::text, 'image/heic'::text]))),
+    CONSTRAINT photos_size_bytes_check CHECK (((size_bytes >= 1) AND (size_bytes <= 8388608))),
+    CONSTRAINT photos_storage_check CHECK ((storage = ANY (ARRAY['supabase'::text, 'local'::text])))
+);
 
 
 --
@@ -463,7 +635,17 @@ CREATE VIEW public.road_audit WITH (security_invoker='true') AS
     COALESCE(b.total_billed_inr, (0)::numeric) AS total_billed_inr,
     COALESCE(b.work_orders_count, (0)::bigint) AS work_orders_count,
     COALESCE(q.rupees_at_stake, (0)::numeric) AS rupees_at_stake,
-    COALESCE(q.flagged_bills, (0)::bigint) AS flagged_bills_count
+    COALESCE(q.flagged_bills, (0)::bigint) AS flagged_bills_count,
+    r.segment_no,
+    r.length_m,
+        CASE
+            WHEN r.under_dlp THEN 36
+            ELSE NULL::integer
+        END AS dlp_months,
+        CASE
+            WHEN r.under_dlp THEN ((r.last_resurfaced + '3 years'::interval))::date
+            ELSE NULL::date
+        END AS dlp_expires_on
    FROM ((public.roads r
      LEFT JOIN ( SELECT work_orders.road_id,
             sum(work_orders.cost_inr) AS total_billed_inr,
@@ -604,6 +786,18 @@ CREATE TABLE public.v3_job_expected_risk (
     contractor_id text NOT NULL,
     p_reopen_expected numeric NOT NULL,
     p_sla_miss_expected numeric NOT NULL
+);
+
+
+--
+-- Name: v3_model_meta; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.v3_model_meta (
+    id smallint DEFAULT 1 NOT NULL,
+    meta jsonb NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT v3_model_meta_id_check CHECK ((id = 1))
 );
 
 
@@ -1054,6 +1248,22 @@ ALTER TABLE ONLY public.accidents
 
 
 --
+-- Name: citizen_report_contacts citizen_report_contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_report_contacts
+    ADD CONSTRAINT citizen_report_contacts_pkey PRIMARY KEY (report_id);
+
+
+--
+-- Name: citizen_report_photos citizen_report_photos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_report_photos
+    ADD CONSTRAINT citizen_report_photos_pkey PRIMARY KEY (report_id, photo_id);
+
+
+--
 -- Name: citizen_reports citizen_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1134,6 +1344,14 @@ ALTER TABLE ONLY public.locality_aliases
 
 
 --
+-- Name: photos photos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.photos
+    ADD CONSTRAINT photos_pkey PRIMARY KEY (photo_id);
+
+
+--
 -- Name: rainfall_daily rainfall_daily_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1198,6 +1416,14 @@ ALTER TABLE ONLY public.v3_job_expected_risk
 
 
 --
+-- Name: v3_model_meta v3_model_meta_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.v3_model_meta
+    ADD CONSTRAINT v3_model_meta_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: v3_next_rupee v3_next_rupee_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1254,11 +1480,51 @@ ALTER TABLE ONLY public.accidents
 
 
 --
+-- Name: citizen_report_contacts citizen_report_contacts_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_report_contacts
+    ADD CONSTRAINT citizen_report_contacts_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.citizen_reports(id);
+
+
+--
+-- Name: citizen_report_photos citizen_report_photos_photo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_report_photos
+    ADD CONSTRAINT citizen_report_photos_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(photo_id);
+
+
+--
+-- Name: citizen_report_photos citizen_report_photos_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_report_photos
+    ADD CONSTRAINT citizen_report_photos_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.citizen_reports(id);
+
+
+--
+-- Name: citizen_reports citizen_reports_duplicate_of_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_reports
+    ADD CONSTRAINT citizen_reports_duplicate_of_fkey FOREIGN KEY (duplicate_of) REFERENCES public.citizen_reports(id);
+
+
+--
 -- Name: citizen_reports citizen_reports_flag_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.citizen_reports
     ADD CONSTRAINT citizen_reports_flag_id_fkey FOREIGN KEY (flag_id) REFERENCES public.flags(flag_id);
+
+
+--
+-- Name: citizen_reports citizen_reports_linked_work_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.citizen_reports
+    ADD CONSTRAINT citizen_reports_linked_work_order_id_fkey FOREIGN KEY (linked_work_order_id) REFERENCES public.work_orders(work_order_id);
 
 
 --
@@ -1522,6 +1788,18 @@ CREATE POLICY "anon insert" ON public.flag_replies FOR INSERT TO authenticated, 
 
 
 --
+-- Name: citizen_report_contacts; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.citizen_report_contacts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: citizen_report_photos; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.citizen_report_photos ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: citizen_reports; Type: ROW SECURITY; Schema: public; Owner: -
 --
 
@@ -1582,10 +1860,23 @@ ALTER TABLE public.localities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.locality_aliases ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: photos; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.photos ENABLE ROW LEVEL SECURITY;
+
+--
 -- Name: accidents public read; Type: POLICY; Schema: public; Owner: -
 --
 
 CREATE POLICY "public read" ON public.accidents FOR SELECT TO authenticated, anon USING (true);
+
+
+--
+-- Name: citizen_report_photos public read; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "public read" ON public.citizen_report_photos FOR SELECT TO authenticated, anon USING (true);
 
 
 --
@@ -1659,6 +1950,13 @@ CREATE POLICY "public read" ON public.locality_aliases FOR SELECT TO authenticat
 
 
 --
+-- Name: photos public read; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "public read" ON public.photos FOR SELECT TO authenticated, anon USING (true);
+
+
+--
 -- Name: rainfall_daily public read; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1712,6 +2010,13 @@ CREATE POLICY "public read" ON public.v3_contractor_scorecard FOR SELECT TO auth
 --
 
 CREATE POLICY "public read" ON public.v3_job_expected_risk FOR SELECT TO authenticated, anon USING (true);
+
+
+--
+-- Name: v3_model_meta public read; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "public read" ON public.v3_model_meta FOR SELECT TO authenticated, anon USING (true);
 
 
 --
@@ -1796,6 +2101,12 @@ ALTER TABLE public.v3_contractor_scorecard ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.v3_job_expected_risk ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: v3_model_meta; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.v3_model_meta ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: v3_next_rupee; Type: ROW SECURITY; Schema: public; Owner: -

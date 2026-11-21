@@ -24,6 +24,18 @@
     {
       "key": "reportId",
       "value": ""
+    },
+    {
+      "key": "photoId",
+      "value": ""
+    },
+    {
+      "key": "formReportId",
+      "value": ""
+    },
+    {
+      "key": "formRoadId",
+      "value": ""
     }
   ],
   "item": [
@@ -60,7 +72,7 @@
             "exec": [
               "pm.test('200', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(17));",
+              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(26));",
               "pm.test('every operation tagged + summarized', () => Object.values(b.paths).forEach(p => Object.values(p).forEach(op => { pm.expect(op.tags.length).to.be.above(0); pm.expect(op.summary).to.be.a('string'); })));"
             ]
           }
@@ -87,6 +99,38 @@
                   "pm.test('recoverable <= spend', () => pm.expect(b.recoverable_dlp_inr).to.be.below(b.total_spend_inr));",
                   "pm.test('whole rupees', () => pm.expect(Number.isInteger(b.total_spend_inr)).to.be.true);",
                   "pm.test('extra KPIs', () => { pm.expect(b.rupees_at_stake_total).to.be.at.least(b.recoverable_dlp_inr); pm.expect(b.wards_over_budget).to.be.a('number'); pm.expect(b.under_reported_wards).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "City KPIs - failed repairs, SLA, DLP rule",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/city",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "city"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('tile fields', () => ['work_orders_count','complaints_count','reopened_within_30d_count','sla_met_rate','dlp_road_spend_inr','recoverable_dlp_rule'].forEach(k => pm.expect(b).to.have.property(k)));",
+                  "pm.test('recoverable is part of DLP-road spend', () => pm.expect(b.recoverable_dlp_inr).to.be.below(b.dlp_road_spend_inr));",
+                  "pm.test('sla rate in 0..1', () => pm.expect(b.sla_met_rate).to.be.within(0, 1));",
+                  "pm.test('rule is one sentence', () => pm.expect(b.recoverable_dlp_rule.length).to.be.above(40));"
                 ]
               }
             }
@@ -491,6 +535,85 @@
       "name": "View 2",
       "item": [
         {
+          "name": "Road search (picker)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/roads?q=andheri&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "roads"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "andheri"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('matches query, limit', () => { pm.expect(b.length).to.be.within(1,5); b.forEach(r => pm.expect(r.road_name.toLowerCase()).to.include('andheri')); });",
+                  "pm.test('picker fields', () => ['road_id','road_name','segment_no','ward_code','under_dlp','total_billed_inr','rupees_at_stake','flagged_bills_count'].forEach(k => pm.expect(b[0]).to.have.property(k)));",
+                  "pm.test('whole rupees', () => pm.expect(Number.isInteger(b[0].total_billed_inr)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Road search - ward filter (K-W)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/roads?ward=K-W&limit=500",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "roads"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "K-W"
+                },
+                {
+                  "key": "limit",
+                  "value": "500"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('all in K/W', () => pm.response.json().forEach(r => pm.expect(r.ward_code).to.eql('K/W')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Road receipt",
           "request": {
             "method": "GET",
@@ -507,6 +630,40 @@
                   "pm.test('has work orders + flags', () => { pm.expect(b.work_orders.length).to.be.above(0); pm.expect(b.flags.length).to.be.above(0); });",
                   "pm.test('billed = sum of work orders', () => pm.expect(Math.round(b.total_billed_inr)).to.eql(Math.round(b.work_orders.reduce((s, w) => s + Number(w.cost_inr), 0))));",
                   "pm.test('flags carry evidence row ids', () => b.flags.forEach(f => pm.expect(f.evidence_row_ids.length).to.be.above(0)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Road receipt - warranty fields",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/roads/{{dlpRoadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "roads",
+                "{{dlpRoadId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('segment + length', () => { pm.expect(b.segment_no).to.be.a('number'); pm.expect(b.length_m).to.be.above(0); });",
+                  "pm.test('DLP months + expiry', () => { pm.expect(b.dlp_months).to.eql(36); pm.expect(b.dlp_expires_on).to.match(/^\\d{4}-\\d{2}-\\d{2}$/); });",
+                  "pm.test('every work order has under_dlp_at_billing', () => b.work_orders.forEach(w => pm.expect(w.under_dlp_at_billing).to.be.a('boolean')));",
+                  "pm.test('timestamps in IST', () => pm.expect(b.work_orders[0].completed_at).to.match(/\\+05:30$/));",
+                  "pm.test('dlp rule text', () => pm.expect(b.dlp_rule).to.include('36 months'));"
                 ]
               }
             }
@@ -618,6 +775,99 @@
               "script": {
                 "exec": [
                   "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft notice - defect notice (en, by flag)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/draft-notice",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flag_id\": \"{{flagId}}\",\n  \"language\": \"en\",\n  \"doc_type\": \"defect_notice\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('generated_by claude or template', () => pm.expect(['claude','template']).to.include(b.generated_by));",
+                  "pm.test('title + body', () => { pm.expect(b.title.length).to.be.above(5); pm.expect(b.body.length).to.be.above(100); });",
+                  "pm.test('cites its evidence', () => { pm.expect(b.cited_row_ids).to.include(pm.collectionVariables.get('dlpRoadId')); pm.expect(b.flag_id).to.eql(pm.collectionVariables.get('flagId')); });",
+                  "pm.test('neutral wording', () => pm.expect(b.body.toLowerCase()).to.not.match(/fraud|corrupt/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft notice - RTI (mr, by road)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/draft-notice",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"road_id\": \"{{dlpRoadId}}\",\n  \"language\": \"mr\",\n  \"doc_type\": \"rti\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('generated_by claude or template', () => pm.expect(['claude','template']).to.include(b.generated_by));",
+                  "pm.test('marathi in Devanagari', () => pm.expect(b.body).to.match(/[\\u0900-\\u097F]/));",
+                  "pm.test('rti + language echoed', () => { pm.expect(b.doc_type).to.eql('rti'); pm.expect(b.language).to.eql('mr'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft notice - no target (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/draft-notice",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"en\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
                 ]
               }
             }
@@ -813,12 +1063,345 @@
               }
             }
           ]
+        },
+        {
+          "name": "Next rupee - city-wide (ALL)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v3/next-rupee/ALL",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v3",
+                "next-rupee",
+                "ALL"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('many wards', () => pm.expect(new Set(b.map(x => x.ward_code)).size).to.be.above(10));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget range - ward (K/W)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v3/budget-range/{{ward}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v3",
+                "budget-range",
+                "{{ward}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('min <= default <= max', () => { pm.expect(b.min_inr).to.eql(0); pm.expect(b.default_inr).to.be.within(b.min_inr, b.max_inr); });",
+                  "pm.test('lakh-scale step', () => pm.expect(b.step_inr).to.eql(10000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget range - city (ALL)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v3/budget-range/ALL",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v3",
+                "budget-range",
+                "ALL"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('ALL bigger step + range', () => { pm.expect(b.ward_code).to.eql('ALL'); pm.expect(b.step_inr).to.eql(100000); pm.expect(b.max_inr).to.be.above(b.default_inr); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget slider - city-wide (ALL)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v3/allocate",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ward_code\": \"ALL\",\n  \"budget_inr\": 17700000\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('within budget', () => pm.expect(b.spend_inr).to.be.at.most(17700000));",
+                  "pm.test('funded items name their ward', () => b.funded.forEach(f => pm.expect(f.ward_code).to.be.a('string')));",
+                  "pm.test('fast', () => pm.expect(pm.response.responseTime).to.be.below(3000));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
       "name": "View 4",
       "item": [
+        {
+          "name": "Localities (picker)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/localities?ward=K-W",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "localities"
+              ],
+              "query": [
+                {
+                  "key": "ward",
+                  "value": "K-W"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('K/W localities with alias arrays', () => { pm.expect(b.length).to.be.above(0); b.forEach(l => { pm.expect(l.ward_code).to.eql('K/W'); pm.expect(l.aliases).to.be.an('array'); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lookup - candidates + matched locality",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/lookup?q=Andheri subway ke bahar wapas khadda ho gaya&language=hi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Andheri subway ke bahar wapas khadda ho gaya"
+                },
+                {
+                  "key": "language",
+                  "value": "hi"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('road + locality', () => { pm.expect(b.matched_road_id).to.eql('RD0153'); pm.expect(b.matched_locality).to.eql('Andheri West'); pm.expect(b.language).to.eql('hi'); });",
+                  "pm.test('3 nearest candidates, nearest first', () => { pm.expect(b.candidates.length).to.eql(3); for (let i = 1; i < 3; i++) pm.expect(b.candidates[i].road_distance_m).to.be.at.least(b.candidates[i-1].road_distance_m); });",
+                  "pm.test('candidate carries latest work order', () => pm.expect(b.candidates[0].latest_work_order.work_order_id).to.match(/^WO25-/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Livability (Moving here)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/livability?locality=Hindmata",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "livability"
+              ],
+              "query": [
+                {
+                  "key": "locality",
+                  "value": "Hindmata"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('livability fields', () => ['flood_hotspots_1500m','failure_rate_30d_1500m','jobs_1500m','hospital_access_roads_1500m','ward_dlp_leakage_rate','nearby_road_ids'].forEach(k => pm.expect(b).to.have.property(k)));",
+                  "pm.test('radius 1500', () => pm.expect(b.radius_m).to.eql(1500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Livability - unknown (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/livability?locality=Atlantis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "livability"
+              ],
+              "query": [
+                {
+                  "key": "locality",
+                  "value": "Atlantis"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen query - street check (hi)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-query",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?\",\n  \"language\": \"hi\",\n  \"mode\": \"street_check\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('generated_by claude or template', () => pm.expect(['claude','template']).to.include(b.generated_by));",
+                  "pm.test('matched', () => { pm.expect(b.matched_road_id).to.eql('RD0153'); pm.expect(b.warranty_status).to.be.oneOf(['UNDER_DLP','OUT_OF_DLP']); });",
+                  "pm.test('hindi reply', () => pm.expect(b.plain_language_reply).to.match(/[\\u0900-\\u097F]/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen query - no match still 200",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-query",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"zzzz qqqq\",\n  \"language\": \"en\",\n  \"mode\": \"street_check\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('null match + helpful reply', () => { pm.expect(b.matched_road_id).to.be.null; pm.expect(b.plain_language_reply.length).to.be.above(10); });"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Lookup - Hinglish road mention",
           "request": {
@@ -920,6 +1503,189 @@
           ]
         },
         {
+          "name": "Photo upload (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/uploads/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "postman/fixtures/report_photo.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('photo fields', () => ['photo_id','photo_url','width','height','taken_at','exif_lat','exif_lon'].forEach(k => pm.expect(b).to.have.property(k)));",
+                  "pm.test('EXIF read', () => { pm.expect(b.exif_lat).to.be.closeTo(19.0049, 0.001); pm.expect(b.taken_at).to.match(/\\+05:30$/); });",
+                  "pm.collectionVariables.set('photoId', b.photo_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Photo upload - not an image (415)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/uploads/photo",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "postman/fixtures/not_an_image.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('415', () => pm.response.to.have.status(415));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report form - pothole with photo + location (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"issue_type\": \"pothole\",\n  \"photo_ids\": [\n    \"{{photoId}}\"\n  ],\n  \"location\": {\n    \"lat\": 19.0049,\n    \"lon\": 72.8463,\n    \"accuracy_m\": 10,\n    \"source\": \"gps\"\n  },\n  \"landmark\": \"near KEM Hospital gate\",\n  \"contact_phone\": \"+91 98200 00000\",\n  \"input_mode\": \"photo\",\n  \"language\": \"en\",\n  \"text\": \"Pothole is back\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('contract shape', () => ['report_id','status','road','duplicate_of','linked_work_order_id','responsible','sla_hours','photos','tracker'].forEach(k => pm.expect(b).to.have.property(k)));",
+                  "pm.test('road resolved from location', () => pm.expect(b.road.road_id).to.match(/^RD\\d{4}$/));",
+                  "pm.test('photo attached', () => pm.expect(b.photos[0].photo_id).to.eql(pm.collectionVariables.get('photoId')));",
+                  "pm.test('responsible + sla', () => { pm.expect(['contractor_under_dlp','bmc_ward']).to.include(b.responsible.party); pm.expect(b.sla_hours).to.eql(72); });",
+                  "pm.test('phone never returned', () => pm.expect(pm.response.text()).to.not.include('98200'));",
+                  "pm.test('tracker steps', () => b.tracker.forEach(x => pm.expect(['done','current','pending']).to.include(x.status)));",
+                  "pm.collectionVariables.set('formReportId', b.report_id); pm.collectionVariables.set('formRoadId', b.road.road_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report form - GET returns same shape",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/citizen-reports/{{formReportId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('same report', () => { pm.expect(b.report_id).to.eql(Number(pm.collectionVariables.get('formReportId'))); pm.expect(b.photos.length).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report form - unknown photo (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"issue_type\": \"pothole\", \"photo_ids\": [\"nope\"]}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));",
+                  "pm.test('standard 422 shape', () => pm.expect(pm.response.json().detail[0].loc).to.eql(['body','photo_ids']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reports on a road",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/roads/{{formRoadId}}/reports?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "roads",
+                "{{formRoadId}}",
+                "reports"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('newest first incl. our report', () => pm.expect(b[0].report_id).to.eql(Number(pm.collectionVariables.get('formReportId'))));",
+                  "pm.test('photo_url', () => pm.expect(b[0].photo_url).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Citizen report - still broken on DLP road (201)",
           "request": {
             "method": "POST",
@@ -944,8 +1710,8 @@
                   "const b = pm.response.json();",
                   "pm.test('payment auto-held on DLP road', () => pm.expect(b.status).to.eql('payment_held'));",
                   "pm.test('linked to DLP flag', () => pm.expect(b.flag_id).to.match(/^DLP_PAID_TWICE:/));",
-                  "pm.test('tracker 3 of 4 done', () => pm.expect(b.tracker.filter(s => s.done).length).to.eql(3));",
-                  "pm.collectionVariables.set('reportId', b.id);"
+                  "pm.test('tracker: payment held is current', () => pm.expect(b.tracker.map(x => x.status)).to.eql(['done','done','current','pending']));",
+                  "pm.collectionVariables.set('reportId', b.report_id);"
                 ]
               }
             }
@@ -963,7 +1729,9 @@
               "script": {
                 "exec": [
                   "pm.test('200', () => pm.response.to.have.status(200));",
-                  "pm.test('same status', () => pm.expect(pm.response.json().status).to.eql('payment_held'));"
+                  "pm.test('same status', () => pm.expect(pm.response.json().status).to.eql('payment_held'));",
+                  "const s = pm.response.json().tracker;",
+                  "pm.test('steps with done/current/pending', () => { pm.expect(s.map(x => x.status)).to.eql(['done','done','current','pending']); pm.expect(s[3].at).to.be.null; pm.expect(s[0].at).to.match(/\\+05:30$/); });"
                 ]
               }
             }

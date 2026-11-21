@@ -5,10 +5,11 @@ Run from the repo root (DATABASE_URL from the environment or the repo-root .env)
     uvicorn backend.main:app --port 8000
 Routes live in backend/routes/, one file per view; models in backend/schemas.py.
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from backend.routes import citizen, city_overview, health, road_story, scorecard_planner
+from backend.routes import citizen, city_overview, health, road_story, scorecard_planner, uploads
 
 app = FastAPI(
     title="Follow the Rupee: Backend",
@@ -28,8 +29,21 @@ app = FastAPI(
     ],
 )
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+MAX_UPLOAD_BODY = 9 * 1024 * 1024  # 8 MB photo + multipart overhead
 
-for module in (health, city_overview, road_story, scorecard_planner, citizen):
+
+@app.middleware("http")
+async def cap_upload_size(request: Request, call_next):
+    """Reject oversized uploads before the body is read (the route's own 8 MB check runs after buffering)."""
+    if request.url.path.startswith("/api/uploads"):
+        declared = request.headers.get("content-length")
+        if declared is None and request.method == "POST":
+            return JSONResponse({"detail": "Content-Length required for uploads"}, status_code=411)
+        if declared and declared.isdigit() and int(declared) > MAX_UPLOAD_BODY:
+            return JSONResponse({"detail": "file too large (max 8 MB)"}, status_code=413)
+    return await call_next(request)
+
+for module in (health, city_overview, road_story, scorecard_planner, citizen, uploads):
     app.include_router(module.router)
 
 

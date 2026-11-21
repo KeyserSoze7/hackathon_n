@@ -1,0 +1,226 @@
+{
+ "Reply": {
+  "id": 4,
+  "flag_id": "DLP_PAID_TWICE:WO25-01994",
+  "author_role": "ward_engineer",
+  "author_name": "AE Roads K/W",
+  "body": "MGL utility trench reopened this stretch; contractor liable under DLP.",
+  "created_at": "2026-11-21T16:01:15+05:30"
+ },
+ "CitizenReport": {
+  "report_id": 24,
+  "kind": "still_broken",
+  "issue_type": "pothole",
+  "status": "payment_held",
+  "road": {
+   "road_id": "RD0048",
+   "road_name": "Dr Babasaheb Ambedkar Road",
+   "ward_code": "F/S",
+   "under_dlp": true
+  },
+  "duplicate_of": null,
+  "linked_work_order_id": "WO25-02017",
+  "responsible": {
+   "party": "contractor_under_dlp",
+   "name": "Konkan Roadcon Pvt Ltd (synthetic)",
+   "ward_office": "F/S Ward Office (synthetic)",
+   "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2026-02-18), so surface defects are the contractor's to fix at no cost to BMC."
+  },
+  "sla_hours": 72,
+  "photos": [
+   {
+    "photo_id": "1aee300d99da4b9b8078e80913f5903c",
+    "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
+    "width": 800,
+    "height": 600
+   }
+  ],
+  "tracker": [
+   {
+    "step": "reported",
+    "label": "Reported",
+    "status": "done",
+    "at": "2026-11-21T16:14:01+05:30"
+   },
+   {
+    "step": "matched_to_contract",
+    "label": "Matched to contract",
+    "status": "done",
+    "at": "2026-11-21T16:14:01+05:30"
+   },
+   {
+    "step": "payment_held",
+    "label": "Payment auto-held (DLP)",
+    "status": "current",
+    "at": "2026-11-21T16:14:01+05:30"
+   },
+   {
+    "step": "contractor_notified",
+    "label": "Contractor notified",
+    "status": "pending",
+    "at": null
+   }
+  ],
+  "flag_id": "DLP_PAID_TWICE:WO25-01947",
+  "landmark": "opposite KEM Hospital gate",
+  "location": {
+   "lat": 19.0058,
+   "lon": 72.8425,
+   "accuracy_m": 12.0,
+   "source": "gps"
+  },
+  "input_mode": "photo",
+  "language": "en",
+  "text": "Pothole is back after the repair",
+  "matched_locality": null,
+  "created_at": "2026-11-21T16:14:01+05:30"
+ },
+ "Allocation": {
+  "ward_code": "K/W",
+  "budget_inr": 500000.0,
+  "spend_inr": 499138,
+  "harm_avoided": 132.2,
+  "funded": [
+   {
+    "item_id": "RD0143|Pothole",
+    "ward_code": "K/W",
+    "method": "Cold mix patch",
+    "cost": 59144.7,
+    "benefit": 20.3,
+    "road_name": "SV Road",
+    "issue": "Pothole",
+    "reason_codes": [
+     "SCHOOL_ZONE",
+     "ACCIDENT_PRONE",
+     "REPEAT_FAILURE",
+     "OPEN_COMPLAINTS"
+    ],
+    "evidence_wo_ids": [
+     "WO25-00025",
+     "WO25-01442",
+     "WO25-01525",
+     "WO25-01654",
+     "WO25-01809",
+     "WO25-02236"
+    ]
+   },
+   {
+    "item_id": "RD0147|Pothole",
+    "ward_code": "K/W",
+    "method": "Cold mix patch",
+    "cost": 92108.6,
+    "benefit": 27.4,
+    "road_name": "Juhu Tara Road",
+    "issue": "Pothole",
+    "reason_codes": [
+     "FLOOD_SPOT",
+     "REPEAT_FAILURE",
+     "OPEN_COMPLAINTS"
+    ],
+    "evidence_wo_ids": [
+     "WO25-00396",
+     "WO25-00477",
+     "WO25-00754",
+     "WO25-00918",
+     "WO25-01582",
+     "WO25-01672",
+     "WO25-02185"
+    ]
+   }
+  ],
+  "bucket_a_dlp": [
+   {
+    "item_id": "RD0152|Pothole",
+    "road_name": "JP Road",
+    "issue": "Pothole",
+    "estimated_repair_cost_inr": 36400,
+    "explanation": "Pothole on JP Road (K/W): needed 3 repairs this season. High stakes: accident prone, open complaints. Road is under warranty, so the original contractor must fix it at no cost to BMC."
+   }
+  ]
+ },
+ "DraftNotice": {
+  "title": "Defect notice: Paver blocks relaid on Sion Trombay Road (RD0240), work order WO25-01994",
+  "body": "To: Konkan Roadcon Pvt Ltd (synthetic)\nThrough: Executive Engineer (Roads), Ward M/W, Brihanmumbai Municipal Corporation\n\nSubject: Defect notice for work order WO25-01994 on Sion Trombay Road (RD0240), Ward M/W\n\nThe road audit has flagged work order WO25-01994 as \"Recoverable under DLP\".\n\nWork: Paver blocks relaid, cost ₹1,48,557, completed on 2025-09-03.\nFinding: Paver blocks relaid billed at ₹14 ...",
+  "cited_row_ids": [
+   "WO25-01994",
+   "RD0240"
+  ],
+  "flag_id": "DLP_PAID_TWICE:WO25-01994",
+  "road_id": "RD0240",
+  "language": "en",
+  "doc_type": "defect_notice",
+  "generated_by": "template"
+ },
+ "CitizenQueryReply": {
+  "matched_locality": "Andheri West",
+  "matched_road_id": "RD0153",
+  "plain_language_reply": "Andheri Subway (RD0153) is out of its Defect Liability Period (warranty). The latest work order WO25-02257 by Mahalaxmi Civil Contractors (synthetic) cost Rs 26,794, completed 2025-09-17; SLA met: yes, reopened within 30 days: yes. If it is broken again, tap 'Still broken' to report it, or draft an RTI request for the work-order records.",
+  "warranty_status": "OUT_OF_DLP",
+  "mode": "street_check",
+  "language": "en",
+  "generated_by": "template",
+  "lookup": {
+   "matched_via": "road_name",
+   "matched_text": "Andheri Subway",
+   "matched_locality": "Andheri West",
+   "ward_code": "K/W",
+   "matched_road_id": "RD0153",
+   "road_distance_m": 0,
+   "warranty_status": "OUT_OF_DLP",
+   "road": {
+    "road_id": "RD0153",
+    "road_name": "Andheri Subway",
+    "ward_code": "K/W",
+    "road_type": "Local",
+    "surface": "Concrete (CC)",
+    "under_dlp": false,
+    "last_resurfaced": "2021-02-27",
+    "total_billed_inr": 344529,
+    "work_orders_count": 6,
+    "rupees_at_stake": 136031,
+    "flagged_bills_count": 2,
+    "segment_no": 1,
+    "length_m": 434.0,
+    "dlp_months": null,
+    "dlp_expires_on": null
+   },
+   "language": "en",
+   "candidates": [
+    {
+     "road_id": "RD0153",
+     "road_name": "Andheri Subway",
+     "ward_code": "K/W",
+     "under_dlp": false,
+     "road_distance_m": 0,
+     "latest_work_order": {
+      "work_order_id": "WO25-02257",
+      "contractor_id": "CT03",
+      "contractor_name": "Mahalaxmi Civil Contractors (synthetic)",
+      "cost_inr": 26794,
+      "completed_at": "2025-09-17T14:53:00+05:30",
+      "sla_met": true,
+      "reopened_within_30d": true
+     }
+    }
+   ]
+  },
+  "livability": null
+ },
+ "PhotoUpload": {
+  "photo_id": "1aee300d99da4b9b8078e80913f5903c",
+  "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
+  "width": 800,
+  "height": 600,
+  "taken_at": "2025-08-01T09:15:00+05:30",
+  "exif_lat": 19.0049,
+  "exif_lon": 72.8463
+ },
+ "RoadReport": {
+  "report_id": 24,
+  "kind": "still_broken",
+  "issue_type": "pothole",
+  "created_at": "2026-11-21T16:14:01+05:30",
+  "status": "payment_held",
+  "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c"
+ }
+}

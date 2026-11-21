@@ -9,3 +9,7 @@ sqlalchemy>=2
 psycopg2-binary
 fastapi
 uvicorn
+anthropic>=2.12
+python-multipart
+pillow
+pillow-heif
