@@ -3,6 +3,8 @@
 export interface City {
   total_budget_inr: number; total_spend_inr: number; recoverable_dlp_inr: number; flagged_bills_count: number
   flags_by_detector: Record<string, number>
+  work_orders_count?: number; complaints_count?: number; reopened_within_30d_count?: number; sla_met_rate?: number
+  rupees_at_stake_total?: number; dlp_road_spend_inr?: number; recoverable_dlp_rule?: string
 }
 export interface Ward {
   ward_code: string; ward_name: string; zone: string; centroid_lat: number; centroid_lon: number
@@ -73,3 +75,36 @@ export interface CitizenReportReq {
   text?: string | null; language?: 'en' | 'hi' | 'mr' | null; photo_url?: string | null
   road_id?: string | null; work_order_id?: string | null; matched_locality?: string | null
 }
+
+export interface CitizenReport {
+  id: number; kind: string; input_mode: string; text: string | null; language: string | null; photo_url: string | null
+  matched_locality: string | null; road_id: string | null; work_order_id: string | null; flag_id: string | null
+  status: string; status_updated_at: string; created_at: string
+  tracker: { step: string; done: boolean; status?: 'done' | 'current' | 'pending'; label?: string; at?: string | null }[]
+  issue_type?: string | null; landmark?: string | null
+  road?: { road_id: string; road_name: string; ward_code: string; under_dlp: boolean } | null
+  responsible?: { party: string; name: string; ward_office: string; basis: string } | null
+  photos?: { photo_id: string; photo_url: string }[]
+  // Requested from backend (lifecycle history); optional until shipped
+  events?: { status: string; at: string; by_role?: string; note?: string }[]
+  sla_due_at?: string | null; rejection_reason?: string | null
+}
+export interface Me {
+  citizen_id: string; display_name: string; joined_at: string
+  stats: { reports: number; roads: number; open: number; resolved: number; confirmed_fixed: number; rupees_flagged_inr: number; rupees_held_inr: number }
+}
+export interface AdminSession { token: string; role: 'citizen' | 'ward_officer' | 'admin'; ward_codes?: string[]; name?: string; email?: string }
+export interface CitizenQueryRes { matched_locality: string | null; matched_road_id: string | null; plain_language_reply: string; warranty_status: string; generated_by?: string; lookup?: Lookup | null }
+export interface MoneyTrail {
+  ward_code: string; budget_inr: number; spend_inr: number
+  by_contractor: { contractor_id: string; contractor_name: string; jobs: number; spend_inr: number; failed_30d: number; failed_spend_inr: number }[]
+  by_repair_method: { repair_method: string; jobs: number; spend_inr: number; failed_30d: number }[]
+  failed_within_30d: { jobs: number; spend_inr: number }
+  summary?: string
+}
+export interface Notice { title: string; body: string; cited_row_ids: string[]; flag_id?: string; generated_by?: string }
+export interface AdminSummary {
+  reports_by_status: Record<string, number>; new_today: number; overdue_sla: number
+  median_hours_to_resolve: number | null; rupees_held_inr: number; flags_awaiting_reply: number
+}
+export interface AccessRequestReq { name: string; email: string; designation: string; ward_code: string; reason: string }

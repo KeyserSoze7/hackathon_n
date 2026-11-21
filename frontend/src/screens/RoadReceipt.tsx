@@ -4,11 +4,14 @@ import { api } from '../data/api'
 import { useAsync } from '../lib/useAsync'
 import { inr, num, date, DETECTOR, cleanName } from '../lib/format'
 import { ErrorBox, Id, Modal, Pending, Primary, Skel } from '../components/ui'
+import ReportFlow from '../components/ReportFlow'
 import type { Flag, RoadDetail, TimelineEvent } from '../data/types'
 
 export default function RoadReceipt({ roadId, onFind }: { roadId: string; onFind: () => void }) {
   const { data, loading, error, reload } = useAsync(() => Promise.all([api.road(roadId), api.timeline(roadId)]), [roadId])
   const [notice, setNotice] = useState(false)
+  // A QR code on a signboard can deep-link straight to the report form: #receipt?road=RD0220&report=1
+  const [reporting, setReporting] = useState(() => new URLSearchParams(location.hash.split('?')[1]).get('report') === '1')
   const [showAll, setShowAll] = useState(false)
 
   if (error) return <ErrorBox error={error} onRetry={reload} />
@@ -79,22 +82,27 @@ export default function RoadReceipt({ roadId, onFind }: { roadId: string; onFind
         <Primary onClick={() => setNotice(true)} className="w-full !min-h-[54px] text-base">
           <FileText size={20} strokeWidth={1.5} /> Draft defect notice (EN / मराठी)
         </Primary>
+        <button onClick={() => setReporting(true)} className="flex min-h-[48px] w-full items-center justify-center rounded-[8px] border border-ink bg-surface font-semibold hover:bg-hwyellow/20">
+          Report a problem on this road
+        </button>
       </div>
 
       <section className="rounded-[20px] border border-hairline bg-surface p-3 sm:p-6">
         <h2 className="text-lg font-bold">What happened, in order</h2>
         <p className="mt-1 text-sm text-muted">{num(timeline.filter((e) => e.event_type === 'complaint').length)} complaints, {num(road.work_orders_count)} repairs, {num(timeline.filter((e) => e.event_type === 'accident').length)} accidents.</p>
-        <ol className="mt-5 border-l border-hairline">
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
           {shown.map((e) => <TimelineRow key={`${e.event_type}-${e.ref_id}-${e.event_at}`} e={e} road={road} />)}
-        </ol>
+        </div>
         {timeline.length > shown.length && (
           <button onClick={() => setShowAll(true)} className="mt-2 text-sm font-semibold underline decoration-hwyellow decoration-2 underline-offset-4">Show remaining {num(timeline.length - shown.length)} events</button>
         )}
       </section>
 
+      {reporting && <ReportFlow road={{ road_id: road.road_id, road_name: road.road_name, ward_code: road.ward_code }} onClose={() => setReporting(false)} />}
+
       {notice && (
         <Modal title={`Defect notice: ${road.road_name}`} onClose={() => setNotice(false)}>
-          <Pending label="Notice drafting in English and Marathi" />
+          <NoticeDraft roadId={road.road_id} />
         </Modal>
       )}
     </div>
@@ -124,9 +132,9 @@ function FlagList({ road, onReplied }: { road: RoadDetail; onReplied: () => void
       </button>
       {open && (
         <div className="rise space-y-4">
-          <ul className="divide-y divide-hairline rounded-[8px] border border-hairline bg-concrete">
+          <div className="grid gap-3">
             {road.flags.map((f) => <FlagRow key={f.flag_id} f={f} />)}
-          </ul>
+          </div>
           <ReplyForm flags={road.flags} onReplied={onReplied} />
         </div>
       )}
@@ -136,7 +144,7 @@ function FlagList({ road, onReplied }: { road: RoadDetail; onReplied: () => void
 
 function FlagRow({ f }: { f: Flag }) {
   return (
-    <li className="space-y-2 p-4 text-sm">
+    <article className="space-y-2 rounded-[16px] border border-hairline bg-concrete p-4 text-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <p className="flex items-center gap-2 font-semibold"><CircleAlert size={16} strokeWidth={1.5} className="shrink-0" />{DETECTOR[f.detector] ?? f.detector} · tier {f.tier} · {f.status_label}</p>
@@ -150,7 +158,7 @@ function FlagRow({ f }: { f: Flag }) {
           <span className="font-semibold">{(r.author_role ?? 'reply').replace('_', ' ')}{r.author_name ? ` · ${r.author_name}` : ''}:</span> {r.body}
         </p>
       ))}
-    </li>
+    </article>
   )
 }
 
@@ -213,15 +221,14 @@ function TimelineRow({ e, road }: { e: TimelineEvent; road: RoadDetail }) {
     title = `Repair completed${e.detail.reopened_within_30d ? ': failed within 30 days' : ''}`
     note = `${e.detail.sla_met ? 'Within SLA' : 'After SLA'}${e.detail.rain_mm_on_completion_day != null ? ` · ${e.detail.rain_mm_on_completion_day} mm rain that day` : ''}`
   } else { title = `${e.detail.severity} accident`; note = String(e.detail.probable_cause ?? '') }
+  const bad = e.event_type !== 'accident' && e.detail.reopened_within_30d
   return (
-    <li className="relative pb-5 pl-6">
-      <span className={`absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full ${e.event_type === 'accident' ? 'bg-ink' : e.detail.reopened_within_30d ? 'bg-hwyellow ring-2 ring-ink' : 'bg-hairline'}`} aria-hidden />
-      <div className="flex flex-wrap items-baseline gap-x-3">
-        <span className="mono text-muted">{date(e.event_at)}</span>
-        <span className="font-medium">{title}</span>
-      </div>
-      <div className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-muted"><Id>{e.ref_id}</Id>{note && <span>{note}</span>}</div>
-    </li>
+    <article className={`space-y-1.5 rounded-[16px] border p-4 ${bad ? 'border-ink bg-hwyellow/25' : 'border-hairline bg-concrete'}`}>
+      <p className="mono text-muted">{date(e.event_at)}</p>
+      <p className="font-semibold leading-snug">{title}</p>
+      {note && <p className="text-sm text-muted">{note}</p>}
+      <p><Id>{e.ref_id}</Id></p>
+    </article>
   )
 }
 
@@ -229,6 +236,30 @@ function Loading() {
   return (
     <div className="mx-auto max-w-3xl space-y-6" role="status" aria-label="Loading road receipt">
       <Skel className="h-28" /><Skel className="h-40" /><Skel className="h-56" />
+    </div>
+  )
+}
+
+function NoticeDraft({ roadId }: { roadId: string }) {
+  const [lang, setLang] = useState<'en' | 'mr'>('en')
+  const { data, loading, error, reload } = useAsync(() => api.draftNotice(roadId, lang), [roadId, lang])
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className="space-y-4">
+      <div role="group" aria-label="Notice language" className="inline-grid grid-cols-2 gap-1 rounded-[12px] border border-hairline bg-concrete p-[4px]">
+        {(['en', 'mr'] as const).map((l) => <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l} className={`min-h-[40px] rounded-[8px] px-4 text-sm ${lang === l ? 'bg-hwyellow font-semibold' : 'font-medium text-muted'}`}>{l === 'en' ? 'English' : 'मराठी'}</button>)}
+      </div>
+      {error ? <ErrorBox error={error} onRetry={reload} /> : loading || !data ? (
+        <div className="space-y-3" role="status" aria-label="Drafting notice"><p className="text-sm text-muted">Claude is drafting from the flagged rows…</p><Skel className="h-5 w-2/3" /><Skel className="h-4 w-full" /><Skel className="h-4 w-full" /><Skel className="h-4 w-5/6" /><Skel className="h-24 w-full" /></div>
+      ) : (
+        <div className="rise space-y-3">
+          <h3 className="font-bold leading-snug">{data.title}</h3>
+          <div className="max-h-[45vh] overflow-y-auto whitespace-pre-wrap rounded-[12px] border border-hairline bg-concrete p-4 text-sm leading-relaxed">{data.body}</div>
+          <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted">Cites {data.cited_row_ids.map((id) => <Id key={id}>{id}</Id>)}</p>
+          <p className="text-xs text-muted">Draft written by Claude from the flagged rows. An officer should review it before sending.</p>
+          <Primary onClick={() => { navigator.clipboard?.writeText(`${data.title}\n\n${data.body}\n\nCited rows: ${data.cited_row_ids.join(', ')}`).then(() => setCopied(true)) }} className="w-full">{copied ? 'Copied' : 'Copy notice'}</Primary>
+        </div>
+      )}
     </div>
   )
 }

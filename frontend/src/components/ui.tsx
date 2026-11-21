@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X, RotateCw } from 'lucide-react'
 import { API_BASE } from '../data/api'
 
@@ -22,7 +23,9 @@ export function ErrorBox({ error, onRetry }: { error: Error; onRetry?: () => voi
   return (
     <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border-2 border-ink bg-surface p-4">
       <p className="text-sm">
-        Could not reach the data service ({error.message}). Check you are on the same network as <span className="mono">{API_BASE}</span>.
+        {location.protocol === 'https:' && API_BASE.startsWith('http:')
+          ? <>This page is secure (https) but the data service at <span className="mono">{API_BASE}</span> is not, so the browser blocks it. Open the app from the laptop's address instead, or point it at an https address for the service.</>
+          : <>Could not reach the data service ({error.message}). Check you are on the same network as <span className="mono">{API_BASE}</span>.</>}
       </p>
       {onRetry && (
         <button onClick={onRetry} className="flex min-h-[40px] items-center gap-2 rounded-[8px] bg-hwyellow px-4 text-sm font-bold hover:bg-hwyellow-strong">
@@ -37,9 +40,12 @@ export function Modal({ title, onClose, children, footer }: { title: string; onC
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', h)
-    return () => window.removeEventListener('keydown', h)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden' // lock page scroll behind the dialog
+    return () => { window.removeEventListener('keydown', h); document.body.style.overflow = prev }
   }, [onClose])
-  return (
+  // Portal to <body>: an animated ancestor (the screens fade in) would otherwise become the containing block for position: fixed.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/35 p-4 sm:items-center" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div role="dialog" aria-modal="true" aria-label={title} className="rise flex max-h-[88vh] w-full max-w-xl flex-col overflow-hidden rounded-[20px] border-2 border-ink bg-surface">
         <div className="flex items-center justify-between gap-3 border-b border-hairline px-5 py-4">
@@ -47,9 +53,10 @@ export function Modal({ title, onClose, children, footer }: { title: string; onC
           <button onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-[8px] border border-hairline bg-concrete hover:border-ink"><X size={18} strokeWidth={1.5} /></button>
         </div>
         <div className="overflow-y-auto p-5">{children}</div>
-        {footer && <div className="border-t border-hairline bg-concrete p-3">{footer}</div>}
+        {footer && <div className="border-t border-hairline bg-concrete p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

@@ -4,18 +4,27 @@ import { api } from '../data/api'
 import type { Lookup, Ward } from '../data/types'
 import { inr, num, pct, date, shortWard } from '../lib/format'
 import { Id, Pending, Primary, Skel } from '../components/ui'
+import ReportFlow from '../components/ReportFlow'
 
 type Tab = 'signboard' | 'qr' | 'search'
-type Found = { state: 'idle' } | { state: 'loading' } | { state: 'none'; text: string } | { state: 'ok'; data: Lookup; text: string }
+type Found = { state: 'idle' } | { state: 'loading' } | { state: 'none'; text: string } | { state: 'ok'; data: Lookup; text: string; answer?: string }
 
 export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | null; ward: string; onOpenRoad: (id: string) => void }) {
   const [tab, setTab] = useState<Tab>('signboard')
   const [text, setText] = useState('')
   const [found, setFound] = useState<Found>({ state: 'idle' })
   const w = wards?.find((x) => x.ward_code === ward)
+  const [reporting, setReporting] = useState<Lookup | null>(null)
 
-  const find = async (q: string) => {
+  // Typed questions go to the Claude citizen query (plain-language answer + matched road); fall back to the plain lookup.
+  const find = async (q: string, ask = false) => {
     setFound({ state: 'loading' })
+    if (ask) {
+      try {
+        const r = await api.citizenQuery(q)
+        if (r.lookup) return setFound({ state: 'ok', data: r.lookup, text: q, answer: r.plain_language_reply })
+      } catch { /* fall back to lookup */ }
+    }
     try { setFound({ state: 'ok', data: await api.lookup(q), text: q }) }
     catch { setFound({ state: 'none', text: q }) }
   }
@@ -52,7 +61,7 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
               <p className="mt-4 text-center text-xs text-muted">Sample board. The board text is sent to the road lookup. Reading a real photo is not connected yet.</p>
             </div>
             <div className="flex flex-col justify-between gap-4 lg:col-span-5">
-              <Result found={found} onOpenRoad={onOpenRoad} />
+              <Result found={found} onOpenRoad={onOpenRoad} onReport={setReporting} />
               <Primary onClick={() => find('Kurla Andheri Road')} disabled={found.state === 'loading'} className="w-full !min-h-[54px] text-base">
                 <Camera size={20} strokeWidth={1.5} /> Photograph road signboard
               </Primary>
@@ -74,16 +83,16 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
 
         {tab === 'search' && (
           <div className="space-y-4">
-            <form onSubmit={(e) => { e.preventDefault(); if (text.trim()) find(text.trim()) }} className="flex flex-col gap-2 sm:flex-row">
+            <form onSubmit={(e) => { e.preventDefault(); if (text.trim()) find(text.trim(), true) }} className="flex flex-col gap-2 sm:flex-row">
               <label className="relative flex-1">
                 <span className="sr-only">Road name or landmark</span>
                 <Search size={18} strokeWidth={1.5} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-                <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Andheri subway ke bahar khadda ho gaya"
+                <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Andheri subway ke bahar khadda wapas aa gaya, paisa kahan gaya?"
                   className="min-h-[52px] w-full rounded-[8px] border border-hairline bg-concrete pl-10 pr-3 placeholder:text-muted focus:border-ink focus:outline-none" />
               </label>
-              <Primary type="submit" disabled={!text.trim() || found.state === 'loading'}>Find road</Primary>
+              <Primary type="submit" disabled={!text.trim() || found.state === 'loading'}>Ask</Primary>
             </form>
-            <Result found={found} onOpenRoad={onOpenRoad} />
+            <Result found={found} onOpenRoad={onOpenRoad} onReport={setReporting} />
             <Pending label="Browse all roads" />
           </div>
         )}
@@ -98,54 +107,47 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
           <Pending label="Flood hotspots, repair failures and hospital access near a locality" />
         </div>
       </div>
+
+      {reporting && (
+        <ReportFlow road={{ road_id: reporting.matched_road_id, road_name: reporting.road.road_name, ward_code: reporting.ward_code }}
+          locality={reporting.matched_locality} onClose={() => setReporting(null)} onOpenRoad={onOpenRoad} />
+      )}
     </div>
   )
 }
 
-function Result({ found, onOpenRoad }: { found: Found; onOpenRoad: (id: string) => void }) {
-  const [report, setReport] = useState<{ state: 'idle' | 'sending' | 'done' | 'error'; id?: string }>({ state: 'idle' })
-  useEffect(() => setReport({ state: 'idle' }), [found])
-
-  if (found.state === 'idle') return <div className="rounded-[8px] border border-hairline bg-concrete p-5 text-sm text-muted">Results appear here.</div>
+function Result({ found, onOpenRoad, onReport }: { found: Found; onOpenRoad: (id: string) => void; onReport: (d: Lookup) => void }) {
+  if (found.state === 'idle') return <div className="rounded-[12px] border border-hairline bg-concrete p-5 text-sm text-muted">Results appear here.</div>
   if (found.state === 'loading') return (
-    <div className="space-y-3 rounded-[8px] border border-hairline bg-concrete p-5" role="status" aria-label="Looking up road">
+    <div className="space-y-3 rounded-[12px] border border-hairline bg-concrete p-5" role="status" aria-label="Looking up road">
       <Skel className="h-4 w-1/3" /><Skel className="h-6 w-3/4" /><Skel className="h-10 w-full" />
     </div>
   )
-  if (found.state === 'none') return <div className="rounded-[8px] border border-hairline bg-concrete p-5 text-sm">No road matched “{found.text}”. Try a road name or a known locality.</div>
+  if (found.state === 'none') return <div className="rounded-[12px] border border-hairline bg-concrete p-5 text-sm">No road matched “{found.text}”. Try a road name or a known locality.</div>
 
   const { data: d } = found
   const under = d.warranty_status === 'UNDER_DLP'
-  const send = async () => {
-    setReport({ state: 'sending' })
-    try {
-      const r = await api.report({ kind: 'still_broken', input_mode: 'text', text: found.text, language: 'en', road_id: d.matched_road_id, matched_locality: d.matched_locality })
-      const id = r.report_id ?? r.id
-      setReport({ state: 'done', id: id === undefined ? undefined : String(id) })
-    } catch { setReport({ state: 'error' }) }
-  }
   return (
-    <div className="rise space-y-3 rounded-[8px] border-2 border-ink bg-surface p-5">
+    <div className="rise space-y-4 rounded-[12px] border-2 border-ink bg-surface p-5">
+      {found.answer && (
+        <div className="rounded-[12px] border border-hairline bg-hwyellow/20 p-4">
+          <p className="text-xs font-semibold text-muted">Answer, written by Claude from the records below</p>
+          <p className="mt-1 text-[15px] leading-relaxed">{found.answer}</p>
+        </div>
+      )}
       <p className="text-xs font-semibold text-hwgreen">
         Matched by {d.matched_via.replace('_', ' ')}: “{d.matched_text}”{d.matched_locality ? ` · ${d.matched_locality}` : ''}
       </p>
       <h3 className="text-lg font-bold">{d.road.road_name}</h3>
       <p className="flex flex-wrap items-center gap-2 text-sm text-muted"><Id>{d.matched_road_id}</Id> <span>Ward {d.ward_code}</span> <span>{num(d.road_distance_m)} m from match</span></p>
-      <dl className="grid grid-cols-2 gap-3 text-sm">
-        <div><dt className="text-muted">Warranty</dt><dd className="font-semibold">{under ? 'Under warranty' : 'Out of warranty'}</dd></div>
-        <div><dt className="text-muted">Billed this monsoon</dt><dd className="font-semibold">{inr(d.road.total_billed_inr)}</dd></div>
-        <div><dt className="text-muted">Flagged bills</dt><dd className="font-semibold">{num(d.road.flagged_bills_count)}</dd></div>
-        <div><dt className="text-muted">Resurfaced</dt><dd className="font-semibold">{date(d.road.last_resurfaced)}</dd></div>
+      <dl className="grid grid-cols-2 gap-2 text-sm">
+        <div className="rounded-[8px] bg-concrete p-3"><dt className="text-xs text-muted">Warranty</dt><dd className="font-semibold">{under ? 'Under warranty' : 'Out of warranty'}</dd></div>
+        <div className="rounded-[8px] bg-concrete p-3"><dt className="text-xs text-muted">Billed this monsoon</dt><dd className="font-semibold">{inr(d.road.total_billed_inr)}</dd></div>
+        <div className="rounded-[8px] bg-concrete p-3"><dt className="text-xs text-muted">Flagged bills</dt><dd className="font-semibold">{num(d.road.flagged_bills_count)}</dd></div>
+        <div className="rounded-[8px] bg-concrete p-3"><dt className="text-xs text-muted">Resurfaced</dt><dd className="font-semibold">{date(d.road.last_resurfaced)}</dd></div>
       </dl>
       <Primary onClick={() => onOpenRoad(d.matched_road_id)} className="w-full">Open road receipt</Primary>
-      {report.state === 'done' ? (
-        <p className="rise flex items-center gap-2 text-sm"><Check size={16} strokeWidth={1.5} /> Reported as still broken{report.id ? ` (report ${report.id})` : ''}.</p>
-      ) : (
-        <button onClick={send} disabled={report.state === 'sending'} className="w-full text-center text-sm font-semibold underline decoration-hwyellow decoration-2 underline-offset-4 disabled:opacity-50">
-          {report.state === 'sending' ? 'Sending…' : 'Still broken? Report it'}
-        </button>
-      )}
-      {report.state === 'error' && <p className="text-sm">The report could not be sent. Try again.</p>}
+      <button onClick={() => onReport(d)} className="flex min-h-[48px] w-full items-center justify-center rounded-[8px] border border-ink bg-surface font-semibold hover:bg-hwyellow/20">Report a problem on this road</button>
     </div>
   )
 }
