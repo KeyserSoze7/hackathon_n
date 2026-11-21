@@ -43,7 +43,8 @@ def road(road_id: str = Path(examples=["RD0058"])):
         "WHERE wo.road_id = %(r)s ORDER BY wo.assigned_at",
         r=road_id)
     r["flags"] = rows(
-        "SELECT f.*, COALESCE((SELECT json_agg(rp ORDER BY rp.created_at) FROM flag_replies rp "
+        "SELECT f.*, COALESCE((SELECT json_agg(json_build_object('id', rp.id, 'flag_id', rp.flag_id, 'author_role', rp.author_role, "
+        "'author_name', rp.author_name, 'body', rp.body, 'created_at', rp.created_at) ORDER BY rp.created_at) FROM flag_replies rp "
         "WHERE rp.flag_id = f.flag_id), '[]') AS replies FROM flags f WHERE f.road_id = %(r)s "
         "ORDER BY f.tier, f.rupees_at_stake DESC", r=road_id)
     r["dlp_rule"] = DLP_RULE
@@ -74,7 +75,8 @@ def road_timeline(road_id: str = Path(examples=["RD0058"])):
 @router.get("/api/flags/{flag_id}", response_model=s.FlagWithReplies, responses=s.NOT_FOUND, summary="One flag with its replies")
 def flag(flag_id: str = Path(description="<DETECTOR>:<work_order_id>", examples=["DLP_PAID_TWICE:WO25-01994"])):
     f = one("SELECT * FROM flags WHERE flag_id = %(f)s", f"flag {flag_id}", f=flag_id)
-    f["replies"] = rows("SELECT * FROM flag_replies WHERE flag_id = %(f)s ORDER BY created_at", f=flag_id)
+    f["replies"] = rows("SELECT id, flag_id, author_role, author_name, body, created_at FROM flag_replies "
+                        "WHERE flag_id = %(f)s ORDER BY created_at", f=flag_id)  # public fields only (no admin_id)
     return f
 
 
