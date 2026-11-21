@@ -1,27 +1,48 @@
-# MARG demo video: script (target 2:00, cut to 1:30 by dropping the lines marked [cut])
+# MARG: final 2:00 demo video
 
-Frames come from the running frontend (screen recording of `http://localhost:5173` on a 390 × 844 phone view for the citizen scenes, and a 1280 × 720 laptop view for the officer scenes). Numbers are read live from the backend; confirm them on screen before recording.
+**File:** `assets/video/marg_demo.mp4` (1280×720, 30 fps, H.264 + AAC, exactly 2:00).
+**Rebuild:**
+1. Start `npm run dev` with the API reachable.
+2. Run `python frontend/scripts/video_capture.py`. This creates one "FRONTEND TEST" report.
+3. Run `python frontend/scripts/video_build.py`.
 
-| Time | On screen | Voice-over |
+Every frame is a real screen from the app on live data. Captions are burned in, in English. The music is the brand animation's own track, looped under the video.
+
+| Time | Scene | On screen (caption) |
 |---|---|---|
-| 0:00 – 0:08 | Boot animation, the MARG emblem forms with "हर रुपये का हिसाब". | Every monsoon, Mumbai spends crores fixing the same roads. Nobody can easily say where the money went, whether the fix lasted, or where the next rupee should go. This is MARG. |
-| 0:08 – 0:25 | **Find a road**, phone view. Type "Andheri subway ke bahar khadda ho gaya". The match card appears: road, ward, warranty status, billed amount. | A citizen types a landmark, in any language they use. MARG finds the road and shows what was billed there, whether it is still under the contractor's warranty, and how many bills need an explanation. No login, no app. |
-| 0:25 – 0:55 | Tap **Report a problem on this road**. Step through What, Photo, Where, Review. Send. The tracker fills: report received, matched to contract, payment held. | If the road is broken again, the citizen reports it in four taps: what is wrong, a photo, where, and send. The report is matched to the road and its contract. If the road is under warranty, the bill is flagged and the contractor, not the public, owes the repair. And the citizen can watch it move. |
-| 0:55 – 1:15 | **Road receipt** for Kurla Andheri Road, laptop view. Scroll the proof trail: complaint, repair, failures, audit flags. Open the evidence rows and show the row IDs. | Behind every answer is a receipt. Thirty-five jobs on one stretch of Kurla Andheri Road, eight flagged bills, each with its rule and its evidence IDs, so anyone can verify it. Flags say "needs explanation", never "fraud", and the ward engineer or contractor can reply on the record. |
-| 1:15 – 1:35 | **City audit.** Hero headline, ₹13.43 Cr spent, ₹60.3 lakh billed under warranty, 527 bills needing explanation. Click a ward on the map; the flagged cards filter. | For the city: 13.43 crore spent, 60.3 lakh of it billed on roads still under warranty, and 527 bills that need explaining, from warranty to overlapping work orders to rain-day work. Select any ward and see exactly which bills. |
-| 1:35 – 1:50 | **Contractors**, then **Next rupee**. Show one contractor card (Deccan: 9.1% failed against 22.9% expected, "better than expected"). Move the budget slider in **Next rupee**; the funded list changes and the ₹0 warranty box stays. | Contractors are judged fairly: each failure rate sits next to what the rain, tides and roads predict, so nobody is punished for working in a flood-prone ward. And the next rupee goes where it does the most good. Roads under warranty cost the city nothing, so that money moves to the roads that need it. |
-| 1:50 – 2:00 | Return to the emblem, tagline. | Where did the money go? Did the fix last? Where should the next rupee go? MARG answers all three. Har rupaye ka hisaab. |
+| 0:00 | Brand animation | The MARG milestone forms |
+| 0:06 | Title | Every monsoon, Mumbai spends crores fixing the same roads. |
+| 0:12 | Positioning | MARG: one tool for the whole money trail. The six ideas listed |
+| 0:20 | Phone: Ask | A Hinglish question, answered by Claude in plain language from the records |
+| 0:29 | Phone: Report step 1 | Broken again? Report it in four steps |
+| 0:35 | Phone: Review | Check it, then send |
+| 0:39 | Phone: Tracker | Matched to the contract, then tracked |
+| 0:46 | Phone: My reports | Every report, its status, its impact; email and password sign-in |
+| 0:53 | Desktop: Road receipt | Kurla Andheri Road: ₹30.5L billed across 35 repair jobs |
+| 1:00 | Desktop: Proof trail | Complaint to repair to failure, connected |
+| 1:05 | Desktop: Defect notice | One click: a defect notice drafted by Claude, citing work orders |
+| 1:13 | Desktop: City audit | ₹13.43 Cr spent, ₹60.3L billed under warranty, 527 bills need explanation |
+| 1:21 | Desktop: Flagged bills | The repair auditor, bill by bill |
+| 1:26 | Desktop: Contractors | Judged fairly against rain, tides and roads |
+| 1:34 | Desktop: Next rupee | Warranty roads cost ₹0; budget goes where it avoids most harm |
+| 1:42 | Phone: Ward office | Officers move each report forward; the citizen sees every step |
+| 1:49 | Phone: Flags awaiting reply | Every flag answered on the record |
+| 1:54 | Close | Where did the money go? Did the fix last? Where should the next rupee go? |
 
-## Cuts for 1:30
+## Google form: choose "Custom", covering all six ideas
 
-- Drop the 0:55 – 1:15 road-receipt scene's evidence-row detail; keep one sentence on the receipt.
-- Merge Contractors and Next rupee into one 10-second shot: contractor verdict, then the slider.
-- Shorten the opening to 5 seconds.
+| Option | What MARG has | Status |
+|---|---|---|
+| Ward Money Trail | Budget vs spend per ward, ₹ billed under warranty, ward map, flagged bills per ward | **Partial.** The per-ward split by contractor and the ₹ spent on fixes that failed within 30 days are built in the UI, but they wait on `GET /api/wards/{ward}/money-trail` ("Data coming in"). The city-level failed-fix count (611) is live. |
+| Repair Auditor | Five deterministic detectors: warranty (DLP), rate card, overlapping work orders (double billing), rain-day work, repeat bill with no complaint. Evidence rows, right of reply | **Done.** Missed SLAs show per repair and per contractor, but they are not a separate flag type. |
+| Contractor Scorecard | Failure and SLA rates against expected for rain, tides, roads and method; ranges; drivers; cost against rate card; volume | **Done** |
+| Next Rupee Planner | Per-ward budget slider re-solved on the server, ₹0 warranty bucket, items ranked by harm avoided, recommended durable method | **Done** (per ward) |
+| Complaint to Work Order Linker | Complaints linked to work orders on every road timeline; Hinglish and Devanagari lookup; Claude parses free text; new reports carry `duplicate_of` | **Mostly.** Bulk complaint de-duplication is done in the backend pipeline; the UI shows the links, not a de-dup console. |
+| Citizen Accountability Bot | "Ask in your own words": Claude answers what happened, with work order, contractor, cost, SLA and warranty. Report tracker and My reports | **Done** |
 
-## Notes for recording
+Suggested custom description: "MARG, a pre-payment audit gate and public rupee receipt for monsoon road repairs. It covers all six ideas in one app: ward money trail, repair auditor, fair contractor scorecard, next-rupee planner, complaint-to-work-order linking, and a citizen accountability bot, plus citizen reporting with a tracker and a ward-office dashboard. Code computes every number; Claude explains, drafts notices and answers citizens."
 
-- Honest framing: the data is synthetic, and the photo step previews the photo but does not upload it yet. Say "photo upload is coming" if asked; do not claim it is sent.
-- The signboard and QR options are demos. Show the typed lookup instead.
-- Record the citizen scenes on a real phone or a 390 px browser window; the bottom navigation should be visible.
-- The Hindi and Marathi toggle only translates the navigation. Do not demonstrate full translation.
-- Delete the "FRONTEND TEST" reports (ids 6 to 9) before recording so the demo data is clean.
+## Before submitting
+
+- Delete the "FRONTEND TEST" reports (ids 6 and up, including 17 from the final capture).
+- The data is synthetic. The photo step previews but does not upload yet. Email and password sign-in and the ward office actions show "Data coming in" until the backend ships `/api/auth/*` and `/api/admin/*`.
