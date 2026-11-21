@@ -1,0 +1,7262 @@
+[
+  {
+    "road_id": "RD0211",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/N",
+    "under_dlp": true,
+    "priority_score": 66.6,
+    "estimated_repair_cost_inr": 172455,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 248,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 12108,
+    "evidence_row_ids": [
+      "RD0211",
+      "ACC0277"
+    ],
+    "bucket_rank": 1
+  },
+  {
+    "road_id": "RD0176",
+    "road_name": "SV Road",
+    "ward_code": "P/N",
+    "under_dlp": true,
+    "priority_score": 66.1,
+    "estimated_repair_cost_inr": 213452,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 680,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 8,
+    "peak_hour_vehicles": 5752,
+    "evidence_row_ids": [
+      "RD0176",
+      "ACC0319",
+      "ACC0258",
+      "ACC0266"
+    ],
+    "bucket_rank": 2
+  },
+  {
+    "road_id": "RD0220",
+    "road_name": "Kurla Andheri Road",
+    "ward_code": "L",
+    "under_dlp": true,
+    "priority_score": 64.3,
+    "estimated_repair_cost_inr": 133047,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 350,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 3050,
+    "evidence_row_ids": [
+      "RD0220",
+      "ACC0018",
+      "ACC0229"
+    ],
+    "bucket_rank": 3
+  },
+  {
+    "road_id": "RD0076",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "F/N",
+    "under_dlp": true,
+    "priority_score": 61.5,
+    "estimated_repair_cost_inr": 127327,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH003",
+    "nearest_hotspot_m": 479,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 10902,
+    "evidence_row_ids": [
+      "RD0076",
+      "ACC0152"
+    ],
+    "bucket_rank": 4
+  },
+  {
+    "road_id": "RD0101",
+    "road_name": "90 Feet Road Dharavi",
+    "ward_code": "G/N",
+    "under_dlp": true,
+    "priority_score": 54.9,
+    "estimated_repair_cost_inr": 122604,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 564,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 7,
+    "peak_hour_vehicles": 844,
+    "evidence_row_ids": [
+      "RD0101",
+      "ACC0404"
+    ],
+    "bucket_rank": 5
+  },
+  {
+    "road_id": "RD0243",
+    "road_name": "RC Marg",
+    "ward_code": "M/W",
+    "under_dlp": true,
+    "priority_score": 53.6,
+    "estimated_repair_cost_inr": 188518,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH016",
+    "nearest_hotspot_m": 243,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 960,
+    "evidence_row_ids": [
+      "RD0243"
+    ],
+    "bucket_rank": 6
+  },
+  {
+    "road_id": "RD0056",
+    "road_name": "Bellasis Road",
+    "ward_code": "E",
+    "under_dlp": true,
+    "priority_score": 50.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 296,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1407,
+    "evidence_row_ids": [
+      "RD0056"
+    ],
+    "bucket_rank": 7
+  },
+  {
+    "road_id": "RD0107",
+    "road_name": "Western Express Highway",
+    "ward_code": "H/E",
+    "under_dlp": true,
+    "priority_score": 49.0,
+    "estimated_repair_cost_inr": 230905,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1908,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 7,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 14818,
+    "evidence_row_ids": [
+      "RD0107",
+      "ACC0186",
+      "ACC0079",
+      "ACC0006"
+    ],
+    "bucket_rank": 8
+  },
+  {
+    "road_id": "RD0083",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/S",
+    "under_dlp": true,
+    "priority_score": 45.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 251,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3879,
+    "evidence_row_ids": [
+      "RD0083"
+    ],
+    "bucket_rank": 9
+  },
+  {
+    "road_id": "RD0235",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/E",
+    "under_dlp": true,
+    "priority_score": 43.4,
+    "estimated_repair_cost_inr": 230944,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1903,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 5,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3723,
+    "evidence_row_ids": [
+      "RD0235",
+      "ACC0367",
+      "ACC0139",
+      "ACC0371",
+      "ACC0039",
+      "ACC0129"
+    ],
+    "bucket_rank": 10
+  },
+  {
+    "road_id": "RD0282",
+    "road_name": "LBS Marg",
+    "ward_code": "T",
+    "under_dlp": true,
+    "priority_score": 41.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1628,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3740,
+    "evidence_row_ids": [
+      "RD0282",
+      "ACC0369"
+    ],
+    "bucket_rank": 11
+  },
+  {
+    "road_id": "RD0002",
+    "road_name": "Shahid Bhagat Singh Marg",
+    "ward_code": "A",
+    "under_dlp": true,
+    "priority_score": 41.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 2966,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3889,
+    "evidence_row_ids": [
+      "RD0002",
+      "ACC0168"
+    ],
+    "bucket_rank": 12
+  },
+  {
+    "road_id": "RD0155",
+    "road_name": "Link Road",
+    "ward_code": "K/W",
+    "under_dlp": true,
+    "priority_score": 38.8,
+    "estimated_repair_cost_inr": 155126,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 743,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 4221,
+    "evidence_row_ids": [
+      "RD0155",
+      "ACC0121"
+    ],
+    "bucket_rank": 13
+  },
+  {
+    "road_id": "RD0271",
+    "road_name": "JVLR",
+    "ward_code": "S",
+    "under_dlp": true,
+    "priority_score": 37.7,
+    "estimated_repair_cost_inr": 128242,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 1293,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 5214,
+    "evidence_row_ids": [
+      "RD0271",
+      "ACC0009"
+    ],
+    "bucket_rank": 14
+  },
+  {
+    "road_id": "RD0052",
+    "road_name": "Clare Road",
+    "ward_code": "E",
+    "under_dlp": true,
+    "priority_score": 37.4,
+    "estimated_repair_cost_inr": 226225,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 84,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 744,
+    "evidence_row_ids": [
+      "RD0052"
+    ],
+    "bucket_rank": 15
+  },
+  {
+    "road_id": "RD0259",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "N",
+    "under_dlp": true,
+    "priority_score": 37.0,
+    "estimated_repair_cost_inr": 196671,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1409,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 16461,
+    "evidence_row_ids": [
+      "RD0259",
+      "ACC0418"
+    ],
+    "bucket_rank": 16
+  },
+  {
+    "road_id": "RD0197",
+    "road_name": "SV Road",
+    "ward_code": "R/C",
+    "under_dlp": true,
+    "priority_score": 35.1,
+    "estimated_repair_cost_inr": 133196,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2360,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3988,
+    "evidence_row_ids": [
+      "RD0197",
+      "ACC0322"
+    ],
+    "bucket_rank": 17
+  },
+  {
+    "road_id": "RD0253",
+    "road_name": "LBS Marg",
+    "ward_code": "N",
+    "under_dlp": true,
+    "priority_score": 34.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "FLOOD_SPOT"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 273,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3543,
+    "evidence_row_ids": [
+      "RD0253"
+    ],
+    "bucket_rank": 18
+  },
+  {
+    "road_id": "RD0200",
+    "road_name": "LT Road",
+    "ward_code": "R/C",
+    "under_dlp": true,
+    "priority_score": 34.0,
+    "estimated_repair_cost_inr": 228423,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 1330,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 1261,
+    "evidence_row_ids": [
+      "RD0200"
+    ],
+    "bucket_rank": 19
+  },
+  {
+    "road_id": "RD0048",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "F/S",
+    "under_dlp": true,
+    "priority_score": 31.9,
+    "estimated_repair_cost_inr": 175047,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 1160,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3301,
+    "evidence_row_ids": [
+      "RD0048",
+      "ACC0112",
+      "ACC0402"
+    ],
+    "bucket_rank": 20
+  },
+  {
+    "road_id": "RD0278",
+    "road_name": "Village Road Bhandup",
+    "ward_code": "S",
+    "under_dlp": true,
+    "priority_score": 31.7,
+    "estimated_repair_cost_inr": 88568,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 777,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 7,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 260,
+    "evidence_row_ids": [
+      "RD0278",
+      "ACC0338",
+      "ACC0285",
+      "ACC0412"
+    ],
+    "bucket_rank": 21
+  },
+  {
+    "road_id": "RD0078",
+    "road_name": "Road No 24 Sion",
+    "ward_code": "F/N",
+    "under_dlp": true,
+    "priority_score": 30.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 651,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 7,
+    "peak_hour_vehicles": 305,
+    "evidence_row_ids": [
+      "RD0078",
+      "ACC0237"
+    ],
+    "bucket_rank": 22
+  },
+  {
+    "road_id": "RD0240",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/W",
+    "under_dlp": true,
+    "priority_score": 30.3,
+    "estimated_repair_cost_inr": 219280,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 838,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4331,
+    "evidence_row_ids": [
+      "RD0240",
+      "ACC0192"
+    ],
+    "bucket_rank": 23
+  },
+  {
+    "road_id": "RD0210",
+    "road_name": "Dahisar Subway Road",
+    "ward_code": "R/N",
+    "under_dlp": true,
+    "priority_score": 29.9,
+    "estimated_repair_cost_inr": 152807,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 1071,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 227,
+    "evidence_row_ids": [
+      "RD0210",
+      "ACC0124",
+      "ACC0054"
+    ],
+    "bucket_rank": 24
+  },
+  {
+    "road_id": "RD0280",
+    "road_name": "LBS Marg",
+    "ward_code": "T",
+    "under_dlp": true,
+    "priority_score": 29.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1258,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3627,
+    "evidence_row_ids": [
+      "RD0280"
+    ],
+    "bucket_rank": 25
+  },
+  {
+    "road_id": "RD0090",
+    "road_name": "Dr Annie Besant Road",
+    "ward_code": "G/S",
+    "under_dlp": true,
+    "priority_score": 27.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 1245,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2516,
+    "evidence_row_ids": [
+      "RD0090"
+    ],
+    "bucket_rank": 26
+  },
+  {
+    "road_id": "RD0162",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": true,
+    "priority_score": 25.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1293,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2454,
+    "evidence_row_ids": [
+      "RD0162",
+      "ACC0276"
+    ],
+    "bucket_rank": 27
+  },
+  {
+    "road_id": "RD0047",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "E",
+    "under_dlp": true,
+    "priority_score": 24.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 1322,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3494,
+    "evidence_row_ids": [
+      "RD0047",
+      "ACC0137"
+    ],
+    "bucket_rank": 28
+  },
+  {
+    "road_id": "RD0023",
+    "road_name": "Kalbadevi Road",
+    "ward_code": "C",
+    "under_dlp": true,
+    "priority_score": 24.1,
+    "estimated_repair_cost_inr": 109209,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1202,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1165,
+    "evidence_row_ids": [
+      "RD0023"
+    ],
+    "bucket_rank": 29
+  },
+  {
+    "road_id": "RD0152",
+    "road_name": "JP Road",
+    "ward_code": "K/W",
+    "under_dlp": true,
+    "priority_score": 23.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1258,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1279,
+    "evidence_row_ids": [
+      "RD0152",
+      "ACC0301"
+    ],
+    "bucket_rank": 30
+  },
+  {
+    "road_id": "RD0111",
+    "road_name": "Kalanagar Road",
+    "ward_code": "H/E",
+    "under_dlp": true,
+    "priority_score": 22.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1270,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2077,
+    "evidence_row_ids": [
+      "RD0111"
+    ],
+    "bucket_rank": 31
+  },
+  {
+    "road_id": "RD0145",
+    "road_name": "SV Road",
+    "ward_code": "K/W",
+    "under_dlp": true,
+    "priority_score": 20.2,
+    "estimated_repair_cost_inr": 90325,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 431,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 5899,
+    "evidence_row_ids": [
+      "RD0145"
+    ],
+    "bucket_rank": 32
+  },
+  {
+    "road_id": "RD0025",
+    "road_name": "Jagannath Shankarseth Road",
+    "ward_code": "C",
+    "under_dlp": true,
+    "priority_score": 20.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 609,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 985,
+    "evidence_row_ids": [
+      "RD0025"
+    ],
+    "bucket_rank": 33
+  },
+  {
+    "road_id": "RD0193",
+    "road_name": "Thakur Village Road",
+    "ward_code": "R/S",
+    "under_dlp": true,
+    "priority_score": 19.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2635,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 963,
+    "evidence_row_ids": [
+      "RD0193"
+    ],
+    "bucket_rank": 34
+  },
+  {
+    "road_id": "RD0123",
+    "road_name": "Linking Road",
+    "ward_code": "H/W",
+    "under_dlp": true,
+    "priority_score": 19.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 1033,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3547,
+    "evidence_row_ids": [
+      "RD0123"
+    ],
+    "bucket_rank": 35
+  },
+  {
+    "road_id": "RD0027",
+    "road_name": "Jagannath Shankarseth Road",
+    "ward_code": "B",
+    "under_dlp": true,
+    "priority_score": 19.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 852,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2060,
+    "evidence_row_ids": [
+      "RD0027"
+    ],
+    "bucket_rank": 36
+  },
+  {
+    "road_id": "RD0119",
+    "road_name": "SV Road",
+    "ward_code": "H/W",
+    "under_dlp": true,
+    "priority_score": 19.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 739,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 2383,
+    "evidence_row_ids": [
+      "RD0119"
+    ],
+    "bucket_rank": 37
+  },
+  {
+    "road_id": "RD0036",
+    "road_name": "Pandita Ramabai Road",
+    "ward_code": "D",
+    "under_dlp": true,
+    "priority_score": 19.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1333,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1961,
+    "evidence_row_ids": [
+      "RD0036"
+    ],
+    "bucket_rank": 38
+  },
+  {
+    "road_id": "RD0075",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "F/N",
+    "under_dlp": true,
+    "priority_score": 18.4,
+    "estimated_repair_cost_inr": 184180,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH003",
+    "nearest_hotspot_m": 699,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 16207,
+    "evidence_row_ids": [
+      "RD0075"
+    ],
+    "bucket_rank": 39
+  },
+  {
+    "road_id": "RD0050",
+    "road_name": "Maulana Azad Road",
+    "ward_code": "E",
+    "under_dlp": true,
+    "priority_score": 18.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 789,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1356,
+    "evidence_row_ids": [
+      "RD0050"
+    ],
+    "bucket_rank": 40
+  },
+  {
+    "road_id": "RD0167",
+    "road_name": "MG Road Goregaon",
+    "ward_code": "P/S",
+    "under_dlp": true,
+    "priority_score": 17.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 660,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1196,
+    "evidence_row_ids": [
+      "RD0167"
+    ],
+    "bucket_rank": 41
+  },
+  {
+    "road_id": "RD0236",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/E",
+    "under_dlp": true,
+    "priority_score": 17.3,
+    "estimated_repair_cost_inr": 194004,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 2444,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 2456,
+    "evidence_row_ids": [
+      "RD0236"
+    ],
+    "bucket_rank": 42
+  },
+  {
+    "road_id": "RD0007",
+    "road_name": "Veer Nariman Road",
+    "ward_code": "A",
+    "under_dlp": true,
+    "priority_score": 14.9,
+    "estimated_repair_cost_inr": 134459,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3530,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2751,
+    "evidence_row_ids": [
+      "RD0007"
+    ],
+    "bucket_rank": 43
+  },
+  {
+    "road_id": "RD0159",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": true,
+    "priority_score": 14.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 902,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3964,
+    "evidence_row_ids": [
+      "RD0159"
+    ],
+    "bucket_rank": 44
+  },
+  {
+    "road_id": "RD0099",
+    "road_name": "Lady Jamshedji Road",
+    "ward_code": "G/N",
+    "under_dlp": true,
+    "priority_score": 14.1,
+    "estimated_repair_cost_inr": 186866,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 1618,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1031,
+    "evidence_row_ids": [
+      "RD0099"
+    ],
+    "bucket_rank": 45
+  },
+  {
+    "road_id": "RD0040",
+    "road_name": "Tardeo Road",
+    "ward_code": "D",
+    "under_dlp": true,
+    "priority_score": 13.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1174,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2315,
+    "evidence_row_ids": [
+      "RD0040"
+    ],
+    "bucket_rank": 46
+  },
+  {
+    "road_id": "RD0227",
+    "road_name": "Kamani Junction Road",
+    "ward_code": "L",
+    "under_dlp": true,
+    "priority_score": 13.8,
+    "estimated_repair_cost_inr": 216752,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 1026,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 247,
+    "evidence_row_ids": [
+      "RD0227"
+    ],
+    "bucket_rank": 47
+  },
+  {
+    "road_id": "RD0072",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "F/N",
+    "under_dlp": true,
+    "priority_score": 13.0,
+    "estimated_repair_cost_inr": 91031,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH020",
+    "nearest_hotspot_m": 481,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 5701,
+    "evidence_row_ids": [
+      "RD0072"
+    ],
+    "bucket_rank": 48
+  },
+  {
+    "road_id": "RD0117",
+    "road_name": "SV Road",
+    "ward_code": "H/W",
+    "under_dlp": true,
+    "priority_score": 12.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1199,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3517,
+    "evidence_row_ids": [
+      "RD0117"
+    ],
+    "bucket_rank": 49
+  },
+  {
+    "road_id": "RD0196",
+    "road_name": "SV Road",
+    "ward_code": "R/C",
+    "under_dlp": true,
+    "priority_score": 12.6,
+    "estimated_repair_cost_inr": 199203,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2371,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3409,
+    "evidence_row_ids": [
+      "RD0196"
+    ],
+    "bucket_rank": 50
+  },
+  {
+    "road_id": "RD0171",
+    "road_name": "Link Road",
+    "ward_code": "P/S",
+    "under_dlp": true,
+    "priority_score": 11.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1232,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 4403,
+    "evidence_row_ids": [
+      "RD0171"
+    ],
+    "bucket_rank": 51
+  },
+  {
+    "road_id": "RD0178",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": true,
+    "priority_score": 11.0,
+    "estimated_repair_cost_inr": 88523,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 970,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3981,
+    "evidence_row_ids": [
+      "RD0178"
+    ],
+    "bucket_rank": 52
+  },
+  {
+    "road_id": "RD0042",
+    "road_name": "Peddar Road",
+    "ward_code": "D",
+    "under_dlp": true,
+    "priority_score": 10.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1740,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3807,
+    "evidence_row_ids": [
+      "RD0042"
+    ],
+    "bucket_rank": 53
+  },
+  {
+    "road_id": "RD0051",
+    "road_name": "Maulana Azad Road",
+    "ward_code": "E",
+    "under_dlp": true,
+    "priority_score": 10.4,
+    "estimated_repair_cost_inr": 151192,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 1064,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 946,
+    "evidence_row_ids": [
+      "RD0051"
+    ],
+    "bucket_rank": 54
+  },
+  {
+    "road_id": "RD0198",
+    "road_name": "SV Road",
+    "ward_code": "R/C",
+    "under_dlp": true,
+    "priority_score": 9.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2382,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3641,
+    "evidence_row_ids": [
+      "RD0198"
+    ],
+    "bucket_rank": 55
+  },
+  {
+    "road_id": "RD0019",
+    "road_name": "P D'Mello Road",
+    "ward_code": "B",
+    "under_dlp": true,
+    "priority_score": 8.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 874,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3273,
+    "evidence_row_ids": [
+      "RD0019"
+    ],
+    "bucket_rank": 56
+  },
+  {
+    "road_id": "RD0035",
+    "road_name": "Pandita Ramabai Road",
+    "ward_code": "D",
+    "under_dlp": true,
+    "priority_score": 7.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1333,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1010,
+    "evidence_row_ids": [
+      "RD0035"
+    ],
+    "bucket_rank": 57
+  },
+  {
+    "road_id": "RD0010",
+    "road_name": "Colaba Causeway",
+    "ward_code": "A",
+    "under_dlp": true,
+    "priority_score": 6.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3498,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 824,
+    "evidence_row_ids": [
+      "RD0010"
+    ],
+    "bucket_rank": 58
+  },
+  {
+    "road_id": "RD0064",
+    "road_name": "Dr E Moses Road",
+    "ward_code": "F/S",
+    "under_dlp": true,
+    "priority_score": 6.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 446,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 797,
+    "evidence_row_ids": [
+      "RD0064"
+    ],
+    "bucket_rank": 59
+  },
+  {
+    "road_id": "RD0142",
+    "road_name": "Marol Maroshi Road",
+    "ward_code": "K/E",
+    "under_dlp": true,
+    "priority_score": 2.2,
+    "estimated_repair_cost_inr": 121089,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 984,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 731,
+    "evidence_row_ids": [
+      "RD0142"
+    ],
+    "bucket_rank": 60
+  },
+  {
+    "road_id": "RD0249",
+    "road_name": "Shell Colony Road",
+    "ward_code": "M/W",
+    "under_dlp": true,
+    "priority_score": 0.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 0,
+    "priority_per_lakh": null,
+    "bucket": "A_DLP_OWED",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH016",
+    "nearest_hotspot_m": 1065,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 182,
+    "evidence_row_ids": [
+      "RD0249"
+    ],
+    "bucket_rank": 61
+  },
+  {
+    "road_id": "RD0251",
+    "road_name": "LBS Marg",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 73.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 83.36,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 162,
+    "ambulance_weight": 5,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3873,
+    "evidence_row_ids": [
+      "RD0251",
+      "ACC0189"
+    ],
+    "bucket_rank": 1
+  },
+  {
+    "road_id": "RD0084",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 70.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 79.438,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 261,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3805,
+    "evidence_row_ids": [
+      "RD0084",
+      "ACC0042"
+    ],
+    "bucket_rank": 2
+  },
+  {
+    "road_id": "RD0058",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 69.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 78.717,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 281,
+    "ambulance_weight": 7,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 4038,
+    "evidence_row_ids": [
+      "RD0058"
+    ],
+    "bucket_rank": 3
+  },
+  {
+    "road_id": "RD0273",
+    "road_name": "Powai Adi Shankaracharya Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 65.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 73.664,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 69,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 2703,
+    "evidence_row_ids": [
+      "RD0273"
+    ],
+    "bucket_rank": 4
+  },
+  {
+    "road_id": "RD0077",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 76.8,
+    "estimated_repair_cost_inr": 104641,
+    "cost_to_bmc_inr": 104641,
+    "priority_per_lakh": 73.404,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH003",
+    "nearest_hotspot_m": 5,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 10585,
+    "evidence_row_ids": [
+      "RD0077",
+      "ACC0262",
+      "ACC0081"
+    ],
+    "bucket_rank": 5
+  },
+  {
+    "road_id": "RD0094",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 66.0,
+    "estimated_repair_cost_inr": 95176,
+    "cost_to_bmc_inr": 95176,
+    "priority_per_lakh": 69.381,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 1644,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 5642,
+    "evidence_row_ids": [
+      "RD0094",
+      "ACC0156"
+    ],
+    "bucket_rank": 6
+  },
+  {
+    "road_id": "RD0055",
+    "road_name": "Bellasis Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 59.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 67.109,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 282,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 9,
+    "peak_hour_vehicles": 569,
+    "evidence_row_ids": [
+      "RD0055"
+    ],
+    "bucket_rank": 7
+  },
+  {
+    "road_id": "RD0016",
+    "road_name": "P D'Mello Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 58.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 66.036,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 265,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 2957,
+    "evidence_row_ids": [
+      "RD0016"
+    ],
+    "bucket_rank": 8
+  },
+  {
+    "road_id": "RD0071",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 58.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 65.744,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 257,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 5944,
+    "evidence_row_ids": [
+      "RD0071"
+    ],
+    "bucket_rank": 9
+  },
+  {
+    "road_id": "RD0057",
+    "road_name": "Bellasis Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 54.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 62.017,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 455,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 700,
+    "evidence_row_ids": [
+      "RD0057",
+      "ACC0323",
+      "ACC0209"
+    ],
+    "bucket_rank": 10
+  },
+  {
+    "road_id": "RD0121",
+    "road_name": "Linking Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 53.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 60.925,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 1323,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 5,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 4655,
+    "evidence_row_ids": [
+      "RD0121",
+      "ACC0278"
+    ],
+    "bucket_rank": 11
+  },
+  {
+    "road_id": "RD0203",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 53.4,
+    "estimated_repair_cost_inr": 90200,
+    "cost_to_bmc_inr": 90200,
+    "priority_per_lakh": 59.236,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2012,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 13193,
+    "evidence_row_ids": [
+      "RD0203",
+      "ACC0007"
+    ],
+    "bucket_rank": 12
+  },
+  {
+    "road_id": "RD0130",
+    "road_name": "Andheri Kurla Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 50.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 57.004,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1524,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 9,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3545,
+    "evidence_row_ids": [
+      "RD0130",
+      "ACC0307",
+      "ACC0334",
+      "ACC0290"
+    ],
+    "bucket_rank": 13
+  },
+  {
+    "road_id": "RD0146",
+    "road_name": "SV Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 50.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 56.926,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 445,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4087,
+    "evidence_row_ids": [
+      "RD0146",
+      "ACC0274",
+      "ACC0329",
+      "ACC0051",
+      "ACC0419"
+    ],
+    "bucket_rank": 14
+  },
+  {
+    "road_id": "RD0136",
+    "road_name": "Western Express Highway",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 62.7,
+    "estimated_repair_cost_inr": 111337,
+    "cost_to_bmc_inr": 111337,
+    "priority_per_lakh": 56.291,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 527,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 7,
+    "peak_hour_vehicles": 15563,
+    "evidence_row_ids": [
+      "RD0136",
+      "ACC0198"
+    ],
+    "bucket_rank": 15
+  },
+  {
+    "road_id": "RD0212",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 65.9,
+    "estimated_repair_cost_inr": 120583,
+    "cost_to_bmc_inr": 120583,
+    "priority_per_lakh": 54.62,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 103,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 14655,
+    "evidence_row_ids": [
+      "RD0212"
+    ],
+    "bucket_rank": 16
+  },
+  {
+    "road_id": "RD0065",
+    "road_name": "G D Ambekar Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 47.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 54.234,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 429,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1318,
+    "evidence_row_ids": [
+      "RD0065",
+      "ACC0061"
+    ],
+    "bucket_rank": 17
+  },
+  {
+    "road_id": "RD0272",
+    "road_name": "JVLR",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 46.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 52.556,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 1480,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3916,
+    "evidence_row_ids": [
+      "RD0272",
+      "ACC0175"
+    ],
+    "bucket_rank": 18
+  },
+  {
+    "road_id": "RD0204",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 45.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 51.912,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 1819,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 12943,
+    "evidence_row_ids": [
+      "RD0204",
+      "ACC0265"
+    ],
+    "bucket_rank": 19
+  },
+  {
+    "road_id": "RD0158",
+    "road_name": "Link Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 45.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 51.463,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1932,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 6213,
+    "evidence_row_ids": [
+      "RD0158",
+      "ACC0049",
+      "ACC0213"
+    ],
+    "bucket_rank": 20
+  },
+  {
+    "road_id": "RD0120",
+    "road_name": "Linking Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 44.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 49.903,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1381,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 6078,
+    "evidence_row_ids": [
+      "RD0120",
+      "ACC0393",
+      "ACC0303"
+    ],
+    "bucket_rank": 21
+  },
+  {
+    "road_id": "RD0041",
+    "road_name": "Peddar Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 43.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 49.688,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1668,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 5210,
+    "evidence_row_ids": [
+      "RD0041",
+      "ACC0015"
+    ],
+    "bucket_rank": 22
+  },
+  {
+    "road_id": "RD0244",
+    "road_name": "RC Marg",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 43.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 49.649,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH016",
+    "nearest_hotspot_m": 233,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1711,
+    "evidence_row_ids": [
+      "RD0244"
+    ],
+    "bucket_rank": 23
+  },
+  {
+    "road_id": "RD0248",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 43.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 49.649,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 385,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 10915,
+    "evidence_row_ids": [
+      "RD0248",
+      "ACC0315",
+      "ACC0385"
+    ],
+    "bucket_rank": 24
+  },
+  {
+    "road_id": "RD0062",
+    "road_name": "Dr E Moses Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 43.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 48.713,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 232,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 650,
+    "evidence_row_ids": [
+      "RD0062"
+    ],
+    "bucket_rank": 25
+  },
+  {
+    "road_id": "RD0269",
+    "road_name": "JVLR",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 43.2,
+    "estimated_repair_cost_inr": 90191,
+    "cost_to_bmc_inr": 90191,
+    "priority_per_lakh": 47.925,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 1341,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 3184,
+    "evidence_row_ids": [
+      "RD0269",
+      "ACC0155"
+    ],
+    "bucket_rank": 26
+  },
+  {
+    "road_id": "RD0274",
+    "road_name": "Powai Adi Shankaracharya Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 42.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 47.601,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 100,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3732,
+    "evidence_row_ids": [
+      "RD0274"
+    ],
+    "bucket_rank": 27
+  },
+  {
+    "road_id": "RD0088",
+    "road_name": "Dr Annie Besant Road",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 50.9,
+    "estimated_repair_cost_inr": 107839,
+    "cost_to_bmc_inr": 107839,
+    "priority_per_lakh": 47.213,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 981,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4132,
+    "evidence_row_ids": [
+      "RD0088",
+      "ACC0064",
+      "ACC0106"
+    ],
+    "bucket_rank": 28
+  },
+  {
+    "road_id": "RD0184",
+    "road_name": "Link Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 41.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 46.567,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1510,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 6197,
+    "evidence_row_ids": [
+      "RD0184",
+      "ACC0180",
+      "ACC0098",
+      "ACC0108"
+    ],
+    "bucket_rank": 29
+  },
+  {
+    "road_id": "RD0087",
+    "road_name": "Dr Annie Besant Road",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 41.6,
+    "estimated_repair_cost_inr": 89444,
+    "cost_to_bmc_inr": 89444,
+    "priority_per_lakh": 46.456,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 634,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 5907,
+    "evidence_row_ids": [
+      "RD0087"
+    ],
+    "bucket_rank": 30
+  },
+  {
+    "road_id": "RD0131",
+    "road_name": "Andheri Kurla Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 47.3,
+    "estimated_repair_cost_inr": 102564,
+    "cost_to_bmc_inr": 102564,
+    "priority_per_lakh": 46.144,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1154,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 5002,
+    "evidence_row_ids": [
+      "RD0131",
+      "ACC0333"
+    ],
+    "bucket_rank": 31
+  },
+  {
+    "road_id": "RD0032",
+    "road_name": "Nepean Sea Road",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 40.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 46.118,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1487,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 846,
+    "evidence_row_ids": [
+      "RD0032",
+      "ACC0103"
+    ],
+    "bucket_rank": 32
+  },
+  {
+    "road_id": "RD0138",
+    "road_name": "Mahakali Caves Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 40.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 46.059,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1726,
+    "ambulance_weight": 5,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1931,
+    "evidence_row_ids": [
+      "RD0138",
+      "ACC0236"
+    ],
+    "bucket_rank": 33
+  },
+  {
+    "road_id": "RD0189",
+    "road_name": "SV Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 39.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 44.987,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2544,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4670,
+    "evidence_row_ids": [
+      "RD0189",
+      "ACC0256"
+    ],
+    "bucket_rank": 34
+  },
+  {
+    "road_id": "RD0063",
+    "road_name": "Dr E Moses Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 39.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 44.44,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 218,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1146,
+    "evidence_row_ids": [
+      "RD0063"
+    ],
+    "bucket_rank": 35
+  },
+  {
+    "road_id": "RD0260",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 38.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 44.07,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1603,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 9516,
+    "evidence_row_ids": [
+      "RD0260",
+      "ACC0035"
+    ],
+    "bucket_rank": 36
+  },
+  {
+    "road_id": "RD0093",
+    "road_name": "Ganpatrao Kadam Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 38.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 43.172,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH010",
+    "nearest_hotspot_m": 530,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 1661,
+    "evidence_row_ids": [
+      "RD0093",
+      "ACC0395"
+    ],
+    "bucket_rank": 37
+  },
+  {
+    "road_id": "RD0208",
+    "road_name": "Gorai Road",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 49.3,
+    "estimated_repair_cost_inr": 117101,
+    "cost_to_bmc_inr": 117101,
+    "priority_per_lakh": 42.08,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 3156,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1853,
+    "evidence_row_ids": [
+      "RD0208",
+      "ACC0004",
+      "ACC0242",
+      "ACC0305"
+    ],
+    "bucket_rank": 38
+  },
+  {
+    "road_id": "RD0231",
+    "road_name": "Ghatkopar Mankhurd Link Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 57.8,
+    "estimated_repair_cost_inr": 137935,
+    "cost_to_bmc_inr": 137935,
+    "priority_per_lakh": 41.886,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1088,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 13,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3993,
+    "evidence_row_ids": [
+      "RD0231",
+      "ACC0053",
+      "ACC0022",
+      "ACC0092",
+      "ACC0073",
+      "ACC0166"
+    ],
+    "bucket_rank": 39
+  },
+  {
+    "road_id": "RD0085",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 36.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 41.065,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 490,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2290,
+    "evidence_row_ids": [
+      "RD0085",
+      "ACC0294",
+      "ACC0157"
+    ],
+    "bucket_rank": 40
+  },
+  {
+    "road_id": "RD0009",
+    "road_name": "Colaba Causeway",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 35.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 40.558,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3345,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1225,
+    "evidence_row_ids": [
+      "RD0009",
+      "ACC0269"
+    ],
+    "bucket_rank": 41
+  },
+  {
+    "road_id": "RD0283",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 35.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 40.285,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1015,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 9410,
+    "evidence_row_ids": [
+      "RD0283"
+    ],
+    "bucket_rank": 42
+  },
+  {
+    "road_id": "RD0252",
+    "road_name": "LBS Marg",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 35.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 40.109,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 94,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2389,
+    "evidence_row_ids": [
+      "RD0252"
+    ],
+    "bucket_rank": 43
+  },
+  {
+    "road_id": "RD0066",
+    "road_name": "G D Ambekar Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 35.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 39.953,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 374,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 704,
+    "evidence_row_ids": [
+      "RD0066",
+      "ACC0220"
+    ],
+    "bucket_rank": 44
+  },
+  {
+    "road_id": "RD0149",
+    "road_name": "Juhu Tara Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 34.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 39.466,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 275,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2055,
+    "evidence_row_ids": [
+      "RD0149"
+    ],
+    "bucket_rank": 45
+  },
+  {
+    "road_id": "RD0291",
+    "road_name": "Devidayal Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 34.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 39.427,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 910,
+    "ambulance_weight": 6,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 9,
+    "peak_hour_vehicles": 207,
+    "evidence_row_ids": [
+      "RD0291"
+    ],
+    "bucket_rank": 46
+  },
+  {
+    "road_id": "RD0246",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 34.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 39.192,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 756,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 10459,
+    "evidence_row_ids": [
+      "RD0246",
+      "ACC0255"
+    ],
+    "bucket_rank": 47
+  },
+  {
+    "road_id": "RD0005",
+    "road_name": "Veer Nariman Road",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 34.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 38.861,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3690,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4776,
+    "evidence_row_ids": [
+      "RD0005",
+      "ACC0382"
+    ],
+    "bucket_rank": 48
+  },
+  {
+    "road_id": "RD0068",
+    "road_name": "Acharya Donde Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 34.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 38.763,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 453,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 664,
+    "evidence_row_ids": [
+      "RD0068",
+      "ACC0191",
+      "ACC0047"
+    ],
+    "bucket_rank": 49
+  },
+  {
+    "road_id": "RD0012",
+    "road_name": "Mohammed Ali Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 33.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 37.788,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 642,
+    "ambulance_weight": 6,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 6176,
+    "evidence_row_ids": [
+      "RD0012"
+    ],
+    "bucket_rank": 50
+  },
+  {
+    "road_id": "RD0276",
+    "road_name": "Powai Adi Shankaracharya Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 39.3,
+    "estimated_repair_cost_inr": 105378,
+    "cost_to_bmc_inr": 105378,
+    "priority_per_lakh": 37.304,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 937,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 4575,
+    "evidence_row_ids": [
+      "RD0276",
+      "ACC0354"
+    ],
+    "bucket_rank": 51
+  },
+  {
+    "road_id": "RD0169",
+    "road_name": "Link Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 59.4,
+    "estimated_repair_cost_inr": 162409,
+    "cost_to_bmc_inr": 162409,
+    "priority_per_lakh": 36.593,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 787,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4136,
+    "evidence_row_ids": [
+      "RD0169",
+      "ACC0343",
+      "ACC0206"
+    ],
+    "bucket_rank": 52
+  },
+  {
+    "road_id": "RD0286",
+    "road_name": "Mulund Goregaon Link Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 32.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 36.461,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1325,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3754,
+    "evidence_row_ids": [
+      "RD0286",
+      "ACC0194"
+    ],
+    "bucket_rank": 53
+  },
+  {
+    "road_id": "RD0188",
+    "road_name": "SV Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 32.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 36.227,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2245,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3449,
+    "evidence_row_ids": [
+      "RD0188"
+    ],
+    "bucket_rank": 54
+  },
+  {
+    "road_id": "RD0213",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 69.9,
+    "estimated_repair_cost_inr": 195245,
+    "cost_to_bmc_inr": 195245,
+    "priority_per_lakh": 35.826,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 113,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 12172,
+    "evidence_row_ids": [
+      "RD0213"
+    ],
+    "bucket_rank": 55
+  },
+  {
+    "road_id": "RD0080",
+    "road_name": "Bhaudaji Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 31.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 35.291,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 637,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 1961,
+    "evidence_row_ids": [
+      "RD0080"
+    ],
+    "bucket_rank": 56
+  },
+  {
+    "road_id": "RD0004",
+    "road_name": "Shahid Bhagat Singh Marg",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 31.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 35.115,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 2455,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4015,
+    "evidence_row_ids": [
+      "RD0004"
+    ],
+    "bucket_rank": 57
+  },
+  {
+    "road_id": "RD0185",
+    "road_name": "Link Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 29.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 33.711,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1912,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4044,
+    "evidence_row_ids": [
+      "RD0185",
+      "ACC0043"
+    ],
+    "bucket_rank": 58
+  },
+  {
+    "road_id": "RD0134",
+    "road_name": "Western Express Highway",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 50.7,
+    "estimated_repair_cost_inr": 152713,
+    "cost_to_bmc_inr": 152713,
+    "priority_per_lakh": 33.181,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1046,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 10318,
+    "evidence_row_ids": [
+      "RD0134",
+      "ACC0029",
+      "ACC0289"
+    ],
+    "bucket_rank": 59
+  },
+  {
+    "road_id": "RD0110",
+    "road_name": "Kalanagar Road",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 51.1,
+    "estimated_repair_cost_inr": 155501,
+    "cost_to_bmc_inr": 155501,
+    "priority_per_lakh": 32.864,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 1674,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 10,
+    "peak_hour_vehicles": 1013,
+    "evidence_row_ids": [
+      "RD0110",
+      "ACC0021"
+    ],
+    "bucket_rank": 60
+  },
+  {
+    "road_id": "RD0177",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 29.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 32.833,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 988,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 5352,
+    "evidence_row_ids": [
+      "RD0177"
+    ],
+    "bucket_rank": 61
+  },
+  {
+    "road_id": "RD0174",
+    "road_name": "Marve Road",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 54.3,
+    "estimated_repair_cost_inr": 168233,
+    "cost_to_bmc_inr": 168233,
+    "priority_per_lakh": 32.303,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 473,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 9,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 717,
+    "evidence_row_ids": [
+      "RD0174",
+      "ACC0380",
+      "ACC0360",
+      "ACC0062",
+      "ACC0361",
+      "ACC0248"
+    ],
+    "bucket_rank": 62
+  },
+  {
+    "road_id": "RD0060",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 28.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 32.072,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 977,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 5975,
+    "evidence_row_ids": [
+      "RD0060",
+      "ACC0187"
+    ],
+    "bucket_rank": 63
+  },
+  {
+    "road_id": "RD0179",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 28.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 31.896,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 895,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3590,
+    "evidence_row_ids": [
+      "RD0179",
+      "ACC0376"
+    ],
+    "bucket_rank": 64
+  },
+  {
+    "road_id": "RD0039",
+    "road_name": "Tardeo Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 35.5,
+    "estimated_repair_cost_inr": 111906,
+    "cost_to_bmc_inr": 111906,
+    "priority_per_lakh": 31.754,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1433,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3865,
+    "evidence_row_ids": [
+      "RD0039",
+      "ACC0036"
+    ],
+    "bucket_rank": 65
+  },
+  {
+    "road_id": "RD0205",
+    "road_name": "Western Express Highway",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 27.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 31.311,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 1678,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 15545,
+    "evidence_row_ids": [
+      "RD0205"
+    ],
+    "bucket_rank": 66
+  },
+  {
+    "road_id": "RD0105",
+    "road_name": "Gokhale Road",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 26.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 30.492,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 769,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1125,
+    "evidence_row_ids": [
+      "RD0105"
+    ],
+    "bucket_rank": 67
+  },
+  {
+    "road_id": "RD0127",
+    "road_name": "Milan Subway Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 26.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 30.336,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1819,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 612,
+    "evidence_row_ids": [
+      "RD0127"
+    ],
+    "bucket_rank": 68
+  },
+  {
+    "road_id": "RD0241",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 26.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 30.258,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 862,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2905,
+    "evidence_row_ids": [
+      "RD0241",
+      "ACC0059"
+    ],
+    "bucket_rank": 69
+  },
+  {
+    "road_id": "RD0073",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 26.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 30.024,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH020",
+    "nearest_hotspot_m": 389,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2773,
+    "evidence_row_ids": [
+      "RD0073",
+      "ACC0210"
+    ],
+    "bucket_rank": 70
+  },
+  {
+    "road_id": "RD0173",
+    "road_name": "Marve Road",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 58.9,
+    "estimated_repair_cost_inr": 196138,
+    "cost_to_bmc_inr": 196138,
+    "priority_per_lakh": 30.011,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 852,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 16,
+    "reopened_jobs": 8,
+    "peak_hour_vehicles": 601,
+    "evidence_row_ids": [
+      "RD0173",
+      "ACC0222",
+      "ACC0136",
+      "ACC0200",
+      "ACC0179",
+      "ACC0279",
+      "ACC0330"
+    ],
+    "bucket_rank": 71
+  },
+  {
+    "road_id": "RD0144",
+    "road_name": "SV Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 35.1,
+    "estimated_repair_cost_inr": 116947,
+    "cost_to_bmc_inr": 116947,
+    "priority_per_lakh": 29.987,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 582,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 5749,
+    "evidence_row_ids": [
+      "RD0144",
+      "ACC0020"
+    ],
+    "bucket_rank": 72
+  },
+  {
+    "road_id": "RD0187",
+    "road_name": "SV Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 26.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 29.848,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2002,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 6167,
+    "evidence_row_ids": [
+      "RD0187"
+    ],
+    "bucket_rank": 73
+  },
+  {
+    "road_id": "RD0239",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 34.6,
+    "estimated_repair_cost_inr": 116786,
+    "cost_to_bmc_inr": 116786,
+    "priority_per_lakh": 29.615,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 872,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2424,
+    "evidence_row_ids": [
+      "RD0239",
+      "ACC0332"
+    ],
+    "bucket_rank": 74
+  },
+  {
+    "road_id": "RD0091",
+    "road_name": "Ganpatrao Kadam Marg",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 26.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 29.614,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 1013,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 940,
+    "evidence_row_ids": [
+      "RD0091"
+    ],
+    "bucket_rank": 75
+  },
+  {
+    "road_id": "RD0217",
+    "road_name": "LBS Marg",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 34.9,
+    "estimated_repair_cost_inr": 117924,
+    "cost_to_bmc_inr": 117924,
+    "priority_per_lakh": 29.563,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 877,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3612,
+    "evidence_row_ids": [
+      "RD0217",
+      "ACC0298"
+    ],
+    "bucket_rank": 76
+  },
+  {
+    "road_id": "RD0059",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 25.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.97,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 527,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3877,
+    "evidence_row_ids": [
+      "RD0059",
+      "ACC0037"
+    ],
+    "bucket_rank": 77
+  },
+  {
+    "road_id": "RD0020",
+    "road_name": "Nishanpada Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 25.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.755,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 163,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 240,
+    "evidence_row_ids": [
+      "RD0020"
+    ],
+    "bucket_rank": 78
+  },
+  {
+    "road_id": "RD0233",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 25.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.56,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 985,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 4933,
+    "evidence_row_ids": [
+      "RD0233"
+    ],
+    "bucket_rank": 79
+  },
+  {
+    "road_id": "RD0255",
+    "road_name": "MG Road Ghatkopar",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 25.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.502,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 877,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1630,
+    "evidence_row_ids": [
+      "RD0255"
+    ],
+    "bucket_rank": 80
+  },
+  {
+    "road_id": "RD0150",
+    "road_name": "JP Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 25.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.443,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1300,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1616,
+    "evidence_row_ids": [
+      "RD0150"
+    ],
+    "bucket_rank": 81
+  },
+  {
+    "road_id": "RD0089",
+    "road_name": "Dr Annie Besant Road",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 25.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 28.326,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 1193,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2714,
+    "evidence_row_ids": [
+      "RD0089"
+    ],
+    "bucket_rank": 82
+  },
+  {
+    "road_id": "RD0190",
+    "road_name": "Charkop Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 34.9,
+    "estimated_repair_cost_inr": 123742,
+    "cost_to_bmc_inr": 123742,
+    "priority_per_lakh": 28.201,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1838,
+    "ambulance_weight": 6,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1456,
+    "evidence_row_ids": [
+      "RD0190"
+    ],
+    "bucket_rank": 83
+  },
+  {
+    "road_id": "RD0139",
+    "road_name": "Mahakali Caves Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 42.2,
+    "estimated_repair_cost_inr": 150020,
+    "cost_to_bmc_inr": 150020,
+    "priority_per_lakh": 28.123,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1503,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 5,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1706,
+    "evidence_row_ids": [
+      "RD0139",
+      "ACC0196",
+      "ACC0153",
+      "ACC0246"
+    ],
+    "bucket_rank": 84
+  },
+  {
+    "road_id": "RD0082",
+    "road_name": "Bhaudaji Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 35.0,
+    "estimated_repair_cost_inr": 124586,
+    "cost_to_bmc_inr": 124586,
+    "priority_per_lakh": 28.093,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 698,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 7,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1011,
+    "evidence_row_ids": [
+      "RD0082",
+      "ACC0217",
+      "ACC0230",
+      "ACC0013"
+    ],
+    "bucket_rank": 85
+  },
+  {
+    "road_id": "RD0281",
+    "road_name": "LBS Marg",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 26.9,
+    "estimated_repair_cost_inr": 96052,
+    "cost_to_bmc_inr": 96052,
+    "priority_per_lakh": 28.056,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1446,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3052,
+    "evidence_row_ids": [
+      "RD0281",
+      "ACC0094"
+    ],
+    "bucket_rank": 86
+  },
+  {
+    "road_id": "RD0154",
+    "road_name": "Andheri Subway",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 37.3,
+    "estimated_repair_cost_inr": 134491,
+    "cost_to_bmc_inr": 134491,
+    "priority_per_lakh": 27.742,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 791,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 253,
+    "evidence_row_ids": [
+      "RD0154",
+      "ACC0087"
+    ],
+    "bucket_rank": 87
+  },
+  {
+    "road_id": "RD0135",
+    "road_name": "Western Express Highway",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 35.8,
+    "estimated_repair_cost_inr": 129553,
+    "cost_to_bmc_inr": 129553,
+    "priority_per_lakh": 27.628,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 734,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 9311,
+    "evidence_row_ids": [
+      "RD0135",
+      "ACC0199"
+    ],
+    "bucket_rank": 88
+  },
+  {
+    "road_id": "RD0166",
+    "road_name": "MG Road Goregaon",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 24.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 27.409,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 460,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1886,
+    "evidence_row_ids": [
+      "RD0166"
+    ],
+    "bucket_rank": 89
+  },
+  {
+    "road_id": "RD0013",
+    "road_name": "Mohammed Ali Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 24.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 27.214,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 908,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2701,
+    "evidence_row_ids": [
+      "RD0013"
+    ],
+    "bucket_rank": 90
+  },
+  {
+    "road_id": "RD0014",
+    "road_name": "Mohammed Ali Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 23.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 27.039,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1434,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2554,
+    "evidence_row_ids": [
+      "RD0014"
+    ],
+    "bucket_rank": 91
+  },
+  {
+    "road_id": "RD0044",
+    "road_name": "Peddar Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 23.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 26.922,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 2067,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3975,
+    "evidence_row_ids": [
+      "RD0044"
+    ],
+    "bucket_rank": 92
+  },
+  {
+    "road_id": "RD0206",
+    "road_name": "Gorai Road",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 23.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 26.746,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2815,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 863,
+    "evidence_row_ids": [
+      "RD0206"
+    ],
+    "bucket_rank": 93
+  },
+  {
+    "road_id": "RD0008",
+    "road_name": "Veer Nariman Road",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 23.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 26.161,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3403,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3793,
+    "evidence_row_ids": [
+      "RD0008"
+    ],
+    "bucket_rank": 94
+  },
+  {
+    "road_id": "RD0128",
+    "road_name": "Milan Subway Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 23.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 25.985,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1603,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 909,
+    "evidence_row_ids": [
+      "RD0128"
+    ],
+    "bucket_rank": 95
+  },
+  {
+    "road_id": "RD0242",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 40.2,
+    "estimated_repair_cost_inr": 155259,
+    "cost_to_bmc_inr": 155259,
+    "priority_per_lakh": 25.908,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 921,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3570,
+    "evidence_row_ids": [
+      "RD0242",
+      "ACC0115",
+      "ACC0026"
+    ],
+    "bucket_rank": 96
+  },
+  {
+    "road_id": "RD0219",
+    "road_name": "LBS Marg",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 52.1,
+    "estimated_repair_cost_inr": 201681,
+    "cost_to_bmc_inr": 201681,
+    "priority_per_lakh": 25.843,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 824,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3196,
+    "evidence_row_ids": [
+      "RD0219",
+      "ACC0123"
+    ],
+    "bucket_rank": 97
+  },
+  {
+    "road_id": "RD0268",
+    "road_name": "LBS Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 44.0,
+    "estimated_repair_cost_inr": 172191,
+    "cost_to_bmc_inr": 172191,
+    "priority_per_lakh": 25.573,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 90,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3362,
+    "evidence_row_ids": [
+      "RD0268"
+    ],
+    "bucket_rank": 98
+  },
+  {
+    "road_id": "RD0245",
+    "road_name": "RC Marg",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 24.9,
+    "estimated_repair_cost_inr": 98337,
+    "cost_to_bmc_inr": 98337,
+    "priority_per_lakh": 25.353,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH016",
+    "nearest_hotspot_m": 318,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1515,
+    "evidence_row_ids": [
+      "RD0245"
+    ],
+    "bucket_rank": 99
+  },
+  {
+    "road_id": "RD0001",
+    "road_name": "Shahid Bhagat Singh Marg",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 22.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 25.224,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3388,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3544,
+    "evidence_row_ids": [
+      "RD0001"
+    ],
+    "bucket_rank": 100
+  },
+  {
+    "road_id": "RD0226",
+    "road_name": "CST Road",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 22.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 25.224,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1201,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1899,
+    "evidence_row_ids": [
+      "RD0226"
+    ],
+    "bucket_rank": 101
+  },
+  {
+    "road_id": "RD0265",
+    "road_name": "LBS Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 32.4,
+    "estimated_repair_cost_inr": 128475,
+    "cost_to_bmc_inr": 128475,
+    "priority_per_lakh": 25.216,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 1016,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2452,
+    "evidence_row_ids": [
+      "RD0265"
+    ],
+    "bucket_rank": 102
+  },
+  {
+    "road_id": "RD0182",
+    "road_name": "Link Road",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 22.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 25.088,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 999,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3749,
+    "evidence_row_ids": [
+      "RD0182"
+    ],
+    "bucket_rank": 103
+  },
+  {
+    "road_id": "RD0024",
+    "road_name": "Kalbadevi Road",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 22.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 24.873,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 894,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1719,
+    "evidence_row_ids": [
+      "RD0024"
+    ],
+    "bucket_rank": 104
+  },
+  {
+    "road_id": "RD0067",
+    "road_name": "G D Ambekar Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 21.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 24.815,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH021",
+    "nearest_hotspot_m": 426,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1714,
+    "evidence_row_ids": [
+      "RD0067"
+    ],
+    "bucket_rank": 105
+  },
+  {
+    "road_id": "RD0074",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 31.8,
+    "estimated_repair_cost_inr": 128912,
+    "cost_to_bmc_inr": 128912,
+    "priority_per_lakh": 24.676,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH020",
+    "nearest_hotspot_m": 338,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3322,
+    "evidence_row_ids": [
+      "RD0074"
+    ],
+    "bucket_rank": 106
+  },
+  {
+    "road_id": "RD0037",
+    "road_name": "Tardeo Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 27.3,
+    "estimated_repair_cost_inr": 110859,
+    "cost_to_bmc_inr": 110859,
+    "priority_per_lakh": 24.589,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 2057,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2252,
+    "evidence_row_ids": [
+      "RD0037"
+    ],
+    "bucket_rank": 107
+  },
+  {
+    "road_id": "RD0207",
+    "road_name": "Gorai Road",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 21.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 24.171,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2933,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2024,
+    "evidence_row_ids": [
+      "RD0207",
+      "ACC0415"
+    ],
+    "bucket_rank": 108
+  },
+  {
+    "road_id": "RD0277",
+    "road_name": "Village Road Bhandup",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 21.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 24.112,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 777,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 270,
+    "evidence_row_ids": [
+      "RD0277"
+    ],
+    "bucket_rank": 109
+  },
+  {
+    "road_id": "RD0261",
+    "road_name": "Andheri Ghatkopar Link Road",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 21.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 23.995,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 692,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3019,
+    "evidence_row_ids": [
+      "RD0261"
+    ],
+    "bucket_rank": 110
+  },
+  {
+    "road_id": "RD0175",
+    "road_name": "Marve Road",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 68.3,
+    "estimated_repair_cost_inr": 286620,
+    "cost_to_bmc_inr": 286620,
+    "priority_per_lakh": 23.815,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 148,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 953,
+    "evidence_row_ids": [
+      "RD0175",
+      "ACC0125",
+      "ACC0257"
+    ],
+    "bucket_rank": 111
+  },
+  {
+    "road_id": "RD0258",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 21.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 23.761,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1071,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 10224,
+    "evidence_row_ids": [
+      "RD0258"
+    ],
+    "bucket_rank": 112
+  },
+  {
+    "road_id": "RD0284",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 20.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 23.703,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1376,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 10116,
+    "evidence_row_ids": [
+      "RD0284"
+    ],
+    "bucket_rank": 113
+  },
+  {
+    "road_id": "RD0250",
+    "road_name": "Shell Colony Road",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 37.5,
+    "estimated_repair_cost_inr": 160164,
+    "cost_to_bmc_inr": 160164,
+    "priority_per_lakh": 23.435,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1316,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 274,
+    "evidence_row_ids": [
+      "RD0250",
+      "ACC0327"
+    ],
+    "bucket_rank": 114
+  },
+  {
+    "road_id": "RD0045",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 34.2,
+    "estimated_repair_cost_inr": 146521,
+    "cost_to_bmc_inr": 146521,
+    "priority_per_lakh": 23.37,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 844,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3452,
+    "evidence_row_ids": [
+      "RD0045",
+      "ACC0286"
+    ],
+    "bucket_rank": 115
+  },
+  {
+    "road_id": "RD0266",
+    "road_name": "LBS Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 36.4,
+    "estimated_repair_cost_inr": 157649,
+    "cost_to_bmc_inr": 157649,
+    "priority_per_lakh": 23.087,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 754,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3319,
+    "evidence_row_ids": [
+      "RD0266",
+      "ACC0296"
+    ],
+    "bucket_rank": 116
+  },
+  {
+    "road_id": "RD0156",
+    "road_name": "Link Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 41.3,
+    "estimated_repair_cost_inr": 179197,
+    "cost_to_bmc_inr": 179197,
+    "priority_per_lakh": 23.024,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1113,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 2535,
+    "evidence_row_ids": [
+      "RD0156",
+      "ACC0011"
+    ],
+    "bucket_rank": 117
+  },
+  {
+    "road_id": "RD0181",
+    "road_name": "Malad Subway",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 57.1,
+    "estimated_repair_cost_inr": 248725,
+    "cost_to_bmc_inr": 248725,
+    "priority_per_lakh": 22.965,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 471,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 191,
+    "evidence_row_ids": [
+      "RD0181",
+      "ACC0083",
+      "ACC0386"
+    ],
+    "bucket_rank": 118
+  },
+  {
+    "road_id": "RD0153",
+    "road_name": "Andheri Subway",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 40.8,
+    "estimated_repair_cost_inr": 179169,
+    "cost_to_bmc_inr": 179169,
+    "priority_per_lakh": 22.758,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1088,
+    "ambulance_weight": 3,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 252,
+    "evidence_row_ids": [
+      "RD0153",
+      "ACC0401"
+    ],
+    "bucket_rank": 119
+  },
+  {
+    "road_id": "RD0216",
+    "road_name": "LBS Marg",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 41.1,
+    "estimated_repair_cost_inr": 181822,
+    "cost_to_bmc_inr": 181822,
+    "priority_per_lakh": 22.587,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 627,
+    "ambulance_weight": 4,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 3133,
+    "evidence_row_ids": [
+      "RD0216"
+    ],
+    "bucket_rank": 120
+  },
+  {
+    "road_id": "RD0172",
+    "road_name": "Link Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 19.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 22.415,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1423,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 5434,
+    "evidence_row_ids": [
+      "RD0172"
+    ],
+    "bucket_rank": 121
+  },
+  {
+    "road_id": "RD0254",
+    "road_name": "LBS Marg",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 19.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 22.298,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 601,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 3579,
+    "evidence_row_ids": [
+      "RD0254"
+    ],
+    "bucket_rank": 122
+  },
+  {
+    "road_id": "RD0003",
+    "road_name": "Shahid Bhagat Singh Marg",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 19.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 22.064,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 2595,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2271,
+    "evidence_row_ids": [
+      "RD0003"
+    ],
+    "bucket_rank": 123
+  },
+  {
+    "road_id": "RD0113",
+    "road_name": "Vakola Bridge Road",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 27.8,
+    "estimated_repair_cost_inr": 126894,
+    "cost_to_bmc_inr": 126894,
+    "priority_per_lakh": 21.93,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1390,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1847,
+    "evidence_row_ids": [
+      "RD0113",
+      "ACC0390"
+    ],
+    "bucket_rank": 124
+  },
+  {
+    "road_id": "RD0109",
+    "road_name": "Western Express Highway",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 36.7,
+    "estimated_repair_cost_inr": 168639,
+    "cost_to_bmc_inr": 168639,
+    "priority_per_lakh": 21.746,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH004",
+    "nearest_hotspot_m": 2172,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 13839,
+    "evidence_row_ids": [
+      "RD0109",
+      "ACC0077"
+    ],
+    "bucket_rank": 125
+  },
+  {
+    "road_id": "RD0164",
+    "road_name": "Aarey Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 18.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 21.245,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1052,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1005,
+    "evidence_row_ids": [
+      "RD0164",
+      "ACC0126"
+    ],
+    "bucket_rank": 126
+  },
+  {
+    "road_id": "RD0086",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 18.7,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 21.128,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH022",
+    "nearest_hotspot_m": 800,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 4295,
+    "evidence_row_ids": [
+      "RD0086"
+    ],
+    "bucket_rank": 127
+  },
+  {
+    "road_id": "RD0030",
+    "road_name": "Princess Street",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 18.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 21.069,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1299,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 607,
+    "evidence_row_ids": [
+      "RD0030"
+    ],
+    "bucket_rank": 128
+  },
+  {
+    "road_id": "RD0202",
+    "road_name": "LT Road",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 33.6,
+    "estimated_repair_cost_inr": 159354,
+    "cost_to_bmc_inr": 159354,
+    "priority_per_lakh": 21.066,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 695,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1575,
+    "evidence_row_ids": [
+      "RD0202",
+      "ACC0148"
+    ],
+    "bucket_rank": 129
+  },
+  {
+    "road_id": "RD0108",
+    "road_name": "Western Express Highway",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 48.8,
+    "estimated_repair_cost_inr": 232042,
+    "cost_to_bmc_inr": 232042,
+    "priority_per_lakh": 21.013,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 2004,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 8,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 11562,
+    "evidence_row_ids": [
+      "RD0108",
+      "ACC0131",
+      "ACC0181"
+    ],
+    "bucket_rank": 130
+  },
+  {
+    "road_id": "RD0141",
+    "road_name": "Marol Maroshi Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 22.6,
+    "estimated_repair_cost_inr": 108140,
+    "cost_to_bmc_inr": 108140,
+    "priority_per_lakh": 20.902,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1035,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1137,
+    "evidence_row_ids": [
+      "RD0141",
+      "ACC0216"
+    ],
+    "bucket_rank": 131
+  },
+  {
+    "road_id": "RD0230",
+    "road_name": "Ghatkopar Mankhurd Link Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 24.9,
+    "estimated_repair_cost_inr": 119834,
+    "cost_to_bmc_inr": 119834,
+    "priority_per_lakh": 20.805,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1034,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 8,
+    "peak_hour_vehicles": 3793,
+    "evidence_row_ids": [
+      "RD0230"
+    ],
+    "bucket_rank": 132
+  },
+  {
+    "road_id": "RD0168",
+    "road_name": "MG Road Goregaon",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 18.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 20.425,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1127,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1572,
+    "evidence_row_ids": [
+      "RD0168"
+    ],
+    "bucket_rank": 133
+  },
+  {
+    "road_id": "RD0100",
+    "road_name": "Lady Jamshedji Road",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 30.4,
+    "estimated_repair_cost_inr": 151493,
+    "cost_to_bmc_inr": 151493,
+    "priority_per_lakh": 20.076,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 1351,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2010,
+    "evidence_row_ids": [
+      "RD0100"
+    ],
+    "bucket_rank": 134
+  },
+  {
+    "road_id": "RD0079",
+    "road_name": "Road No 24 Sion",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 37.8,
+    "estimated_repair_cost_inr": 190582,
+    "cost_to_bmc_inr": 190582,
+    "priority_per_lakh": 19.858,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 963,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 320,
+    "evidence_row_ids": [
+      "RD0079",
+      "ACC0107"
+    ],
+    "bucket_rank": 135
+  },
+  {
+    "road_id": "RD0081",
+    "road_name": "Bhaudaji Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 17.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 19.606,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 664,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 739,
+    "evidence_row_ids": [
+      "RD0081",
+      "ACC0147"
+    ],
+    "bucket_rank": 136
+  },
+  {
+    "road_id": "RD0112",
+    "road_name": "Kalanagar Road",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 27.8,
+    "estimated_repair_cost_inr": 142644,
+    "cost_to_bmc_inr": 142644,
+    "priority_per_lakh": 19.508,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1024,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 844,
+    "evidence_row_ids": [
+      "RD0112",
+      "ACC0078"
+    ],
+    "bucket_rank": 137
+  },
+  {
+    "road_id": "RD0133",
+    "road_name": "Andheri Kurla Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 19.2,
+    "estimated_repair_cost_inr": 98680,
+    "cost_to_bmc_inr": 98680,
+    "priority_per_lakh": 19.499,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 445,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 2399,
+    "evidence_row_ids": [
+      "RD0133"
+    ],
+    "bucket_rank": 138
+  },
+  {
+    "road_id": "RD0095",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 23.1,
+    "estimated_repair_cost_inr": 118963,
+    "cost_to_bmc_inr": 118963,
+    "priority_per_lakh": 19.435,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 1587,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2800,
+    "evidence_row_ids": [
+      "RD0095",
+      "ACC0069"
+    ],
+    "bucket_rank": 139
+  },
+  {
+    "road_id": "RD0148",
+    "road_name": "Juhu Tara Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 41.4,
+    "estimated_repair_cost_inr": 214035,
+    "cost_to_bmc_inr": 214035,
+    "priority_per_lakh": 19.365,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 240,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 7,
+    "peak_hour_vehicles": 713,
+    "evidence_row_ids": [
+      "RD0148"
+    ],
+    "bucket_rank": 140
+  },
+  {
+    "road_id": "RD0214",
+    "road_name": "Anand Nagar Road",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 32.2,
+    "estimated_repair_cost_inr": 168105,
+    "cost_to_bmc_inr": 168105,
+    "priority_per_lakh": 19.138,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 942,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 175,
+    "evidence_row_ids": [
+      "RD0214",
+      "ACC0336"
+    ],
+    "bucket_rank": 141
+  },
+  {
+    "road_id": "RD0270",
+    "road_name": "JVLR",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 16.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 19.138,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 1293,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 6039,
+    "evidence_row_ids": [
+      "RD0270"
+    ],
+    "bucket_rank": 142
+  },
+  {
+    "road_id": "RD0289",
+    "road_name": "Mulund Goregaon Link Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 16.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 19.079,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1604,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 6006,
+    "evidence_row_ids": [
+      "RD0289"
+    ],
+    "bucket_rank": 143
+  },
+  {
+    "road_id": "RD0186",
+    "road_name": "SV Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 35.4,
+    "estimated_repair_cost_inr": 185953,
+    "cost_to_bmc_inr": 185953,
+    "priority_per_lakh": 19.026,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1871,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 2811,
+    "evidence_row_ids": [
+      "RD0186",
+      "ACC0232"
+    ],
+    "bucket_rank": 144
+  },
+  {
+    "road_id": "RD0104",
+    "road_name": "Gokhale Road",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 38.3,
+    "estimated_repair_cost_inr": 201758,
+    "cost_to_bmc_inr": 201758,
+    "priority_per_lakh": 18.963,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 769,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 8,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 629,
+    "evidence_row_ids": [
+      "RD0104",
+      "ACC0247",
+      "ACC0044"
+    ],
+    "bucket_rank": 145
+  },
+  {
+    "road_id": "RD0115",
+    "road_name": "Vakola Bridge Road",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 55.6,
+    "estimated_repair_cost_inr": 295888,
+    "cost_to_bmc_inr": 295888,
+    "priority_per_lakh": 18.804,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1306,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 1808,
+    "evidence_row_ids": [
+      "RD0115",
+      "ACC0411"
+    ],
+    "bucket_rank": 146
+  },
+  {
+    "road_id": "RD0247",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "M/W",
+    "under_dlp": false,
+    "priority_score": 21.5,
+    "estimated_repair_cost_inr": 116948,
+    "cost_to_bmc_inr": 116948,
+    "priority_per_lakh": 18.399,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 429,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 12316,
+    "evidence_row_ids": [
+      "RD0247"
+    ],
+    "bucket_rank": 147
+  },
+  {
+    "road_id": "RD0163",
+    "road_name": "Aarey Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 16.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 18.26,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 925,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1932,
+    "evidence_row_ids": [
+      "RD0163"
+    ],
+    "bucket_rank": 148
+  },
+  {
+    "road_id": "RD0143",
+    "road_name": "SV Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 52.0,
+    "estimated_repair_cost_inr": 287538,
+    "cost_to_bmc_inr": 287538,
+    "priority_per_lakh": 18.091,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1037,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 3171,
+    "evidence_row_ids": [
+      "RD0143",
+      "ACC0212",
+      "ACC0174",
+      "ACC0399",
+      "ACC0271"
+    ],
+    "bucket_rank": 149
+  },
+  {
+    "road_id": "RD0195",
+    "road_name": "Thakur Village Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 34.7,
+    "estimated_repair_cost_inr": 192085,
+    "cost_to_bmc_inr": 192085,
+    "priority_per_lakh": 18.086,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2531,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 1542,
+    "evidence_row_ids": [
+      "RD0195",
+      "ACC0033",
+      "ACC0140"
+    ],
+    "bucket_rank": 150
+  },
+  {
+    "road_id": "RD0170",
+    "road_name": "Link Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 15.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 17.85,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 857,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4712,
+    "evidence_row_ids": [
+      "RD0170"
+    ],
+    "bucket_rank": 151
+  },
+  {
+    "road_id": "RD0287",
+    "road_name": "Mulund Goregaon Link Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 15.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 17.675,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1325,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4609,
+    "evidence_row_ids": [
+      "RD0287"
+    ],
+    "bucket_rank": 152
+  },
+  {
+    "road_id": "RD0229",
+    "road_name": "Ghatkopar Mankhurd Link Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 39.7,
+    "estimated_repair_cost_inr": 225621,
+    "cost_to_bmc_inr": 225621,
+    "priority_per_lakh": 17.584,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1020,
+    "ambulance_weight": 2,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 4954,
+    "evidence_row_ids": [
+      "RD0229"
+    ],
+    "bucket_rank": 153
+  },
+  {
+    "road_id": "RD0288",
+    "road_name": "Mulund Goregaon Link Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 15.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 17.382,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1391,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4462,
+    "evidence_row_ids": [
+      "RD0288"
+    ],
+    "bucket_rank": 154
+  },
+  {
+    "road_id": "RD0218",
+    "road_name": "LBS Marg",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 34.8,
+    "estimated_repair_cost_inr": 200359,
+    "cost_to_bmc_inr": 200359,
+    "priority_per_lakh": 17.357,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 844,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2838,
+    "evidence_row_ids": [
+      "RD0218",
+      "ACC0394",
+      "ACC0377"
+    ],
+    "bucket_rank": 155
+  },
+  {
+    "road_id": "RD0061",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 15.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 17.206,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 1239,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 4322,
+    "evidence_row_ids": [
+      "RD0061"
+    ],
+    "bucket_rank": 156
+  },
+  {
+    "road_id": "RD0228",
+    "road_name": "Kamani Junction Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 33.9,
+    "estimated_repair_cost_inr": 201488,
+    "cost_to_bmc_inr": 201488,
+    "priority_per_lakh": 16.832,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 986,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 6,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 220,
+    "evidence_row_ids": [
+      "RD0228",
+      "ACC0239",
+      "ACC0142"
+    ],
+    "bucket_rank": 157
+  },
+  {
+    "road_id": "RD0049",
+    "road_name": "Maulana Azad Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 33.2,
+    "estimated_repair_cost_inr": 197690,
+    "cost_to_bmc_inr": 197690,
+    "priority_per_lakh": 16.789,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 607,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 799,
+    "evidence_row_ids": [
+      "RD0049",
+      "ACC0190"
+    ],
+    "bucket_rank": 158
+  },
+  {
+    "road_id": "RD0221",
+    "road_name": "Kurla Andheri Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 34.3,
+    "estimated_repair_cost_inr": 205056,
+    "cost_to_bmc_inr": 205056,
+    "priority_per_lakh": 16.707,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 431,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2682,
+    "evidence_row_ids": [
+      "RD0221",
+      "ACC0164",
+      "ACC0325"
+    ],
+    "bucket_rank": 159
+  },
+  {
+    "road_id": "RD0234",
+    "road_name": "Sion Trombay Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 23.6,
+    "estimated_repair_cost_inr": 141918,
+    "cost_to_bmc_inr": 141918,
+    "priority_per_lakh": 16.62,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1409,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 4048,
+    "evidence_row_ids": [
+      "RD0234"
+    ],
+    "bucket_rank": 160
+  },
+  {
+    "road_id": "RD0011",
+    "road_name": "Colaba Causeway",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 14.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 16.446,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3833,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 637,
+    "evidence_row_ids": [
+      "RD0011"
+    ],
+    "bucket_rank": 161
+  },
+  {
+    "road_id": "RD0285",
+    "road_name": "Eastern Express Highway",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 14.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 16.27,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1917,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 11642,
+    "evidence_row_ids": [
+      "RD0285"
+    ],
+    "bucket_rank": 162
+  },
+  {
+    "road_id": "RD0069",
+    "road_name": "Acharya Donde Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 24.9,
+    "estimated_repair_cost_inr": 154212,
+    "cost_to_bmc_inr": 154212,
+    "priority_per_lakh": 16.133,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 762,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 846,
+    "evidence_row_ids": [
+      "RD0069",
+      "ACC0388"
+    ],
+    "bucket_rank": 163
+  },
+  {
+    "road_id": "RD0157",
+    "road_name": "Link Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 14.2,
+    "estimated_repair_cost_inr": 88721,
+    "cost_to_bmc_inr": 88721,
+    "priority_per_lakh": 16.032,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1422,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3893,
+    "evidence_row_ids": [
+      "RD0157"
+    ],
+    "bucket_rank": 164
+  },
+  {
+    "road_id": "RD0122",
+    "road_name": "Linking Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 13.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 15.568,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 1062,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 6216,
+    "evidence_row_ids": [
+      "RD0122"
+    ],
+    "bucket_rank": 165
+  },
+  {
+    "road_id": "RD0140",
+    "road_name": "Marol Maroshi Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 14.3,
+    "estimated_repair_cost_inr": 94508,
+    "cost_to_bmc_inr": 94508,
+    "priority_per_lakh": 15.16,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 1239,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 721,
+    "evidence_row_ids": [
+      "RD0140"
+    ],
+    "bucket_rank": 166
+  },
+  {
+    "road_id": "RD0222",
+    "road_name": "Kurla Andheri Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 43.7,
+    "estimated_repair_cost_inr": 291262,
+    "cost_to_bmc_inr": 291262,
+    "priority_per_lakh": 15.012,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH008",
+    "nearest_hotspot_m": 893,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 4464,
+    "evidence_row_ids": [
+      "RD0222",
+      "ACC0273",
+      "ACC0326"
+    ],
+    "bucket_rank": 167
+  },
+  {
+    "road_id": "RD0161",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 14.9,
+    "estimated_repair_cost_inr": 100375,
+    "cost_to_bmc_inr": 100375,
+    "priority_per_lakh": 14.841,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1159,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2749,
+    "evidence_row_ids": [
+      "RD0161"
+    ],
+    "bucket_rank": 168
+  },
+  {
+    "road_id": "RD0160",
+    "road_name": "SV Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 12.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 14.573,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1042,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 5469,
+    "evidence_row_ids": [
+      "RD0160"
+    ],
+    "bucket_rank": 169
+  },
+  {
+    "road_id": "RD0232",
+    "road_name": "Ghatkopar Mankhurd Link Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 37.7,
+    "estimated_repair_cost_inr": 258642,
+    "cost_to_bmc_inr": 258642,
+    "priority_per_lakh": 14.559,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1272,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 9,
+    "peak_hour_vehicles": 3681,
+    "evidence_row_ids": [
+      "RD0232"
+    ],
+    "bucket_rank": 170
+  },
+  {
+    "road_id": "RD0097",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 23.1,
+    "estimated_repair_cost_inr": 161111,
+    "cost_to_bmc_inr": 161111,
+    "priority_per_lakh": 14.319,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH011",
+    "nearest_hotspot_m": 1396,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 3406,
+    "evidence_row_ids": [
+      "RD0097"
+    ],
+    "bucket_rank": 171
+  },
+  {
+    "road_id": "RD0018",
+    "road_name": "P D'Mello Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 12.6,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 14.222,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 585,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 5047,
+    "evidence_row_ids": [
+      "RD0018"
+    ],
+    "bucket_rank": 172
+  },
+  {
+    "road_id": "RD0180",
+    "road_name": "Malad Subway",
+    "ward_code": "P/N",
+    "under_dlp": false,
+    "priority_score": 81.1,
+    "estimated_repair_cost_inr": 573561,
+    "cost_to_bmc_inr": 573561,
+    "priority_per_lakh": 14.146,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "FLOOD_SPOT",
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE",
+      "UNDER_REPORTED_WARD"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 251,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 4,
+    "reopened_jobs": 8,
+    "peak_hour_vehicles": 324,
+    "evidence_row_ids": [
+      "RD0180",
+      "ACC0017",
+      "ACC0226"
+    ],
+    "bucket_rank": 173
+  },
+  {
+    "road_id": "RD0118",
+    "road_name": "SV Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 12.1,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 13.695,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 985,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3180,
+    "evidence_row_ids": [
+      "RD0118"
+    ],
+    "bucket_rank": 174
+  },
+  {
+    "road_id": "RD0238",
+    "road_name": "Deonar Village Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 34.9,
+    "estimated_repair_cost_inr": 262111,
+    "cost_to_bmc_inr": 262111,
+    "priority_per_lakh": 13.32,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1890,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 10,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 182,
+    "evidence_row_ids": [
+      "RD0238",
+      "ACC0120",
+      "ACC0072",
+      "ACC0104",
+      "ACC0368"
+    ],
+    "bucket_rank": 175
+  },
+  {
+    "road_id": "RD0132",
+    "road_name": "Andheri Kurla Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 12.7,
+    "estimated_repair_cost_inr": 96449,
+    "cost_to_bmc_inr": 96449,
+    "priority_per_lakh": 13.193,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH028",
+    "nearest_hotspot_m": 769,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 3473,
+    "evidence_row_ids": [
+      "RD0132"
+    ],
+    "bucket_rank": 176
+  },
+  {
+    "road_id": "RD0279",
+    "road_name": "LBS Marg",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 11.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 12.993,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1199,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 4108,
+    "evidence_row_ids": [
+      "RD0279"
+    ],
+    "bucket_rank": 177
+  },
+  {
+    "road_id": "RD0102",
+    "road_name": "90 Feet Road Dharavi",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 37.6,
+    "estimated_repair_cost_inr": 293764,
+    "cost_to_bmc_inr": 293764,
+    "priority_per_lakh": 12.806,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 557,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1320,
+    "evidence_row_ids": [
+      "RD0102",
+      "ACC0113",
+      "ACC0214"
+    ],
+    "bucket_rank": 178
+  },
+  {
+    "road_id": "RD0015",
+    "road_name": "Mohammed Ali Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 11.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 12.641,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1813,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3999,
+    "evidence_row_ids": [
+      "RD0015"
+    ],
+    "bucket_rank": 179
+  },
+  {
+    "road_id": "RD0262",
+    "road_name": "Andheri Ghatkopar Link Road",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 13.6,
+    "estimated_repair_cost_inr": 107874,
+    "cost_to_bmc_inr": 107874,
+    "priority_per_lakh": 12.563,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 752,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2250,
+    "evidence_row_ids": [
+      "RD0262"
+    ],
+    "bucket_rank": 180
+  },
+  {
+    "road_id": "RD0237",
+    "road_name": "Deonar Village Road",
+    "ward_code": "M/E",
+    "under_dlp": false,
+    "priority_score": 46.1,
+    "estimated_repair_cost_inr": 368245,
+    "cost_to_bmc_inr": 368245,
+    "priority_per_lakh": 12.506,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "AMBULANCE_ROUTE",
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH024",
+    "nearest_hotspot_m": 1552,
+    "ambulance_weight": 1,
+    "road_condition_accident_harm": 2,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 237,
+    "evidence_row_ids": [
+      "RD0237",
+      "ACC0392",
+      "ACC0177"
+    ],
+    "bucket_rank": 181
+  },
+  {
+    "road_id": "RD0165",
+    "road_name": "Aarey Road",
+    "ward_code": "P/S",
+    "under_dlp": false,
+    "priority_score": 14.8,
+    "estimated_repair_cost_inr": 119538,
+    "cost_to_bmc_inr": 119538,
+    "priority_per_lakh": 12.419,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH026",
+    "nearest_hotspot_m": 1350,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 1344,
+    "evidence_row_ids": [
+      "RD0165"
+    ],
+    "bucket_rank": 182
+  },
+  {
+    "road_id": "RD0103",
+    "road_name": "90 Feet Road Dharavi",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 25.1,
+    "estimated_repair_cost_inr": 202722,
+    "cost_to_bmc_inr": 202722,
+    "priority_per_lakh": 12.375,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 582,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 904,
+    "evidence_row_ids": [
+      "RD0103",
+      "ACC0228"
+    ],
+    "bucket_rank": 183
+  },
+  {
+    "road_id": "RD0096",
+    "road_name": "Senapati Bapat Marg",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 40.0,
+    "estimated_repair_cost_inr": 323996,
+    "cost_to_bmc_inr": 323996,
+    "priority_per_lakh": 12.341,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 1588,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 1,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 5405,
+    "evidence_row_ids": [
+      "RD0096",
+      "ACC0302"
+    ],
+    "bucket_rank": 184
+  },
+  {
+    "road_id": "RD0038",
+    "road_name": "Tardeo Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 10.9,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 12.29,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1626,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3936,
+    "evidence_row_ids": [
+      "RD0038"
+    ],
+    "bucket_rank": 185
+  },
+  {
+    "road_id": "RD0275",
+    "road_name": "Powai Adi Shankaracharya Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 17.4,
+    "estimated_repair_cost_inr": 141456,
+    "cost_to_bmc_inr": 141456,
+    "priority_per_lakh": 12.286,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 545,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 2505,
+    "evidence_row_ids": [
+      "RD0275"
+    ],
+    "bucket_rank": 186
+  },
+  {
+    "road_id": "RD0137",
+    "road_name": "Mahakali Caves Road",
+    "ward_code": "K/E",
+    "under_dlp": false,
+    "priority_score": 37.8,
+    "estimated_repair_cost_inr": 312514,
+    "cost_to_bmc_inr": 312514,
+    "priority_per_lakh": 12.093,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1526,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 3,
+    "reopened_jobs": 5,
+    "peak_hour_vehicles": 1025,
+    "evidence_row_ids": [
+      "RD0137",
+      "ACC0010",
+      "ACC0225",
+      "ACC0238"
+    ],
+    "bucket_rank": 187
+  },
+  {
+    "road_id": "RD0263",
+    "road_name": "Andheri Ghatkopar Link Road",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 17.6,
+    "estimated_repair_cost_inr": 150809,
+    "cost_to_bmc_inr": 150809,
+    "priority_per_lakh": 11.661,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 829,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 2547,
+    "evidence_row_ids": [
+      "RD0263"
+    ],
+    "bucket_rank": 188
+  },
+  {
+    "road_id": "RD0225",
+    "road_name": "CST Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 30.2,
+    "estimated_repair_cost_inr": 266671,
+    "cost_to_bmc_inr": 266671,
+    "priority_per_lakh": 11.327,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "ACCIDENT_PRONE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 984,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 9,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 727,
+    "evidence_row_ids": [
+      "RD0225",
+      "ACC0215",
+      "ACC0268",
+      "ACC0002",
+      "ACC0339",
+      "ACC0023"
+    ],
+    "bucket_rank": 189
+  },
+  {
+    "road_id": "RD0043",
+    "road_name": "Peddar Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 9.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 11.061,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1872,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 3591,
+    "evidence_row_ids": [
+      "RD0043"
+    ],
+    "bucket_rank": 190
+  },
+  {
+    "road_id": "RD0028",
+    "road_name": "Princess Street",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 9.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 10.476,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1421,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1844,
+    "evidence_row_ids": [
+      "RD0028"
+    ],
+    "bucket_rank": 191
+  },
+  {
+    "road_id": "RD0092",
+    "road_name": "Ganpatrao Kadam Marg",
+    "ward_code": "G/S",
+    "under_dlp": false,
+    "priority_score": 8.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 9.949,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH010",
+    "nearest_hotspot_m": 743,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 653,
+    "evidence_row_ids": [
+      "RD0092"
+    ],
+    "bucket_rank": 192
+  },
+  {
+    "road_id": "RD0256",
+    "road_name": "MG Road Ghatkopar",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 8.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 9.598,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1150,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1430,
+    "evidence_row_ids": [
+      "RD0256"
+    ],
+    "bucket_rank": 193
+  },
+  {
+    "road_id": "RD0070",
+    "road_name": "Acharya Donde Marg",
+    "ward_code": "F/S",
+    "under_dlp": false,
+    "priority_score": 8.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 9.54,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH001",
+    "nearest_hotspot_m": 953,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1411,
+    "evidence_row_ids": [
+      "RD0070"
+    ],
+    "bucket_rank": 194
+  },
+  {
+    "road_id": "RD0053",
+    "road_name": "Clare Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 13.4,
+    "estimated_repair_cost_inr": 140802,
+    "cost_to_bmc_inr": 140802,
+    "priority_per_lakh": 9.514,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 304,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 943,
+    "evidence_row_ids": [
+      "RD0053"
+    ],
+    "bucket_rank": 195
+  },
+  {
+    "road_id": "RD0257",
+    "road_name": "MG Road Ghatkopar",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 10.7,
+    "estimated_repair_cost_inr": 113904,
+    "cost_to_bmc_inr": 113904,
+    "priority_per_lakh": 9.4,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1627,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 992,
+    "evidence_row_ids": [
+      "RD0257"
+    ],
+    "bucket_rank": 196
+  },
+  {
+    "road_id": "RD0017",
+    "road_name": "P D'Mello Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 8.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 9.071,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 383,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2768,
+    "evidence_row_ids": [
+      "RD0017"
+    ],
+    "bucket_rank": 197
+  },
+  {
+    "road_id": "RD0201",
+    "road_name": "LT Road",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 9.8,
+    "estimated_repair_cost_inr": 108961,
+    "cost_to_bmc_inr": 108961,
+    "priority_per_lakh": 8.972,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 942,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 2019,
+    "evidence_row_ids": [
+      "RD0201"
+    ],
+    "bucket_rank": 198
+  },
+  {
+    "road_id": "RD0026",
+    "road_name": "Jagannath Shankarseth Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 7.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 8.837,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 624,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 1168,
+    "evidence_row_ids": [
+      "RD0026"
+    ],
+    "bucket_rank": 199
+  },
+  {
+    "road_id": "RD0021",
+    "road_name": "Nishanpada Road",
+    "ward_code": "B",
+    "under_dlp": false,
+    "priority_score": 7.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 8.779,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 642,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 291,
+    "evidence_row_ids": [
+      "RD0021"
+    ],
+    "bucket_rank": 200
+  },
+  {
+    "road_id": "RD0264",
+    "road_name": "Andheri Ghatkopar Link Road",
+    "ward_code": "N",
+    "under_dlp": false,
+    "priority_score": 7.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 8.486,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH017",
+    "nearest_hotspot_m": 1014,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2539,
+    "evidence_row_ids": [
+      "RD0264"
+    ],
+    "bucket_rank": 201
+  },
+  {
+    "road_id": "RD0223",
+    "road_name": "Kurla Andheri Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 16.4,
+    "estimated_repair_cost_inr": 201001,
+    "cost_to_bmc_inr": 201001,
+    "priority_per_lakh": 8.157,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH019",
+    "nearest_hotspot_m": 776,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 5552,
+    "evidence_row_ids": [
+      "RD0223"
+    ],
+    "bucket_rank": 202
+  },
+  {
+    "road_id": "RD0116",
+    "road_name": "SV Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 6.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 7.667,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1627,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2309,
+    "evidence_row_ids": [
+      "RD0116"
+    ],
+    "bucket_rank": 203
+  },
+  {
+    "road_id": "RD0054",
+    "road_name": "Clare Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 9.2,
+    "estimated_repair_cost_inr": 140428,
+    "cost_to_bmc_inr": 140428,
+    "priority_per_lakh": 6.556,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 829,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 731,
+    "evidence_row_ids": [
+      "RD0054"
+    ],
+    "bucket_rank": 204
+  },
+  {
+    "road_id": "RD0126",
+    "road_name": "Hill Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 5.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 6.204,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 398,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1692,
+    "evidence_row_ids": [
+      "RD0126"
+    ],
+    "bucket_rank": 205
+  },
+  {
+    "road_id": "RD0006",
+    "road_name": "Veer Nariman Road",
+    "ward_code": "A",
+    "under_dlp": false,
+    "priority_score": 12.0,
+    "estimated_repair_cost_inr": 199904,
+    "cost_to_bmc_inr": 199904,
+    "priority_per_lakh": 6.003,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC"
+    ],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 3557,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 4469,
+    "evidence_row_ids": [
+      "RD0006"
+    ],
+    "bucket_rank": 206
+  },
+  {
+    "road_id": "RD0267",
+    "road_name": "LBS Marg",
+    "ward_code": "S",
+    "under_dlp": false,
+    "priority_score": 24.3,
+    "estimated_repair_cost_inr": 415489,
+    "cost_to_bmc_inr": 415489,
+    "priority_per_lakh": 5.839,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "HIGH_TRAFFIC",
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH018",
+    "nearest_hotspot_m": 396,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 4,
+    "peak_hour_vehicles": 4516,
+    "evidence_row_ids": [
+      "RD0267"
+    ],
+    "bucket_rank": 207
+  },
+  {
+    "road_id": "RD0147",
+    "road_name": "Juhu Tara Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 13.0,
+    "estimated_repair_cost_inr": 229360,
+    "cost_to_bmc_inr": 229360,
+    "priority_per_lakh": 5.683,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 430,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 863,
+    "evidence_row_ids": [
+      "RD0147"
+    ],
+    "bucket_rank": 208
+  },
+  {
+    "road_id": "RD0098",
+    "road_name": "Lady Jamshedji Road",
+    "ward_code": "G/N",
+    "under_dlp": false,
+    "priority_score": 8.6,
+    "estimated_repair_cost_inr": 161424,
+    "cost_to_bmc_inr": 161424,
+    "priority_per_lakh": 5.319,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH023",
+    "nearest_hotspot_m": 1731,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 627,
+    "evidence_row_ids": [
+      "RD0098"
+    ],
+    "bucket_rank": 209
+  },
+  {
+    "road_id": "RD0124",
+    "road_name": "Hill Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 5.9,
+    "estimated_repair_cost_inr": 114872,
+    "cost_to_bmc_inr": 114872,
+    "priority_per_lakh": 5.178,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 896,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 751,
+    "evidence_row_ids": [
+      "RD0124"
+    ],
+    "bucket_rank": 210
+  },
+  {
+    "road_id": "RD0031",
+    "road_name": "Nepean Sea Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 4.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 5.092,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1521,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1204,
+    "evidence_row_ids": [
+      "RD0031"
+    ],
+    "bucket_rank": 211
+  },
+  {
+    "road_id": "RD0106",
+    "road_name": "Gokhale Road",
+    "ward_code": "F/N",
+    "under_dlp": false,
+    "priority_score": 8.2,
+    "estimated_repair_cost_inr": 164929,
+    "cost_to_bmc_inr": 164929,
+    "priority_per_lakh": 4.986,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH002",
+    "nearest_hotspot_m": 528,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 571,
+    "evidence_row_ids": [
+      "RD0106"
+    ],
+    "bucket_rank": 212
+  },
+  {
+    "road_id": "RD0022",
+    "road_name": "Kalbadevi Road",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 4.4,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 4.975,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1392,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1178,
+    "evidence_row_ids": [
+      "RD0022"
+    ],
+    "bucket_rank": 213
+  },
+  {
+    "road_id": "RD0114",
+    "road_name": "Vakola Bridge Road",
+    "ward_code": "H/E",
+    "under_dlp": false,
+    "priority_score": 6.2,
+    "estimated_repair_cost_inr": 128751,
+    "cost_to_bmc_inr": 128751,
+    "priority_per_lakh": 4.821,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 1306,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 828,
+    "evidence_row_ids": [
+      "RD0114"
+    ],
+    "bucket_rank": 214
+  },
+  {
+    "road_id": "RD0034",
+    "road_name": "Pandita Ramabai Road",
+    "ward_code": "D",
+    "under_dlp": false,
+    "priority_score": 4.2,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 4.741,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH013",
+    "nearest_hotspot_m": 1357,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 1143,
+    "evidence_row_ids": [
+      "RD0034"
+    ],
+    "bucket_rank": 215
+  },
+  {
+    "road_id": "RD0046",
+    "road_name": "Dr Babasaheb Ambedkar Road",
+    "ward_code": "E",
+    "under_dlp": false,
+    "priority_score": 14.6,
+    "estimated_repair_cost_inr": 313928,
+    "cost_to_bmc_inr": 313928,
+    "priority_per_lakh": 4.663,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH012",
+    "nearest_hotspot_m": 1096,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 2,
+    "peak_hour_vehicles": 2673,
+    "evidence_row_ids": [
+      "RD0046"
+    ],
+    "bucket_rank": 216
+  },
+  {
+    "road_id": "RD0191",
+    "road_name": "Charkop Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 11.2,
+    "estimated_repair_cost_inr": 273916,
+    "cost_to_bmc_inr": 273916,
+    "priority_per_lakh": 4.079,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1687,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 568,
+    "evidence_row_ids": [
+      "RD0191"
+    ],
+    "bucket_rank": 217
+  },
+  {
+    "road_id": "RD0194",
+    "road_name": "Thakur Village Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 3.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 3.98,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 2531,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 957,
+    "evidence_row_ids": [
+      "RD0194"
+    ],
+    "bucket_rank": 218
+  },
+  {
+    "road_id": "RD0129",
+    "road_name": "Milan Subway Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 3.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 3.687,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH014",
+    "nearest_hotspot_m": 1213,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 934,
+    "evidence_row_ids": [
+      "RD0129"
+    ],
+    "bucket_rank": 219
+  },
+  {
+    "road_id": "RD0183",
+    "road_name": "Link Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 16.9,
+    "estimated_repair_cost_inr": 470470,
+    "cost_to_bmc_inr": 470470,
+    "priority_per_lakh": 3.595,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1241,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 3,
+    "peak_hour_vehicles": 2341,
+    "evidence_row_ids": [
+      "RD0183"
+    ],
+    "bucket_rank": 220
+  },
+  {
+    "road_id": "RD0192",
+    "road_name": "Charkop Road",
+    "ward_code": "R/S",
+    "under_dlp": false,
+    "priority_score": 6.7,
+    "estimated_repair_cost_inr": 201174,
+    "cost_to_bmc_inr": 201174,
+    "priority_per_lakh": 3.317,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH006",
+    "nearest_hotspot_m": 1586,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 1,
+    "peak_hour_vehicles": 927,
+    "evidence_row_ids": [
+      "RD0192"
+    ],
+    "bucket_rank": 221
+  },
+  {
+    "road_id": "RD0199",
+    "road_name": "SV Road",
+    "ward_code": "R/C",
+    "under_dlp": false,
+    "priority_score": 7.3,
+    "estimated_repair_cost_inr": 223337,
+    "cost_to_bmc_inr": 223337,
+    "priority_per_lakh": 3.266,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 2554,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 2462,
+    "evidence_row_ids": [
+      "RD0199"
+    ],
+    "bucket_rank": 222
+  },
+  {
+    "road_id": "RD0224",
+    "road_name": "CST Road",
+    "ward_code": "L",
+    "under_dlp": false,
+    "priority_score": 16.4,
+    "estimated_repair_cost_inr": 534373,
+    "cost_to_bmc_inr": 534373,
+    "priority_per_lakh": 3.068,
+    "bucket": "B_INVEST",
+    "reason_codes": [
+      "REPEAT_FAILURE"
+    ],
+    "nearest_hotspot_id": "FH009",
+    "nearest_hotspot_m": 684,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 6,
+    "peak_hour_vehicles": 744,
+    "evidence_row_ids": [
+      "RD0224"
+    ],
+    "bucket_rank": 223
+  },
+  {
+    "road_id": "RD0125",
+    "road_name": "Hill Road",
+    "ward_code": "H/W",
+    "under_dlp": false,
+    "priority_score": 2.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 2.868,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH015",
+    "nearest_hotspot_m": 783,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 789,
+    "evidence_row_ids": [
+      "RD0125"
+    ],
+    "bucket_rank": 224
+  },
+  {
+    "road_id": "RD0151",
+    "road_name": "JP Road",
+    "ward_code": "K/W",
+    "under_dlp": false,
+    "priority_score": 1.5,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 1.697,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH005",
+    "nearest_hotspot_m": 1253,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 608,
+    "evidence_row_ids": [
+      "RD0151"
+    ],
+    "bucket_rank": 225
+  },
+  {
+    "road_id": "RD0033",
+    "road_name": "Nepean Sea Road",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 1.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 1.522,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1401,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 577,
+    "evidence_row_ids": [
+      "RD0033"
+    ],
+    "bucket_rank": 226
+  },
+  {
+    "road_id": "RD0029",
+    "road_name": "Princess Street",
+    "ward_code": "C",
+    "under_dlp": false,
+    "priority_score": 1.3,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 1.463,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH027",
+    "nearest_hotspot_m": 1307,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 572,
+    "evidence_row_ids": [
+      "RD0029"
+    ],
+    "bucket_rank": 227
+  },
+  {
+    "road_id": "RD0215",
+    "road_name": "Anand Nagar Road",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 1.0,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 1.112,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 1211,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 310,
+    "evidence_row_ids": [
+      "RD0215"
+    ],
+    "bucket_rank": 228
+  },
+  {
+    "road_id": "RD0290",
+    "road_name": "Devidayal Road",
+    "ward_code": "T",
+    "under_dlp": false,
+    "priority_score": 0.8,
+    "estimated_repair_cost_inr": 88379,
+    "cost_to_bmc_inr": 88379,
+    "priority_per_lakh": 0.936,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH025",
+    "nearest_hotspot_m": 1282,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 301,
+    "evidence_row_ids": [
+      "RD0290"
+    ],
+    "bucket_rank": 229
+  },
+  {
+    "road_id": "RD0209",
+    "road_name": "Dahisar Subway Road",
+    "ward_code": "R/N",
+    "under_dlp": false,
+    "priority_score": 0.9,
+    "estimated_repair_cost_inr": 151863,
+    "cost_to_bmc_inr": 151863,
+    "priority_per_lakh": 0.579,
+    "bucket": "B_INVEST",
+    "reason_codes": [],
+    "nearest_hotspot_id": "FH007",
+    "nearest_hotspot_m": 798,
+    "ambulance_weight": 0,
+    "road_condition_accident_harm": 0,
+    "reopened_jobs": 0,
+    "peak_hour_vehicles": 303,
+    "evidence_row_ids": [
+      "RD0209"
+    ],
+    "bucket_rank": 230
+  }
+]
