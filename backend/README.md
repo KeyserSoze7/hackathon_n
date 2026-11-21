@@ -2,6 +2,9 @@
 
 One FastAPI app (`api.py`) serves all four views. All backend endpoints go here; don't add a second server.
 
+## Configure
+Copy `.env.example` to `.env` at the repo root and fill in the Supabase Session pooler URI (or `export DATABASE_URL=...`).
+
 ## Run locally
 From the repo root, with the database already loaded (see `view3/README.md` → Supabase / Postgres integration):
 ```bash
@@ -15,7 +18,7 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 - ReDoc: http://127.0.0.1:8000/redoc
 - Spec: `GET /openapi.json`, committed as `backend/openapi.json` (import into Postman or a client generator).
   Regenerate after changing endpoints: `curl -s http://127.0.0.1:8000/openapi.json > backend/openapi.json`
-- Every endpoint has a response model (`models.py`), so the spec is fully typed (28 schemas, enums for labels/codes,
+- Every endpoint has a response model (`models.py`), so the spec is fully typed (31 schemas, enums for labels/codes,
   typed 404 `{detail}`). Generate a client from `backend/openapi.json`, e.g.
   `npx openapi-typescript backend/openapi.json -o src/api.d.ts` (TS types) or
   `openapi-generator-cli generate -i backend/openapi.json -g typescript-fetch -o src/api` (full client).
@@ -24,9 +27,10 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 | View | Method + path | Reads |
 |---|---|---|
 | — | `GET /api/health` | row counts |
-| 1 | `GET /api/city` | `city_kpis` |
+| 1 | `GET /api/city` | `city_kpis` (incl. `rupees_at_stake_total`, `wards_over_budget`, `under_reported_wards`) |
 | 1 | `GET /api/wards` (all, list) · `GET /api/wards?ward=K/W` or header `X-Ward-Code: K/W` (one, object; query wins; case-insensitive; 404 if unknown) | `ward_overview` |
-| 1 | `GET /api/flagged-queue?ward=K/W&tier=1&limit=20` | `flagged_queue` |
+| 1 | `GET /api/wards/map` | GeoJSON: `data/wards.geojson` polygons + `ward_overview` in properties (colour by `dlp_leakage_rate`) |
+| 1 | `GET /api/flagged-queue?ward=K/W&tier=1&detector=REPEAT_BILL_NO_COMPLAINT&limit=20&offset=0` | `flagged_queue` |
 | 2 | `GET /api/roads/{road_id}` | `road_audit`, `work_orders`, `flags`, `flag_replies` |
 | 2 | `GET /api/roads/{road_id}/timeline` | `road_timeline` |
 | 2 | `GET /api/flags/{flag_id}` | `flags`, `flag_replies` |
@@ -34,10 +38,13 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 | 3 | `GET /api/v3/contractors` | `v3_contractor_scorecard` |
 | 3 | `GET /api/v3/wards` | `v3_ward_allocation` |
 | 3 | `GET /api/v3/next-rupee/{ward}` | `v3_next_rupee` |
+| 3 | `GET /api/v3/summary` | `v3_model_meta` (model quality + budget curve for the demo chart) |
 | 3 | `POST /api/v3/allocate` | live MILP re-solve (`view3/allocator.py`) |
 | 4 | `GET /api/lookup?q=...` | `roads`, `locality_aliases`, `locality_nearest_road`, `road_audit` |
 | 4 | `POST /api/citizen-reports` | writes `citizen_reports` (server sets tracker status) |
 | 4 | `GET /api/citizen-reports/{id}` | `citizen_reports` |
+
+Ward codes are accepted as `K/W`, `K-W` or `k_w` everywhere (the frontend contract uses `K-W`; the database stores `K/W`).
 
 Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (View 4), the two Claude endpoints.
 
@@ -54,4 +61,4 @@ Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (
   (`%(name)s` params; never format user input into SQL) and `ENG.begin()` + `text()` for writes.
 - Numbers come from the database/pipeline; endpoints only select and shape. No arithmetic in prompts or UI.
 - Update `postman/backend.postman_collection.json` and run it against an API started with `STRICT_MODELS=1`:
-  `postman collection run postman/backend.postman_collection.json` (28 requests, 70 assertions)
+  `postman collection run postman/backend.postman_collection.json` (37 requests, 94 assertions)

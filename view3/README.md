@@ -17,6 +17,9 @@ The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipelin
    python3 pipeline/build.py
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000000_schema.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000100_audit_views.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000200_revoke_truncate.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000300_v3_model_meta.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000400_city_kpis_extra.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit.sql
    ```

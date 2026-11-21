@@ -115,6 +115,38 @@
         }
       }
     },
+    "/api/v3/summary": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Model quality + budget curve (optimizer vs simple rules)",
+        "description": "View 3 demo chart: harm avoided by the optimizer vs simple rules at each budget level, plus model quality.",
+        "operationId": "v3_summary_api_v3_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V3Summary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v3/allocate": {
       "post": {
         "tags": [
@@ -215,7 +247,7 @@
           "View 1: City & Ward Overview"
         ],
         "summary": "All wards, or one ward via ?ward= / X-Ward-Code",
-        "description": "View 1 ward map: all wards as a list, or one ward as an object when a ward code is given\n(query param or X-Ward-Code header). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code.",
+        "description": "View 1 ward map: all wards as a list, or one ward as an object when a ward code is given\n(query param or X-Ward-Code header; K/W, K-W and k_w all work). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code.",
         "operationId": "ward_list_api_wards_get",
         "parameters": [
           {
@@ -300,13 +332,35 @@
         }
       }
     },
+    "/api/wards/map": {
+      "get": {
+        "tags": [
+          "View 1: City & Ward Overview"
+        ],
+        "summary": "Ward map as GeoJSON (polygons + ward metrics)",
+        "description": "View 1 map: polygons from data/wards.geojson, every ward_overview column in properties.\nColour by dlp_leakage_rate.",
+        "operationId": "ward_map_api_wards_map_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WardMap"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/flagged-queue": {
       "get": {
         "tags": [
           "View 1: City & Ward Overview"
         ],
         "summary": "Flagged bills ranked by rupees at stake",
-        "description": "View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&limit=20",
+        "description": "View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&detector=REPEAT_BILL_NO_COMPLAINT&limit=20&offset=0",
         "operationId": "flagged_queue_api_flagged_queue_get",
         "parameters": [
           {
@@ -322,13 +376,13 @@
                   "type": "null"
                 }
               ],
-              "description": "Ward code filter",
+              "description": "Ward code filter (K/W or K-W)",
               "examples": [
                 "K/W"
               ],
               "title": "Ward"
             },
-            "description": "Ward code filter"
+            "description": "Ward code filter (K/W or K-W)"
           },
           {
             "name": "tier",
@@ -351,6 +405,31 @@
             "description": "Top tier filter: 1 contractual, 2 implausible, 3 lead"
           },
           {
+            "name": "detector",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "DLP_PAID_TWICE",
+                    "RATE_INFLATION",
+                    "OVERLAPPING_WORK_ORDER",
+                    "RAIN_DAY_WORK",
+                    "REPEAT_BILL_NO_COMPLAINT"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only bills with this detector",
+              "title": "Detector"
+            },
+            "description": "Only bills with this detector"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -361,6 +440,19 @@
               "default": 50,
               "title": "Limit"
             }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Paging: skip this many rows",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Paging: skip this many rows"
           }
         ],
         "responses": {
@@ -1210,6 +1302,21 @@
             },
             "type": "object",
             "title": "Flags By Detector"
+          },
+          "rupees_at_stake_total": {
+            "type": "integer",
+            "title": "Rupees At Stake Total"
+          },
+          "wards_over_budget": {
+            "type": "integer",
+            "title": "Wards Over Budget"
+          },
+          "under_reported_wards": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Under Reported Wards"
           }
         },
         "additionalProperties": false,
@@ -1219,7 +1326,10 @@
           "total_spend_inr",
           "recoverable_dlp_inr",
           "flagged_bills_count",
-          "flags_by_detector"
+          "flags_by_detector",
+          "rupees_at_stake_total",
+          "wards_over_budget",
+          "under_reported_wards"
         ],
         "title": "CityKPIs"
       },
@@ -1489,7 +1599,8 @@
               "DLP_PAID_TWICE",
               "RATE_INFLATION",
               "OVERLAPPING_WORK_ORDER",
-              "RAIN_DAY_WORK"
+              "RAIN_DAY_WORK",
+              "REPEAT_BILL_NO_COMPLAINT"
             ],
             "title": "Detector"
           },
@@ -1634,7 +1745,8 @@
                 "DLP_PAID_TWICE",
                 "RATE_INFLATION",
                 "OVERLAPPING_WORK_ORDER",
-                "RAIN_DAY_WORK"
+                "RAIN_DAY_WORK",
+                "REPEAT_BILL_NO_COMPLAINT"
               ]
             },
             "type": "array",
@@ -2530,6 +2642,33 @@
         ],
         "title": "TrackerStep"
       },
+      "V3Summary": {
+        "properties": {
+          "scorecard": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Scorecard"
+          },
+          "allocation": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Allocation"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scorecard",
+          "allocation",
+          "updated_at"
+        ],
+        "title": "V3Summary"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -2748,6 +2887,61 @@
           "dlp_value_owed_inr"
         ],
         "title": "WardAllocation"
+      },
+      "WardFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/Ward"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "properties",
+          "geometry"
+        ],
+        "title": "WardFeature"
+      },
+      "WardMap": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/WardFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "features"
+        ],
+        "title": "WardMap"
       }
     }
   },

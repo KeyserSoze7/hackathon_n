@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 HERE = pathlib.Path(__file__).parent
+WARDS_GEOJSON = HERE.parent / "data" / "wards.geojson"
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "view3"))  # View 3 model code (allocator, feature pipeline)
 import allocator, view3_pipeline as vp
@@ -60,6 +61,11 @@ def one(sql, what, **params):
     return r[0]
 
 
+def norm_ward(code: Optional[str]) -> Optional[str]:
+    """Accept K-W, k_w or K/W (the frontend contract uses K-W); the database stores K/W."""
+    return code.strip().upper().replace("-", "/").replace("_", "/") if code else code
+
+
 @app.on_event("startup")
 def warm():
     model_inputs()
@@ -78,10 +84,17 @@ def wards():
 @app.get("/api/v3/next-rupee/{ward_code:path}", response_model=list[m.NextRupeeItem], responses=NOT_FOUND, tags=[V3], summary="Next-rupee items for one ward (Bucket A = DLP, Rs 0)")
 def next_rupee(ward_code: str = Path(examples=["K/W"])):
     r = rows("SELECT * FROM v3_next_rupee WHERE ward_code = %(w)s "
-             "ORDER BY bucket, funded DESC, priority_score DESC", w=ward_code)
+             "ORDER BY bucket, funded DESC, priority_score DESC", w=norm_ward(ward_code))
     if not r:
         raise HTTPException(404, f"unknown ward {ward_code}")
     return r
+
+
+@app.get("/api/v3/summary", response_model=m.V3Summary, responses=NOT_FOUND, tags=[V3], summary="Model quality + budget curve (optimizer vs simple rules)")
+def v3_summary():
+    """View 3 demo chart: harm avoided by the optimizer vs simple rules at each budget level, plus model quality."""
+    r = one("SELECT meta, updated_at FROM v3_model_meta WHERE id = 1", "v3 summary (run view3/view3_pipeline.py)")
+    return {**r["meta"], "updated_at": r["updated_at"]}
 
 
 class AllocateReq(BaseModel):
@@ -93,17 +106,18 @@ class AllocateReq(BaseModel):
 @app.post("/api/v3/allocate", response_model=m.Allocation, responses=NOT_FOUND, tags=[V3], summary="Budget slider: exact re-solve for one ward")
 def allocate(req: AllocateReq):
     items, opts = model_inputs()
-    if req.ward_code not in set(items.ward_code):
+    ward = norm_ward(req.ward_code)
+    if ward not in set(items.ward_code):
         raise HTTPException(404, f"unknown ward {req.ward_code}")
-    res = allocator.allocate_ward(items, opts, req.ward_code, req.budget_inr)
+    res = allocator.allocate_ward(items, opts, ward, req.budget_inr)
     detail = {r["item_id"]: r for r in rows(
         "SELECT item_id, road_name, issue, reason_codes, evidence_wo_ids FROM v3_next_rupee WHERE ward_code = %(w)s",
-        w=req.ward_code)}
+        w=ward)}
     for f in res["funded"]:
         f.update({k: v for k, v in detail.get(f["item_id"], {}).items() if k != "item_id"})
     res["bucket_a_dlp"] = rows(
         "SELECT item_id, road_name, issue, estimated_repair_cost_inr, explanation FROM v3_next_rupee "
-        "WHERE ward_code = %(w)s AND bucket = 'A_OWED_BY_CONTRACTOR_DLP'", w=req.ward_code)
+        "WHERE ward_code = %(w)s AND bucket = 'A_OWED_BY_CONTRACTOR_DLP'", w=ward)
     return res
 
 
@@ -124,21 +138,40 @@ def city():
 def ward_list(ward: Optional[str] = Query(None, description="Ward code, e.g. K/W. Returns that ward only."),
               x_ward_code: Optional[str] = Header(None, description="Same as ?ward=; the query param wins if both are sent.")):
     """View 1 ward map: all wards as a list, or one ward as an object when a ward code is given
-    (query param or X-Ward-Code header). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code."""
-    code = (ward or x_ward_code or "").strip().upper()
+    (query param or X-Ward-Code header; K/W, K-W and k_w all work). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code."""
+    code = norm_ward(ward or x_ward_code or "")
     if code:
         return one("SELECT * FROM ward_overview WHERE ward_code = %(w)s", f"ward {code}", w=code)
     return rows("SELECT * FROM ward_overview ORDER BY ward_code")
 
 
+@lru_cache(maxsize=1)
+def _ward_polygons():
+    gj = json.loads(WARDS_GEOJSON.read_text(encoding="utf-8"))
+    return {f["properties"]["ward_code"]: f["geometry"] for f in gj["features"]}
+
+
+@app.get("/api/wards/map", response_model=m.WardMap, tags=[V1], summary="Ward map as GeoJSON (polygons + ward metrics)")
+def ward_map():
+    """View 1 map: polygons from data/wards.geojson, every ward_overview column in properties.
+    Colour by dlp_leakage_rate."""
+    polys = _ward_polygons()
+    return {"type": "FeatureCollection",
+            "features": [{"type": "Feature", "properties": w, "geometry": polys.get(w["ward_code"])}
+                         for w in rows("SELECT * FROM ward_overview ORDER BY ward_code")]}
+
+
 @app.get("/api/flagged-queue", response_model=list[m.FlaggedBill], tags=[V1], summary="Flagged bills ranked by rupees at stake")
-def flagged_queue(ward: Optional[str] = Query(None, description="Ward code filter", examples=["K/W"]),
+def flagged_queue(ward: Optional[str] = Query(None, description="Ward code filter (K/W or K-W)", examples=["K/W"]),
                   tier: Optional[int] = Query(None, ge=1, le=3, description="Top tier filter: 1 contractual, 2 implausible, 3 lead"),
-                  limit: int = Query(50, ge=1, le=500)):
-    """View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&limit=20"""
+                  detector: Optional[m.Detector] = Query(None, description="Only bills with this detector"),
+                  limit: int = Query(50, ge=1, le=500),
+                  offset: int = Query(0, ge=0, description="Paging: skip this many rows")):
+    """View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&detector=REPEAT_BILL_NO_COMPLAINT&limit=20&offset=0"""
     return rows("SELECT * FROM flagged_queue WHERE (%(w)s IS NULL OR ward_code = %(w)s) "
-                "AND (%(t)s IS NULL OR top_tier = %(t)s) ORDER BY rupees_at_stake DESC, work_order_id LIMIT %(n)s",
-                w=ward, t=tier, n=max(1, min(limit, 500)))
+                "AND (%(t)s IS NULL OR top_tier = %(t)s) AND (%(d)s IS NULL OR %(d)s = ANY(detectors)) "
+                "ORDER BY rupees_at_stake DESC, work_order_id LIMIT %(n)s OFFSET %(o)s",
+                w=norm_ward(ward), t=tier, d=detector, n=max(1, min(limit, 500)), o=offset)
 
 
 @app.get("/api/roads/{road_id}", response_model=m.RoadReceipt, responses=NOT_FOUND, tags=[V2], summary="Road receipt: header, work orders, flags + replies")

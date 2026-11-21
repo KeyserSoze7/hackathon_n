@@ -10,6 +10,7 @@ Every number is computed here; nothing downstream does arithmetic.
 import csv
 import json
 from collections import Counter, defaultdict
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +25,7 @@ HOT_ASPHALT_METHODS = {"Hot mix patch", "Mastic asphalt"}
 HEAVY_RAIN_MM = 64.5  # IMD "Heavy" threshold
 RATE_NORMAL_BAND = 1.30  # dictionary: normal jobs vary ~20-30% around the rate
 RATE_FLAG_RATIO = 1.50  # flag only well outside the band (clean break in the data)
+REPEAT_BILL_DAYS = 7  # same road + issue billed again this soon, with no complaint behind it
 
 
 def read(name):
@@ -86,6 +88,22 @@ def detect_flags(work_orders, roads, rate_card, rain_by_date):
             add(2, "RAIN_DAY_WORK", wo, cost,
                 f"{wo['repair_method']} completed on {day} with {mm} mm rain (IMD heavy >= {HEAVY_RAIN_MM} mm).",
                 [wo_id, f"RAIN:{day}"])
+
+    # Tier 1: repeat bill with no complaint behind it. Every genuine job in this data has at least one linked
+    # complaint; a bill with none, for the same road + issue fixed days earlier, is a likely duplicate.
+    ts = lambda v: datetime.strptime(v[:16], "%Y-%m-%d %H:%M")
+    by_issue = defaultdict(list)
+    for wo in work_orders:
+        by_issue[(wo["road_id"], wo["work_type"])].append(wo)
+    for jobs in by_issue.values():
+        jobs.sort(key=lambda w: w["completed_at"])
+        for a, b in zip(jobs, jobs[1:]):
+            gap = (ts(b["completed_at"]) - ts(a["completed_at"])).total_seconds() / 86400
+            if not b["linked_complaint_ids"].strip() and gap <= REPEAT_BILL_DAYS:
+                add(1, "REPEAT_BILL_NO_COMPLAINT", b, float(b["cost_inr"]),
+                    f"{b['work_order_id']} bills {b['work_type'].lower()} on {b['road_id']} {gap:.1f} days after "
+                    f"{a['work_order_id']} fixed the same issue, and no citizen complaint is linked to it.",
+                    [b["work_order_id"], a["work_order_id"], b["road_id"]])
 
     # Tier 1: same road + same method with overlapping work windows.
     by_key = defaultdict(list)
@@ -242,6 +260,7 @@ def build():
                 "heavy_rain_mm": HEAVY_RAIN_MM,
                 "rate_flag_ratio": RATE_FLAG_RATIO,
                 "rate_normal_band": RATE_NORMAL_BAND,
+                "repeat_bill_days": REPEAT_BILL_DAYS,
                 "dlp_surface_methods": sorted(DLP_SURFACE_METHODS),
             },
         },

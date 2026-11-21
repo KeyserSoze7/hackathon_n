@@ -60,7 +60,7 @@
             "exec": [
               "pm.test('200', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(15));",
+              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(17));",
               "pm.test('every operation tagged + summarized', () => Object.values(b.paths).forEach(p => Object.values(p).forEach(op => { pm.expect(op.tags.length).to.be.above(0); pm.expect(op.summary).to.be.a('string'); })));"
             ]
           }
@@ -85,7 +85,8 @@
                   "const b = pm.response.json();",
                   "pm.test('KPI strip fields', () => { ['total_budget_inr','total_spend_inr','recoverable_dlp_inr','flagged_bills_count','flags_by_detector'].forEach(k => pm.expect(b).to.have.property(k)); });",
                   "pm.test('recoverable <= spend', () => pm.expect(b.recoverable_dlp_inr).to.be.below(b.total_spend_inr));",
-                  "pm.test('whole rupees', () => pm.expect(Number.isInteger(b.total_spend_inr)).to.be.true);"
+                  "pm.test('whole rupees', () => pm.expect(Number.isInteger(b.total_spend_inr)).to.be.true);",
+                  "pm.test('extra KPIs', () => { pm.expect(b.rupees_at_stake_total).to.be.at.least(b.recoverable_dlp_inr); pm.expect(b.wards_over_budget).to.be.a('number'); pm.expect(b.under_reported_wards).to.be.an('array'); });"
                 ]
               }
             }
@@ -287,7 +288,8 @@
                   "pm.test('neutral labels only', () => b.forEach(q => pm.expect(['Needs Explanation','Recoverable under DLP']).to.include(q.status_label)));",
                   "const dlp = b.find(q => q.detectors.includes('DLP_PAID_TWICE'));",
                   "pm.collectionVariables.set('flagId', dlp.flag_ids[0]);",
-                  "pm.collectionVariables.set('dlpRoadId', dlp.road_id);"
+                  "pm.collectionVariables.set('dlpRoadId', dlp.road_id);",
+                  "pm.collectionVariables.set('page1Ids', pm.response.json().slice(0, 5).map(q => q.work_order_id).join(','));"
                 ]
               }
             }
@@ -356,6 +358,121 @@
                 }
               ]
             }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward map (GeoJSON)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards/map"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('24 ward polygons', () => { pm.expect(b.type).to.eql('FeatureCollection'); pm.expect(b.features.length).to.eql(24); });",
+                  "pm.test('geometry + metrics', () => { const f = b.features[0]; pm.expect(f.geometry.type).to.match(/Polygon/); pm.expect(f.properties).to.have.property('dlp_leakage_rate'); pm.expect(f.properties).to.have.property('ward_name'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue - repeat bills with no complaint",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/flagged-queue?detector=REPEAT_BILL_NO_COMPLAINT&limit=500"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('45 repeat bills', () => pm.expect(b.length).to.eql(45));",
+                  "pm.test('all carry the detector', () => b.forEach(q => pm.expect(q.detectors).to.include('REPEAT_BILL_NO_COMPLAINT')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ward (single, K-W accepted)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards?ward=K-W"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('normalised to K/W', () => pm.expect(pm.response.json().ward_code).to.eql('K/W'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue - ward as K-W",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/flagged-queue?ward=K-W&limit=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('rows', () => pm.expect(b.length).to.be.within(1, 5));",
+                  "pm.test('all K/W', () => b.forEach(q => pm.expect(q.ward_code).to.eql('K/W')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue - page 2 (offset)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/flagged-queue?limit=5&offset=5"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('5 rows', () => pm.expect(b.length).to.eql(5));",
+                  "pm.test('no overlap with page 1', () => pm.expect(pm.collectionVariables.get('page1Ids') || '').to.not.include(b[0].work_order_id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flagged queue - unknown detector (422)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/flagged-queue?detector=NOPE"
           },
           "event": [
             {
@@ -624,6 +741,74 @@
               "script": {
                 "exec": [
                   "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "View 3 summary (budget curve)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/summary"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('model quality', () => pm.expect(b.scorecard).to.have.property('sla_model_auc_oof'));",
+                  "pm.test('budget curve: optimizer never worse than simple rules', () => { pm.expect(b.allocation.budget_curve.length).to.be.above(0); b.allocation.budget_curve.forEach(p => { pm.expect(p.optimizer).to.be.at.least(p.volume_first_cheapest); pm.expect(p.optimizer).to.be.at.least(p.stakes_first_cheapest); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Budget slider - ward as K-W",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v3/allocate",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"ward_code\": \"K-W\", \"budget_inr\": 500000}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('normalised', () => pm.expect(b.ward_code).to.eql('K/W'));",
+                  "pm.test('within budget', () => pm.expect(b.spend_inr).to.be.at.most(500000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Next rupee - ward as K-W",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/next-rupee/K-W"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('all K/W', () => pm.response.json().forEach(r => pm.expect(r.ward_code).to.eql('K/W')));"
                 ]
               }
             }

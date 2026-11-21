@@ -699,7 +699,7 @@
     "under_dlp": false,
     "last_resurfaced": "2021-02-22",
     "total_billed_inr": 422903,
-    "rupees_at_stake": 24029,
+    "rupees_at_stake": 42853,
     "work_orders": [
       {
         "work_order_id": "WO25-00645",
@@ -825,6 +825,24 @@
           "RATE:Drain desilting"
         ],
         "rule_text": "Billed ₹141,029 vs rate-card ₹90,000 (1.57x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02456",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "A",
+        "road_id": "RD0011",
+        "work_order_id": "WO25-02456",
+        "contractor_id": "CT05",
+        "rupees_at_stake": 18824,
+        "evidence_row_ids": [
+          "WO25-02456",
+          "WO25-00606",
+          "RD0011"
+        ],
+        "rule_text": "WO25-02456 bills pothole on RD0011 4.0 days after WO25-00606 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -3328,6 +3346,24 @@
     ],
     "flags": [
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02500",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "D",
+        "road_id": "RD0040",
+        "work_order_id": "WO25-02500",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 73848,
+        "evidence_row_ids": [
+          "WO25-02500",
+          "WO25-01837",
+          "RD0040"
+        ],
+        "rule_text": "WO25-02500 bills choked drain / nullah overflow on RD0040 1.0 days after WO25-01837 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-02500",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -3798,7 +3834,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-02-17",
     "total_billed_inr": 313928,
-    "rupees_at_stake": 0,
+    "rupees_at_stake": 64531,
     "work_orders": [
       {
         "work_order_id": "WO25-00148",
@@ -3958,7 +3994,26 @@
         ]
       }
     ],
-    "flags": []
+    "flags": [
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02461",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "E",
+        "road_id": "RD0046",
+        "work_order_id": "WO25-02461",
+        "contractor_id": "CT05",
+        "rupees_at_stake": 64531,
+        "evidence_row_ids": [
+          "WO25-02461",
+          "WO25-01323",
+          "RD0046"
+        ],
+        "rule_text": "WO25-02461 bills broken paver blocks on RD0046 4.0 days after WO25-01323 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      }
+    ]
   },
   {
     "road_id": "RD0047",
@@ -5978,7 +6033,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-04-05",
     "total_billed_inr": 2175570,
-    "rupees_at_stake": 258285,
+    "rupees_at_stake": 263680,
     "work_orders": [
       {
         "work_order_id": "WO25-00008",
@@ -6562,6 +6617,24 @@
           "RATE:Desilting and garbage removal"
         ],
         "rule_text": "Billed ₹110,281 vs rate-card ₹70,000 (1.58x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02498",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "E",
+        "road_id": "RD0055",
+        "work_order_id": "WO25-02498",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 5395,
+        "evidence_row_ids": [
+          "WO25-02498",
+          "WO25-01643",
+          "RD0055"
+        ],
+        "rule_text": "WO25-02498 bills pothole on RD0055 4.0 days after WO25-01643 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -7676,7 +7749,7 @@
     "under_dlp": false,
     "last_resurfaced": "2020-01-19",
     "total_billed_inr": 302260,
-    "rupees_at_stake": 0,
+    "rupees_at_stake": 50848,
     "work_orders": [
       {
         "work_order_id": "WO25-00100",
@@ -7837,7 +7910,26 @@
         ]
       }
     ],
-    "flags": []
+    "flags": [
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02495",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "F/S",
+        "road_id": "RD0061",
+        "work_order_id": "WO25-02495",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 50848,
+        "evidence_row_ids": [
+          "WO25-02495",
+          "WO25-00273",
+          "RD0061"
+        ],
+        "rule_text": "WO25-02495 bills waterlogging on RD0061 3.0 days after WO25-00273 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      }
+    ]
   },
   {
     "road_id": "RD0062",
@@ -7848,7 +7940,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-04-04",
     "total_billed_inr": 719301,
-    "rupees_at_stake": 75488,
+    "rupees_at_stake": 78084,
     "work_orders": [
       {
         "work_order_id": "WO25-00843",
@@ -8037,6 +8129,24 @@
           "RATE:Desilting and garbage removal"
         ],
         "rule_text": "Billed ₹166,488 vs rate-card ₹70,000 (2.38x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02493",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "F/S",
+        "road_id": "RD0062",
+        "work_order_id": "WO25-02493",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 2596,
+        "evidence_row_ids": [
+          "WO25-02493",
+          "WO25-00843",
+          "RD0062"
+        ],
+        "rule_text": "WO25-02493 bills pothole on RD0062 4.0 days after WO25-00843 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -9154,7 +9264,7 @@
     "under_dlp": false,
     "last_resurfaced": "2020-04-12",
     "total_billed_inr": 1695077,
-    "rupees_at_stake": 212835,
+    "rupees_at_stake": 293721,
     "work_orders": [
       {
         "work_order_id": "WO25-00407",
@@ -9500,6 +9610,24 @@
           "RATE:Desilting and garbage removal"
         ],
         "rule_text": "Billed ₹200,322 vs rate-card ₹70,000 (2.86x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02479",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "F/N",
+        "road_id": "RD0071",
+        "work_order_id": "WO25-02479",
+        "contractor_id": "CT07",
+        "rupees_at_stake": 80886,
+        "evidence_row_ids": [
+          "WO25-02479",
+          "WO25-02032",
+          "RD0071"
+        ],
+        "rule_text": "WO25-02479 bills waterlogging on RD0071 3.0 days after WO25-02032 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -11983,7 +12111,7 @@
     "under_dlp": false,
     "last_resurfaced": "2019-02-21",
     "total_billed_inr": 759285,
-    "rupees_at_stake": 110851,
+    "rupees_at_stake": 186470,
     "work_orders": [
       {
         "work_order_id": "WO25-00175",
@@ -12178,6 +12306,24 @@
           "RATE:Desilting and garbage removal"
         ],
         "rule_text": "Billed ₹201,851 vs rate-card ₹70,000 (2.88x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02476",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "F/N",
+        "road_id": "RD0082",
+        "work_order_id": "WO25-02476",
+        "contractor_id": "CT08",
+        "rupees_at_stake": 75619,
+        "evidence_row_ids": [
+          "WO25-02476",
+          "WO25-00841",
+          "RD0082"
+        ],
+        "rule_text": "WO25-02476 bills waterlogging on RD0082 4.0 days after WO25-00841 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -14114,7 +14260,7 @@
     "under_dlp": false,
     "last_resurfaced": "2020-05-07",
     "total_billed_inr": 359982,
-    "rupees_at_stake": 0,
+    "rupees_at_stake": 76647,
     "work_orders": [
       {
         "work_order_id": "WO25-00348",
@@ -14296,7 +14442,26 @@
         ]
       }
     ],
-    "flags": []
+    "flags": [
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02487",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0094",
+        "work_order_id": "WO25-02487",
+        "contractor_id": "CT05",
+        "rupees_at_stake": 76647,
+        "evidence_row_ids": [
+          "WO25-02487",
+          "WO25-01156",
+          "RD0094"
+        ],
+        "rule_text": "WO25-02487 bills waterlogging on RD0094 3.0 days after WO25-01156 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      }
+    ]
   },
   {
     "road_id": "RD0095",
@@ -14497,7 +14662,7 @@
     "under_dlp": false,
     "last_resurfaced": "2018-04-10",
     "total_billed_inr": 801403,
-    "rupees_at_stake": 10403,
+    "rupees_at_stake": 97449,
     "work_orders": [
       {
         "work_order_id": "WO25-00144",
@@ -14841,6 +15006,24 @@
         ],
         "rule_text": "Hot mix patch completed on 2025-06-18 with 249.5 mm rain (IMD heavy >= 64.5 mm).",
         "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02482",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0096",
+        "work_order_id": "WO25-02482",
+        "contractor_id": "CT07",
+        "rupees_at_stake": 87046,
+        "evidence_row_ids": [
+          "WO25-02482",
+          "WO25-01060",
+          "RD0096"
+        ],
+        "rule_text": "WO25-02482 bills broken paver blocks on RD0096 2.0 days after WO25-01060 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
       }
     ]
   },
@@ -14853,7 +15036,7 @@
     "under_dlp": false,
     "last_resurfaced": "2023-05-12",
     "total_billed_inr": 920420,
-    "rupees_at_stake": 71096,
+    "rupees_at_stake": 283568,
     "work_orders": [
       {
         "work_order_id": "WO25-00414",
@@ -15100,6 +15283,42 @@
           "RATE:Manhole cover replaced + grating"
         ],
         "rule_text": "Billed ₹129,596 vs rate-card ₹45,000 (2.88x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02488",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0097",
+        "work_order_id": "WO25-02488",
+        "contractor_id": "CT02",
+        "rupees_at_stake": 98616,
+        "evidence_row_ids": [
+          "WO25-02488",
+          "WO25-00863",
+          "RD0097"
+        ],
+        "rule_text": "WO25-02488 bills waterlogging on RD0097 3.0 days after WO25-00863 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02465",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0097",
+        "work_order_id": "WO25-02465",
+        "contractor_id": "CT02",
+        "rupees_at_stake": 113856,
+        "evidence_row_ids": [
+          "WO25-02465",
+          "WO25-02106",
+          "RD0097"
+        ],
+        "rule_text": "WO25-02465 bills waterlogging on RD0097 2.0 days after WO25-02106 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -16165,7 +16384,7 @@
     "under_dlp": false,
     "last_resurfaced": "2020-04-21",
     "total_billed_inr": 1596273,
-    "rupees_at_stake": 66046,
+    "rupees_at_stake": 215499,
     "work_orders": [
       {
         "work_order_id": "WO25-00057",
@@ -16624,6 +16843,42 @@
           "RAIN:2025-07-10"
         ],
         "rule_text": "Mastic asphalt completed on 2025-07-10 with 150.4 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02485",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0102",
+        "work_order_id": "WO25-02485",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 97114,
+        "evidence_row_ids": [
+          "WO25-02485",
+          "WO25-00057",
+          "RD0102"
+        ],
+        "rule_text": "WO25-02485 bills waterlogging on RD0102 3.0 days after WO25-00057 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02472",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0102",
+        "work_order_id": "WO25-02472",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 52339,
+        "evidence_row_ids": [
+          "WO25-02472",
+          "WO25-00373",
+          "RD0102"
+        ],
+        "rule_text": "WO25-02472 bills waterlogging on RD0102 2.0 days after WO25-00373 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -17195,6 +17450,24 @@
         "right_of_reply": ""
       },
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02484",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "G/N",
+        "road_id": "RD0104",
+        "work_order_id": "WO25-02484",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 70539,
+        "evidence_row_ids": [
+          "WO25-02484",
+          "WO25-01750",
+          "RD0104"
+        ],
+        "rule_text": "WO25-02484 bills choked drain / nullah overflow on RD0104 1.0 days after WO25-01750 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-02484",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -17386,7 +17659,7 @@
     "under_dlp": false,
     "last_resurfaced": "2021-01-01",
     "total_billed_inr": 634762,
-    "rupees_at_stake": 8693,
+    "rupees_at_stake": 85748,
     "work_orders": [
       {
         "work_order_id": "WO25-00660",
@@ -17546,6 +17819,24 @@
           "RAIN:2025-07-10"
         ],
         "rule_text": "Hot mix patch completed on 2025-07-10 with 150.4 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02464",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "F/N",
+        "road_id": "RD0106",
+        "work_order_id": "WO25-02464",
+        "contractor_id": "CT02",
+        "rupees_at_stake": 77055,
+        "evidence_row_ids": [
+          "WO25-02464",
+          "WO25-01247",
+          "RD0106"
+        ],
+        "rule_text": "WO25-02464 bills waterlogging on RD0106 3.0 days after WO25-01247 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -17904,7 +18195,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-02-18",
     "total_billed_inr": 957741,
-    "rupees_at_stake": 211830,
+    "rupees_at_stake": 232505,
     "work_orders": [
       {
         "work_order_id": "WO25-00010",
@@ -18334,6 +18625,24 @@
         "right_of_reply": ""
       },
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02468",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/E",
+        "road_id": "RD0108",
+        "work_order_id": "WO25-02468",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 20675,
+        "evidence_row_ids": [
+          "WO25-02468",
+          "WO25-01053",
+          "RD0108"
+        ],
+        "rule_text": "WO25-02468 bills pothole on RD0108 3.0 days after WO25-01053 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-00293",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -18380,7 +18689,7 @@
     "under_dlp": false,
     "last_resurfaced": "2021-01-04",
     "total_billed_inr": 325832,
-    "rupees_at_stake": 36782,
+    "rupees_at_stake": 67736,
     "work_orders": [
       {
         "work_order_id": "WO25-00339",
@@ -18522,6 +18831,24 @@
     ],
     "flags": [
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02490",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/E",
+        "road_id": "RD0109",
+        "work_order_id": "WO25-02490",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 30954,
+        "evidence_row_ids": [
+          "WO25-02490",
+          "WO25-01501",
+          "RD0109"
+        ],
+        "rule_text": "WO25-02490 bills pothole on RD0109 2.0 days after WO25-01501 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-01546",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -18550,7 +18877,7 @@
     "under_dlp": false,
     "last_resurfaced": "2018-03-23",
     "total_billed_inr": 2109452,
-    "rupees_at_stake": 99316,
+    "rupees_at_stake": 109491,
     "work_orders": [
       {
         "work_order_id": "WO25-00812",
@@ -19082,6 +19409,42 @@
           "RAIN:2025-07-13"
         ],
         "rule_text": "Hot mix patch completed on 2025-07-13 with 70.7 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02463",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/E",
+        "road_id": "RD0110",
+        "work_order_id": "WO25-02463",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 10175,
+        "evidence_row_ids": [
+          "WO25-02463",
+          "WO25-00812",
+          "RD0110"
+        ],
+        "rule_text": "WO25-02463 bills pothole on RD0110 3.0 days after WO25-00812 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02492",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/E",
+        "road_id": "RD0110",
+        "work_order_id": "WO25-02492",
+        "contractor_id": "CT08",
+        "rupees_at_stake": 88774,
+        "evidence_row_ids": [
+          "WO25-02492",
+          "WO25-02131",
+          "RD0110"
+        ],
+        "rule_text": "WO25-02492 bills choked drain / nullah overflow on RD0110 3.0 days after WO25-02131 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -20145,6 +20508,24 @@
           "RATE:Cold mix patch"
         ],
         "rule_text": "Billed ₹28,151 vs rate-card ₹14,580 (1.93x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02494",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/E",
+        "road_id": "RD0115",
+        "work_order_id": "WO25-02494",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 120055,
+        "evidence_row_ids": [
+          "WO25-02494",
+          "WO25-01235",
+          "RD0115"
+        ],
+        "rule_text": "WO25-02494 bills waterlogging on RD0115 1.0 days after WO25-01235 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -21374,6 +21755,24 @@
           "RAIN:2025-07-13"
         ],
         "rule_text": "Mastic asphalt completed on 2025-07-13 with 70.7 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02475",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "H/W",
+        "road_id": "RD0125",
+        "work_order_id": "WO25-02475",
+        "contractor_id": "CT05",
+        "rupees_at_stake": 45505,
+        "evidence_row_ids": [
+          "WO25-02475",
+          "WO25-00167",
+          "RD0125"
+        ],
+        "rule_text": "WO25-02475 bills waterlogging on RD0125 1.0 days after WO25-00167 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -23023,7 +23422,7 @@
     "under_dlp": false,
     "last_resurfaced": "2019-01-10",
     "total_billed_inr": 2074623,
-    "rupees_at_stake": 164749,
+    "rupees_at_stake": 188049,
     "work_orders": [
       {
         "work_order_id": "WO25-00001",
@@ -23551,6 +23950,24 @@
     ],
     "flags": [
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02478",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "K/E",
+        "road_id": "RD0136",
+        "work_order_id": "WO25-02478",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 23300,
+        "evidence_row_ids": [
+          "WO25-02478",
+          "WO25-02076",
+          "RD0136"
+        ],
+        "rule_text": "WO25-02478 bills pothole on RD0136 3.0 days after WO25-02076 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-00282",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -23615,7 +24032,7 @@
     "under_dlp": false,
     "last_resurfaced": "2018-02-14",
     "total_billed_inr": 465407,
-    "rupees_at_stake": 47764,
+    "rupees_at_stake": 65188,
     "work_orders": [
       {
         "work_order_id": "WO25-00031",
@@ -23927,6 +24344,24 @@
           "RAIN:2025-07-26"
         ],
         "rule_text": "Mastic asphalt completed on 2025-07-26 with 210.8 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02471",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "K/E",
+        "road_id": "RD0137",
+        "work_order_id": "WO25-02471",
+        "contractor_id": "CT07",
+        "rupees_at_stake": 17424,
+        "evidence_row_ids": [
+          "WO25-02471",
+          "WO25-01243",
+          "RD0137"
+        ],
+        "rule_text": "WO25-02471 bills pothole on RD0137 2.0 days after WO25-01243 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -25656,6 +26091,24 @@
         ],
         "rule_text": "Cold mix patch billed at ₹12,591 on RD0145, which is under the original contractor's Defect Liability Period (last resurfaced 2024-02-09).",
         "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02460",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "K/W",
+        "road_id": "RD0145",
+        "work_order_id": "WO25-02460",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 17949,
+        "evidence_row_ids": [
+          "WO25-02460",
+          "WO25-00618",
+          "RD0145"
+        ],
+        "rule_text": "WO25-02460 bills pothole on RD0145 4.0 days after WO25-00618 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
       }
     ]
   },
@@ -26067,7 +26520,7 @@
     "under_dlp": false,
     "last_resurfaced": "2025-02-07",
     "total_billed_inr": 1689489,
-    "rupees_at_stake": 203493,
+    "rupees_at_stake": 376232,
     "work_orders": [
       {
         "work_order_id": "WO25-00207",
@@ -26498,6 +26951,42 @@
           "RATE:Pump + debris removal"
         ],
         "rule_text": "Billed ₹176,993 vs rate-card ₹110,000 (1.61x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02470",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "K/W",
+        "road_id": "RD0148",
+        "work_order_id": "WO25-02470",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 67281,
+        "evidence_row_ids": [
+          "WO25-02470",
+          "WO25-01327",
+          "RD0148"
+        ],
+        "rule_text": "WO25-02470 bills waterlogging on RD0148 4.0 days after WO25-01327 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02467",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "K/W",
+        "road_id": "RD0148",
+        "work_order_id": "WO25-02467",
+        "contractor_id": "CT08",
+        "rupees_at_stake": 105458,
+        "evidence_row_ids": [
+          "WO25-02467",
+          "WO25-01470",
+          "RD0148"
+        ],
+        "rule_text": "WO25-02467 bills waterlogging on RD0148 3.0 days after WO25-01470 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -29433,6 +29922,24 @@
           "RATE:Cold mix patch"
         ],
         "rule_text": "Billed ₹5,829 vs rate-card ₹3,060 (1.90x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02474",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "P/S",
+        "road_id": "RD0165",
+        "work_order_id": "WO25-02474",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 29162,
+        "evidence_row_ids": [
+          "WO25-02474",
+          "WO25-00667",
+          "RD0165"
+        ],
+        "rule_text": "WO25-02474 bills pothole on RD0165 1.9 days after WO25-00667 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -33354,6 +33861,24 @@
         "right_of_reply": ""
       },
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02497",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "P/N",
+        "road_id": "RD0180",
+        "work_order_id": "WO25-02497",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 27096,
+        "evidence_row_ids": [
+          "WO25-02497",
+          "WO25-01004",
+          "RD0180"
+        ],
+        "rule_text": "WO25-02497 bills pothole on RD0180 1.0 days after WO25-01004 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-00734",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -33382,7 +33907,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-04-23",
     "total_billed_inr": 429156,
-    "rupees_at_stake": 0,
+    "rupees_at_stake": 35895,
     "work_orders": [
       {
         "work_order_id": "WO25-00350",
@@ -33564,7 +34089,26 @@
         "linked_complaint_ids": []
       }
     ],
-    "flags": []
+    "flags": [
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02477",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "P/N",
+        "road_id": "RD0181",
+        "work_order_id": "WO25-02477",
+        "contractor_id": "CT04",
+        "rupees_at_stake": 35895,
+        "evidence_row_ids": [
+          "WO25-02477",
+          "WO25-02388",
+          "RD0181"
+        ],
+        "rule_text": "WO25-02477 bills broken paver blocks on RD0181 1.0 days after WO25-02388 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      }
+    ]
   },
   {
     "road_id": "RD0182",
@@ -36773,6 +37317,24 @@
         ],
         "rule_text": "Paver blocks relaid billed at ₹70,860 on RD0196, which is under the original contractor's Defect Liability Period (last resurfaced 2025-02-09).",
         "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02489",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "R/C",
+        "road_id": "RD0196",
+        "work_order_id": "WO25-02489",
+        "contractor_id": "CT05",
+        "rupees_at_stake": 14088,
+        "evidence_row_ids": [
+          "WO25-02489",
+          "WO25-00737",
+          "RD0196"
+        ],
+        "rule_text": "WO25-02489 bills pothole on RD0196 1.0 days after WO25-00737 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
       }
     ]
   },
@@ -37063,6 +37625,24 @@
           "RD0197"
         ],
         "rule_text": "Cold mix patch billed at ₹9,778 on RD0197, which is under the original contractor's Defect Liability Period (last resurfaced 2023-05-21).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02466",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "R/C",
+        "road_id": "RD0197",
+        "work_order_id": "WO25-02466",
+        "contractor_id": "CT08",
+        "rupees_at_stake": 21578,
+        "evidence_row_ids": [
+          "WO25-02466",
+          "WO25-02111",
+          "RD0197"
+        ],
+        "rule_text": "WO25-02466 bills pothole on RD0197 2.0 days after WO25-02111 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -39823,7 +40403,7 @@
     "under_dlp": false,
     "last_resurfaced": "2021-01-20",
     "total_billed_inr": 953754,
-    "rupees_at_stake": 0,
+    "rupees_at_stake": 42099,
     "work_orders": [
       {
         "work_order_id": "WO25-00016",
@@ -40130,7 +40710,26 @@
         ]
       }
     ],
-    "flags": []
+    "flags": [
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02483",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "R/N",
+        "road_id": "RD0212",
+        "work_order_id": "WO25-02483",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 42099,
+        "evidence_row_ids": [
+          "WO25-02483",
+          "WO25-01962",
+          "RD0212"
+        ],
+        "rule_text": "WO25-02483 bills broken paver blocks on RD0212 2.0 days after WO25-01962 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      }
+    ]
   },
   {
     "road_id": "RD0213",
@@ -40688,7 +41287,7 @@
     "under_dlp": false,
     "last_resurfaced": "2019-04-04",
     "total_billed_inr": 2151246,
-    "rupees_at_stake": 168024,
+    "rupees_at_stake": 395690,
     "work_orders": [
       {
         "work_order_id": "WO25-00183",
@@ -41341,6 +41940,60 @@
           "RAIN:2025-08-20"
         ],
         "rule_text": "Mastic asphalt completed on 2025-08-20 with 258.2 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02459",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "L",
+        "road_id": "RD0216",
+        "work_order_id": "WO25-02459",
+        "contractor_id": "CT02",
+        "rupees_at_stake": 27412,
+        "evidence_row_ids": [
+          "WO25-02459",
+          "WO25-02052",
+          "RD0216"
+        ],
+        "rule_text": "WO25-02459 bills pothole on RD0216 1.0 days after WO25-02052 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02486",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "L",
+        "road_id": "RD0216",
+        "work_order_id": "WO25-02486",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 112441,
+        "evidence_row_ids": [
+          "WO25-02486",
+          "WO25-01255",
+          "RD0216"
+        ],
+        "rule_text": "WO25-02486 bills waterlogging on RD0216 3.0 days after WO25-01255 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02496",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "L",
+        "road_id": "RD0216",
+        "work_order_id": "WO25-02496",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 87813,
+        "evidence_row_ids": [
+          "WO25-02496",
+          "WO25-02174",
+          "RD0216"
+        ],
+        "rule_text": "WO25-02496 bills waterlogging on RD0216 4.0 days after WO25-02174 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -44158,7 +44811,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-05-18",
     "total_billed_inr": 1242534,
-    "rupees_at_stake": 135000,
+    "rupees_at_stake": 138370,
     "work_orders": [
       {
         "work_order_id": "WO25-00012",
@@ -44595,6 +45248,24 @@
           "RATE:Paver blocks relaid"
         ],
         "rule_text": "Billed ₹216,234 vs rate-card ₹85,500 (2.53x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02457",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "L",
+        "road_id": "RD0224",
+        "work_order_id": "WO25-02457",
+        "contractor_id": "CT04",
+        "rupees_at_stake": 3370,
+        "evidence_row_ids": [
+          "WO25-02457",
+          "WO25-02364",
+          "RD0224"
+        ],
+        "rule_text": "WO25-02457 bills pothole on RD0224 2.0 days after WO25-02364 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -47894,6 +48565,24 @@
         ],
         "rule_text": "Cold mix patch billed at ₹14,027 on RD0235, which is under the original contractor's Defect Liability Period (last resurfaced 2024-05-22).",
         "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02469",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "M/E",
+        "road_id": "RD0235",
+        "work_order_id": "WO25-02469",
+        "contractor_id": "CT06",
+        "rupees_at_stake": 16754,
+        "evidence_row_ids": [
+          "WO25-02469",
+          "WO25-01483",
+          "RD0235"
+        ],
+        "rule_text": "WO25-02469 bills pothole on RD0235 1.0 days after WO25-01483 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
       }
     ]
   },
@@ -48363,7 +49052,7 @@
     "under_dlp": false,
     "last_resurfaced": "2018-02-23",
     "total_billed_inr": 922495,
-    "rupees_at_stake": 19316,
+    "rupees_at_stake": 101093,
     "work_orders": [
       {
         "work_order_id": "WO25-00035",
@@ -48814,6 +49503,24 @@
           "RATE:Cold mix patch"
         ],
         "rule_text": "Billed ₹16,178 vs rate-card ₹9,000 (1.80x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02473",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "M/E",
+        "road_id": "RD0237",
+        "work_order_id": "WO25-02473",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 81777,
+        "evidence_row_ids": [
+          "WO25-02473",
+          "WO25-00328",
+          "RD0237"
+        ],
+        "rule_text": "WO25-02473 bills waterlogging on RD0237 4.0 days after WO25-00328 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -51466,7 +52173,7 @@
     "under_dlp": false,
     "last_resurfaced": "2018-02-22",
     "total_billed_inr": 1039712,
-    "rupees_at_stake": 185805,
+    "rupees_at_stake": 284419,
     "work_orders": [
       {
         "work_order_id": "WO25-00218",
@@ -51819,6 +52526,24 @@
           "RATE:Desilting and garbage removal"
         ],
         "rule_text": "Billed ₹142,479 vs rate-card ₹70,000 (2.04x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02499",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "N",
+        "road_id": "RD0252",
+        "work_order_id": "WO25-02499",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 98614,
+        "evidence_row_ids": [
+          "WO25-02499",
+          "WO25-01444",
+          "RD0252"
+        ],
+        "rule_text": "WO25-02499 bills waterlogging on RD0252 1.0 days after WO25-01444 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {
@@ -52321,7 +53046,7 @@
     "under_dlp": false,
     "last_resurfaced": "2022-05-03",
     "total_billed_inr": 212061,
-    "rupees_at_stake": 2582,
+    "rupees_at_stake": 73420,
     "work_orders": [
       {
         "work_order_id": "WO25-00024",
@@ -52445,6 +53170,24 @@
           "RATE:Cold mix patch"
         ],
         "rule_text": "Billed ₹7,028 vs rate-card ₹3,420 (2.05x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02481",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "N",
+        "road_id": "RD0256",
+        "work_order_id": "WO25-02481",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 70838,
+        "evidence_row_ids": [
+          "WO25-02481",
+          "WO25-00367",
+          "RD0256"
+        ],
+        "rule_text": "WO25-02481 bills waterlogging on RD0256 2.0 days after WO25-00367 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -52817,6 +53560,24 @@
           "RAIN:2025-07-09"
         ],
         "rule_text": "Mastic asphalt completed on 2025-07-09 with 150.5 mm rain (IMD heavy >= 64.5 mm).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02491",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "N",
+        "road_id": "RD0258",
+        "work_order_id": "WO25-02491",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 12958,
+        "evidence_row_ids": [
+          "WO25-02491",
+          "WO25-00609",
+          "RD0258"
+        ],
+        "rule_text": "WO25-02491 bills pothole on RD0258 1.0 days after WO25-00609 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -54302,7 +55063,7 @@
     "under_dlp": false,
     "last_resurfaced": "2021-02-28",
     "total_billed_inr": 1035077,
-    "rupees_at_stake": 106166,
+    "rupees_at_stake": 216593,
     "work_orders": [
       {
         "work_order_id": "WO25-00019",
@@ -54585,6 +55346,24 @@
           "RATE:Dewatering pump deployed"
         ],
         "rule_text": "Billed ₹117,150 vs rate-card ₹60,000 (1.95x). At stake = amount above the normal +30% band.",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02480",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "S",
+        "road_id": "RD0268",
+        "work_order_id": "WO25-02480",
+        "contractor_id": "CT01",
+        "rupees_at_stake": 110427,
+        "evidence_row_ids": [
+          "WO25-02480",
+          "WO25-00143",
+          "RD0268"
+        ],
+        "rule_text": "WO25-02480 bills waterlogging on RD0268 2.0 days after WO25-00143 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       }
     ]
@@ -55661,6 +56440,24 @@
     ],
     "flags": [
       {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02462",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "S",
+        "road_id": "RD0273",
+        "work_order_id": "WO25-02462",
+        "contractor_id": "CT03",
+        "rupees_at_stake": 167957,
+        "evidence_row_ids": [
+          "WO25-02462",
+          "WO25-01977",
+          "RD0273"
+        ],
+        "rule_text": "WO25-02462 bills road cave-in on RD0273 3.0 days after WO25-01977 fixed the same issue, and no citizen complaint is linked to it.",
+        "right_of_reply": ""
+      },
+      {
         "flag_id": "OVERLAPPING_WORK_ORDER:WO25-01066",
         "tier": 1,
         "detector": "OVERLAPPING_WORK_ORDER",
@@ -56526,6 +57323,24 @@
           "RD0278"
         ],
         "rule_text": "Mastic asphalt billed at ₹20,743 on RD0278, which is under the original contractor's Defect Liability Period (last resurfaced 2023-01-21).",
+        "right_of_reply": ""
+      },
+      {
+        "flag_id": "REPEAT_BILL_NO_COMPLAINT:WO25-02458",
+        "tier": 1,
+        "detector": "REPEAT_BILL_NO_COMPLAINT",
+        "status_label": "Needs Explanation",
+        "ward_code": "S",
+        "road_id": "RD0278",
+        "work_order_id": "WO25-02458",
+        "contractor_id": "CT04",
+        "rupees_at_stake": 37064,
+        "evidence_row_ids": [
+          "WO25-02458",
+          "WO25-02024",
+          "RD0278"
+        ],
+        "rule_text": "WO25-02458 bills open or broken manhole on RD0278 2.0 days after WO25-02024 fixed the same issue, and no citizen complaint is linked to it.",
         "right_of_reply": ""
       },
       {

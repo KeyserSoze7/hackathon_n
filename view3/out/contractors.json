@@ -5,19 +5,19 @@
     "jobs_count": 287,
     "total_billed_inr": 14074782,
     "reopen_rate_30d": 0.091,
-    "expected_reopen_rate_30d": 0.234,
+    "expected_reopen_rate_30d": 0.227,
     "sla_met_rate": 0.596,
-    "expected_sla_met_rate": 0.499,
-    "durability_index": 76.7,
+    "expected_sla_met_rate": 0.497,
+    "durability_index": 76.0,
     "durability_verdict": "better than expected",
-    "durability_ratio_obs_over_exp": 0.386,
+    "durability_ratio_obs_over_exp": 0.4,
     "durability_ratio_ci90": [
-      0.271,
-      0.536
+      0.28,
+      0.555
     ],
-    "speed_index": 59.0,
+    "speed_index": 59.2,
     "speed_verdict": "better than expected",
-    "risk_adjusted_score": 69.6,
+    "risk_adjusted_score": 69.3,
     "cost_vs_rate_median": 1.015,
     "jobs_over_130pct_rate": 4,
     "method_mix_top3": {
@@ -37,23 +37,23 @@
       {
         "feature": "work_type",
         "plain": "the kind of jobs assigned",
-        "effect_logodds": -0.025,
+        "effect_logodds": -0.022,
         "direction": "made failures less likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01037",
+      "WO25-00025",
       "WO25-00130",
-      "WO25-02320",
-      "WO25-02326",
       "WO25-00219",
-      "WO25-01556",
-      "WO25-02427",
+      "WO25-00321",
+      "WO25-00399",
+      "WO25-00561",
+      "WO25-00576",
       "WO25-00775",
-      "WO25-01763",
-      "WO25-02424"
+      "WO25-00981",
+      "WO25-01037"
     ],
-    "explanation": "Deccan Paving Solutions (synthetic) did 287 jobs. 9% failed within 30 days; given the rain, tides and roads they worked on, about 23% would be expected (city average 24%). Durability is better than expected (score 77/100, where 50 = as expected). Deadlines met: 60% vs 50% expected. Median bill was 1.01x the rate card; 4 jobs were above 1.3x."
+    "explanation": "Deccan Paving Solutions (synthetic) did 287 jobs. 9% failed within 30 days; given the rain, tides and roads they worked on, about 23% would be expected (city average 24%). Durability is better than expected (score 76/100, where 50 = as expected). Deadlines met: 60% vs 50% expected. Median bill was 1.01x the rate card; 4 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT01",
@@ -61,19 +61,19 @@
     "jobs_count": 337,
     "total_billed_inr": 17209448,
     "reopen_rate_30d": 0.136,
-    "expected_reopen_rate_30d": 0.236,
+    "expected_reopen_rate_30d": 0.238,
     "sla_met_rate": 0.623,
-    "expected_sla_met_rate": 0.507,
-    "durability_index": 68.7,
+    "expected_sla_met_rate": 0.516,
+    "durability_index": 69.0,
     "durability_verdict": "better than expected",
-    "durability_ratio_obs_over_exp": 0.58,
+    "durability_ratio_obs_over_exp": 0.573,
     "durability_ratio_ci90": [
-      0.447,
-      0.741
+      0.442,
+      0.733
     ],
-    "speed_index": 61.1,
+    "speed_index": 60.5,
     "speed_verdict": "better than expected",
-    "risk_adjusted_score": 65.7,
+    "risk_adjusted_score": 65.6,
     "cost_vs_rate_median": 1.062,
     "jobs_over_130pct_rate": 3,
     "method_mix_top3": {
@@ -91,31 +91,25 @@
     },
     "drivers": [
       {
-        "feature": "work_type",
-        "plain": "the kind of jobs assigned",
-        "effect_logodds": 0.011,
-        "direction": "made failures more likely"
-      },
-      {
-        "feature": "road_age_years",
-        "plain": "age of the road surface",
-        "effect_logodds": -0.017,
+        "feature": "low_lying_index",
+        "plain": "how flood-prone the ward is",
+        "effect_logodds": -0.015,
         "direction": "made failures less likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01844",
-      "WO25-02500",
-      "WO25-01837",
-      "WO25-01042",
-      "WO25-02386",
+      "WO25-00092",
+      "WO25-00069",
+      "WO25-00116",
+      "WO25-00129",
+      "WO25-00163",
       "WO25-00283",
-      "WO25-01883",
-      "WO25-01239",
-      "WO25-01370",
-      "WO25-00261"
+      "WO25-00254",
+      "WO25-00261",
+      "WO25-00500",
+      "WO25-00491"
     ],
-    "explanation": "Sahyadri Infra Works (synthetic) did 337 jobs. 14% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is better than expected (score 69/100, where 50 = as expected). Their jobs were harder than average because of the kind of jobs assigned. Deadlines met: 62% vs 51% expected. Median bill was 1.06x the rate card; 3 jobs were above 1.3x."
+    "explanation": "Sahyadri Infra Works (synthetic) did 337 jobs. 14% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is better than expected (score 69/100, where 50 = as expected). Deadlines met: 62% vs 52% expected. Median bill was 1.06x the rate card; 3 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT08",
@@ -125,17 +119,17 @@
     "reopen_rate_30d": 0.116,
     "expected_reopen_rate_30d": 0.24,
     "sla_met_rate": 0.517,
-    "expected_sla_met_rate": 0.5,
+    "expected_sla_met_rate": 0.486,
     "durability_index": 72.9,
     "durability_verdict": "better than expected",
-    "durability_ratio_obs_over_exp": 0.482,
+    "durability_ratio_obs_over_exp": 0.483,
     "durability_ratio_ci90": [
       0.36,
       0.635
     ],
-    "speed_index": 51.7,
+    "speed_index": 52.8,
     "speed_verdict": "within the normal range",
-    "risk_adjusted_score": 64.4,
+    "risk_adjusted_score": 64.9,
     "cost_vs_rate_median": 1.043,
     "jobs_over_130pct_rate": 10,
     "method_mix_top3": {
@@ -155,23 +149,23 @@
       {
         "feature": "area_sqm",
         "plain": "size of the jobs",
-        "effect_logodds": -0.019,
+        "effect_logodds": -0.015,
         "direction": "made failures less likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01974",
-      "WO25-01078",
-      "WO25-00234",
-      "WO25-01544",
-      "WO25-01670",
-      "WO25-00498",
+      "WO25-00037",
+      "WO25-00070",
       "WO25-00099",
-      "WO25-02262",
-      "WO25-02446",
-      "WO25-00070"
+      "WO25-00146",
+      "WO25-00234",
+      "WO25-00201",
+      "WO25-00377",
+      "WO25-00452",
+      "WO25-00498",
+      "WO25-00620"
     ],
-    "explanation": "Mithi Infra Projects (synthetic) did 319 jobs. 12% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is better than expected (score 73/100, where 50 = as expected). Deadlines met: 52% vs 50% expected. Median bill was 1.04x the rate card; 10 jobs were above 1.3x."
+    "explanation": "Mithi Infra Projects (synthetic) did 319 jobs. 12% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is better than expected (score 73/100, where 50 = as expected). Deadlines met: 52% vs 49% expected. Median bill was 1.04x the rate card; 10 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT06",
@@ -179,19 +173,19 @@
     "jobs_count": 289,
     "total_billed_inr": 14672446,
     "reopen_rate_30d": 0.263,
-    "expected_reopen_rate_30d": 0.236,
+    "expected_reopen_rate_30d": 0.232,
     "sla_met_rate": 0.471,
-    "expected_sla_met_rate": 0.471,
-    "durability_index": 45.1,
+    "expected_sla_met_rate": 0.476,
+    "durability_index": 44.1,
     "durability_verdict": "within the normal range",
-    "durability_ratio_obs_over_exp": 1.112,
+    "durability_ratio_obs_over_exp": 1.136,
     "durability_ratio_ci90": [
-      0.911,
-      1.346
+      0.93,
+      1.375
     ],
-    "speed_index": 49.9,
+    "speed_index": 49.5,
     "speed_verdict": "within the normal range",
-    "risk_adjusted_score": 47.0,
+    "risk_adjusted_score": 46.3,
     "cost_vs_rate_median": 1.046,
     "jobs_over_130pct_rate": 5,
     "method_mix_top3": {
@@ -211,29 +205,29 @@
       {
         "feature": "area_sqm",
         "plain": "size of the jobs",
-        "effect_logodds": 0.011,
+        "effect_logodds": 0.012,
         "direction": "made failures more likely"
       },
       {
         "feature": "surface",
         "plain": "road surface type",
-        "effect_logodds": -0.013,
+        "effect_logodds": -0.012,
         "direction": "made failures less likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01514",
-      "WO25-01339",
-      "WO25-00917",
-      "WO25-00772",
-      "WO25-02282",
-      "WO25-02005",
-      "WO25-00829",
-      "WO25-02189",
-      "WO25-02394",
-      "WO25-00713"
+      "WO25-00017",
+      "WO25-00012",
+      "WO25-00121",
+      "WO25-00170",
+      "WO25-00115",
+      "WO25-00225",
+      "WO25-00352",
+      "WO25-00344",
+      "WO25-00306",
+      "WO25-00410"
     ],
-    "explanation": "Shivneri Construction (synthetic) did 289 jobs. 26% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is within the normal range (score 45/100, where 50 = as expected). Their jobs were harder than average because of size of the jobs. Deadlines met: 47% vs 47% expected. Median bill was 1.05x the rate card; 5 jobs were above 1.3x."
+    "explanation": "Shivneri Construction (synthetic) did 289 jobs. 26% failed within 30 days; given the rain, tides and roads they worked on, about 23% would be expected (city average 24%). Durability is within the normal range (score 44/100, where 50 = as expected). Their jobs were harder than average because of size of the jobs. Deadlines met: 47% vs 48% expected. Median bill was 1.05x the rate card; 5 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT02",
@@ -241,19 +235,19 @@
     "jobs_count": 337,
     "total_billed_inr": 18906137,
     "reopen_rate_30d": 0.267,
-    "expected_reopen_rate_30d": 0.239,
+    "expected_reopen_rate_30d": 0.236,
     "sla_met_rate": 0.46,
-    "expected_sla_met_rate": 0.474,
-    "durability_index": 44.8,
+    "expected_sla_met_rate": 0.477,
+    "durability_index": 44.2,
     "durability_verdict": "within the normal range",
-    "durability_ratio_obs_over_exp": 1.117,
+    "durability_ratio_obs_over_exp": 1.131,
     "durability_ratio_ci90": [
-      0.931,
-      1.331
+      0.942,
+      1.347
     ],
-    "speed_index": 48.7,
+    "speed_index": 48.4,
     "speed_verdict": "within the normal range",
-    "risk_adjusted_score": 46.4,
+    "risk_adjusted_score": 45.9,
     "cost_vs_rate_median": 1.048,
     "jobs_over_130pct_rate": 5,
     "method_mix_top3": {
@@ -277,31 +271,25 @@
         "direction": "made failures more likely"
       },
       {
-        "feature": "rain_during_mm",
-        "plain": "rain while the work was being done",
-        "effect_logodds": 0.013,
-        "direction": "made failures more likely"
-      },
-      {
         "feature": "work_type",
         "plain": "the kind of jobs assigned",
-        "effect_logodds": -0.019,
+        "effect_logodds": -0.018,
         "direction": "made failures less likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01464",
-      "WO25-01699",
-      "WO25-00999",
-      "WO25-00664",
-      "WO25-00947",
-      "WO25-00514",
-      "WO25-02159",
-      "WO25-00276",
-      "WO25-02119",
-      "WO25-00364"
+      "WO25-00022",
+      "WO25-00098",
+      "WO25-00074",
+      "WO25-00158",
+      "WO25-00233",
+      "WO25-00331",
+      "WO25-00220",
+      "WO25-00298",
+      "WO25-00317",
+      "WO25-00252"
     ],
-    "explanation": "Konkan Roadcon Pvt Ltd (synthetic) did 337 jobs. 27% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is within the normal range (score 45/100, where 50 = as expected). Their jobs were harder than average because of closeness to a flood hotspot and rain while the work was being done. Deadlines met: 46% vs 47% expected. Median bill was 1.05x the rate card; 5 jobs were above 1.3x."
+    "explanation": "Konkan Roadcon Pvt Ltd (synthetic) did 337 jobs. 27% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is within the normal range (score 44/100, where 50 = as expected). Their jobs were harder than average because of closeness to a flood hotspot. Deadlines met: 46% vs 48% expected. Median bill was 1.05x the rate card; 5 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT07",
@@ -309,19 +297,19 @@
     "jobs_count": 328,
     "total_billed_inr": 18639434,
     "reopen_rate_30d": 0.323,
-    "expected_reopen_rate_30d": 0.251,
+    "expected_reopen_rate_30d": 0.249,
     "sla_met_rate": 0.436,
-    "expected_sla_met_rate": 0.516,
-    "durability_index": 37.3,
+    "expected_sla_met_rate": 0.519,
+    "durability_index": 36.6,
     "durability_verdict": "worse than expected",
-    "durability_ratio_obs_over_exp": 1.285,
+    "durability_ratio_obs_over_exp": 1.3,
     "durability_ratio_ci90": [
-      1.087,
-      1.51
+      1.1,
+      1.528
     ],
-    "speed_index": 42.2,
+    "speed_index": 41.9,
     "speed_verdict": "worse than expected",
-    "risk_adjusted_score": 39.3,
+    "risk_adjusted_score": 38.7,
     "cost_vs_rate_median": 1.08,
     "jobs_over_130pct_rate": 38,
     "method_mix_top3": {
@@ -339,31 +327,31 @@
     },
     "drivers": [
       {
-        "feature": "work_type",
-        "plain": "the kind of jobs assigned",
-        "effect_logodds": 0.015,
+        "feature": "road_age_years",
+        "plain": "age of the road surface",
+        "effect_logodds": 0.016,
         "direction": "made failures more likely"
       },
       {
-        "feature": "road_age_years",
-        "plain": "age of the road surface",
+        "feature": "work_type",
+        "plain": "the kind of jobs assigned",
         "effect_logodds": 0.015,
         "direction": "made failures more likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01755",
-      "WO25-01886",
-      "WO25-00646",
-      "WO25-01344",
-      "WO25-00582",
-      "WO25-01510",
+      "WO25-00020",
+      "WO25-00024",
+      "WO25-00056",
+      "WO25-00038",
       "WO25-00204",
-      "WO25-01907",
-      "WO25-01903",
-      "WO25-01965"
+      "WO25-00155",
+      "WO25-00178",
+      "WO25-00183",
+      "WO25-00319",
+      "WO25-00288"
     ],
-    "explanation": "Arabian Sea Engineering (synthetic) did 328 jobs. 32% failed within 30 days; given the rain, tides and roads they worked on, about 25% would be expected (city average 24%). Durability is worse than expected (score 37/100, where 50 = as expected). Their jobs were harder than average because of the kind of jobs assigned and age of the road surface. Deadlines met: 44% vs 52% expected. Median bill was 1.08x the rate card; 38 jobs were above 1.3x."
+    "explanation": "Arabian Sea Engineering (synthetic) did 328 jobs. 32% failed within 30 days; given the rain, tides and roads they worked on, about 25% would be expected (city average 24%). Durability is worse than expected (score 37/100, where 50 = as expected). Their jobs were harder than average because of age of the road surface and the kind of jobs assigned. Deadlines met: 44% vs 52% expected. Median bill was 1.08x the rate card; 38 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT04",
@@ -371,19 +359,19 @@
     "jobs_count": 299,
     "total_billed_inr": 17491777,
     "reopen_rate_30d": 0.388,
-    "expected_reopen_rate_30d": 0.241,
+    "expected_reopen_rate_30d": 0.24,
     "sla_met_rate": 0.472,
-    "expected_sla_met_rate": 0.492,
-    "durability_index": 23.2,
+    "expected_sla_met_rate": 0.486,
+    "durability_index": 23.0,
     "durability_verdict": "worse than expected",
-    "durability_ratio_obs_over_exp": 1.609,
+    "durability_ratio_obs_over_exp": 1.615,
     "durability_ratio_ci90": [
-      1.372,
-      1.878
+      1.377,
+      1.885
     ],
-    "speed_index": 48.1,
+    "speed_index": 48.7,
     "speed_verdict": "within the normal range",
-    "risk_adjusted_score": 33.2,
+    "risk_adjusted_score": 33.3,
     "cost_vs_rate_median": 1.065,
     "jobs_over_130pct_rate": 5,
     "method_mix_top3": {
@@ -403,29 +391,29 @@
       {
         "feature": "rain_next7_mm",
         "plain": "rain in the week after the repair",
-        "effect_logodds": 0.019,
+        "effect_logodds": 0.02,
         "direction": "made failures more likely"
       },
       {
-        "feature": "road_age_years",
-        "plain": "age of the road surface",
-        "effect_logodds": 0.018,
+        "feature": "rain_during_mm",
+        "plain": "rain while the work was being done",
+        "effect_logodds": 0.016,
         "direction": "made failures more likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01762",
-      "WO25-01250",
-      "WO25-01128",
-      "WO25-00186",
+      "WO25-00034",
       "WO25-00059",
-      "WO25-01190",
-      "WO25-01118",
-      "WO25-00510",
-      "WO25-00845",
-      "WO25-02210"
+      "WO25-00040",
+      "WO25-00122",
+      "WO25-00126",
+      "WO25-00186",
+      "WO25-00125",
+      "WO25-00229",
+      "WO25-00223",
+      "WO25-00222"
     ],
-    "explanation": "Western Coast Asphalt Co (synthetic) did 299 jobs. 39% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is worse than expected (score 23/100, where 50 = as expected). Their jobs were harder than average because of rain in the week after the repair and age of the road surface. Deadlines met: 47% vs 49% expected. Median bill was 1.06x the rate card; 5 jobs were above 1.3x."
+    "explanation": "Western Coast Asphalt Co (synthetic) did 299 jobs. 39% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is worse than expected (score 23/100, where 50 = as expected). Their jobs were harder than average because of rain in the week after the repair and rain while the work was being done. Deadlines met: 47% vs 49% expected. Median bill was 1.06x the rate card; 5 jobs were above 1.3x."
   },
   {
     "contractor_id": "CT03",
@@ -433,19 +421,19 @@
     "jobs_count": 303,
     "total_billed_inr": 16190323,
     "reopen_rate_30d": 0.376,
-    "expected_reopen_rate_30d": 0.241,
+    "expected_reopen_rate_30d": 0.239,
     "sla_met_rate": 0.393,
-    "expected_sla_met_rate": 0.514,
-    "durability_index": 25.3,
+    "expected_sla_met_rate": 0.522,
+    "durability_index": 24.8,
     "durability_verdict": "worse than expected",
-    "durability_ratio_obs_over_exp": 1.563,
+    "durability_ratio_obs_over_exp": 1.574,
     "durability_ratio_ci90": [
-      1.33,
-      1.826
+      1.339,
+      1.839
     ],
-    "speed_index": 38.4,
+    "speed_index": 37.3,
     "speed_verdict": "worse than expected",
-    "risk_adjusted_score": 30.5,
+    "risk_adjusted_score": 29.8,
     "cost_vs_rate_median": 1.079,
     "jobs_over_130pct_rate": 44,
     "method_mix_top3": {
@@ -465,28 +453,28 @@
       {
         "feature": "work_type",
         "plain": "the kind of jobs assigned",
-        "effect_logodds": 0.028,
+        "effect_logodds": 0.023,
         "direction": "made failures more likely"
       },
       {
-        "feature": "rain_during_mm",
-        "plain": "rain while the work was being done",
-        "effect_logodds": 0.023,
+        "feature": "area_sqm",
+        "plain": "size of the jobs",
+        "effect_logodds": 0.018,
         "direction": "made failures more likely"
       }
     ],
     "evidence_reopened_wo_ids": [
-      "WO25-01753",
-      "WO25-01355",
-      "WO25-01278",
-      "WO25-01655",
-      "WO25-00423",
-      "WO25-00466",
-      "WO25-00551",
-      "WO25-02113",
+      "WO25-00016",
+      "WO25-00055",
+      "WO25-00093",
+      "WO25-00076",
+      "WO25-00237",
+      "WO25-00157",
+      "WO25-00185",
       "WO25-00284",
-      "WO25-02087"
+      "WO25-00336",
+      "WO25-00318"
     ],
-    "explanation": "Mahalaxmi Civil Contractors (synthetic) did 303 jobs. 38% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is worse than expected (score 25/100, where 50 = as expected). Their jobs were harder than average because of the kind of jobs assigned and rain while the work was being done. Deadlines met: 39% vs 51% expected. Median bill was 1.08x the rate card; 44 jobs were above 1.3x."
+    "explanation": "Mahalaxmi Civil Contractors (synthetic) did 303 jobs. 38% failed within 30 days; given the rain, tides and roads they worked on, about 24% would be expected (city average 24%). Durability is worse than expected (score 25/100, where 50 = as expected). Their jobs were harder than average because of the kind of jobs assigned and size of the jobs. Deadlines met: 39% vs 52% expected. Median bill was 1.08x the rate card; 44 jobs were above 1.3x."
   }
 ]

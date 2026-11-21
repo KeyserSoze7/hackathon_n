@@ -3,18 +3,21 @@ View 3 backend: fair contractor scorecard (3A) + next-rupee planner (3B).
 
   python view3_pipeline.py --csv-dir path/to/data            # local, DuckDB on the CSVs
   DATABASE_URL=postgresql://... python view3_pipeline.py      # Supabase: reads tables, writes results back
+                                                              # (or put DATABASE_URL in the repo-root .env)
 
 SQL (sql/01_features.sql) builds the feature views; XGBoost + SHAP run here in Python;
 results land in out/*.json (frontend contract) and, with DATABASE_URL, in Supabase tables.
 Every number is computed in code. Claude only turns the `drivers` / `explanation` fields into prose.
 """
-import argparse, json, os, pathlib
+import argparse, json, os, pathlib, sys
 import numpy as np, pandas as pd, xgboost as xgb, shap
 from scipy.stats import chi2, spearmanr
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.metrics import roc_auc_score
 
 HERE = pathlib.Path(__file__).parent
+sys.path.insert(1, str(HERE.parent / "backend"))
+import db  # noqa: E402  (loads DATABASE_URL from the repo-root .env, if present)
 TABLES = ["work_orders", "wards", "roads", "rate_card", "rainfall_daily", "tides", "traffic",
           "accidents", "facilities", "flood_hotspots", "complaints", "localities", "contractors"]
 SEED = 7
@@ -27,8 +30,7 @@ def load(csv_dir):
     feats_sql = (HERE / "sql" / "01_features.sql").read_text()
     url = os.environ.get("DATABASE_URL")
     if url:
-        import sys; sys.path.insert(0, str(HERE.parent / "backend")); from db import engine
-        eng = engine()
+        eng = db.engine()
         with eng.begin() as c:
             c.exec_driver_sql(feats_sql)
             # Supabase exposes public views to the anon key. Run them as the caller (RLS applies) and make
@@ -250,8 +252,10 @@ def main():
         # Truncate + insert in one transaction: readers never see a half-written or unprotected table.
         flat = lambda rows: pd.DataFrame([{k: (json.dumps(v, default=_json) if isinstance(v, (dict, list, tuple)) else v)
                                            for k, v in r.items()} for r in rows])
+        meta = pd.DataFrame([{"id": 1, "meta": json.dumps({"scorecard": meta_a, "allocation": meta_b}, default=_json)}])
         out_tables = [("v3_contractor_scorecard", flat(cards)), ("v3_next_rupee", flat(roads)),
-                      ("v3_ward_allocation", pd.DataFrame(ward_alloc)), ("v3_job_expected_risk", jobs)]
+                      ("v3_ward_allocation", pd.DataFrame(ward_alloc)), ("v3_job_expected_risk", jobs),
+                      ("v3_model_meta", meta)]
         with eng.begin() as c:
             c.exec_driver_sql("TRUNCATE " + ", ".join(t for t, _ in out_tables))
             for t, df in out_tables:

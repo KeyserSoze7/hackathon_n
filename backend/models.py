@@ -16,7 +16,8 @@ class Out(BaseModel):
 
 
 StatusLabel = Literal["Needs Explanation", "Recoverable under DLP"]
-Detector = Literal["DLP_PAID_TWICE", "RATE_INFLATION", "OVERLAPPING_WORK_ORDER", "RAIN_DAY_WORK"]
+Detector = Literal["DLP_PAID_TWICE", "RATE_INFLATION", "OVERLAPPING_WORK_ORDER", "RAIN_DAY_WORK",
+                   "REPEAT_BILL_NO_COMPLAINT"]
 AuthorRole = Literal["ward_engineer", "contractor", "other"]
 ReportKind = Literal["still_broken", "verified_fixed", "new_issue"]
 InputMode = Literal["text", "voice", "photo", "qr"]
@@ -42,6 +43,9 @@ class CityKPIs(Out):
     recoverable_dlp_inr: int  # already paid for DLP-covered repairs
     flagged_bills_count: int
     flags_by_detector: dict[str, int]
+    rupees_at_stake_total: int  # every flagged bill once (flagged_queue grain)
+    wards_over_budget: int
+    under_reported_wards: list[str]
 
 
 class Ward(Out):
@@ -299,3 +303,22 @@ class CitizenReport(Out):
 
 class Error(Out):
     detail: str
+
+
+# ── View 1 map ──────────────────────────────────────────────────────────────
+class WardFeature(Out):
+    type: Literal["Feature"]
+    properties: Ward
+    geometry: Optional[dict[str, Any]]  # GeoJSON Polygon from data/wards.geojson
+
+
+class WardMap(Out):
+    type: Literal["FeatureCollection"]
+    features: list[WardFeature]
+
+
+# ── View 3 summary ──────────────────────────────────────────────────────────
+class V3Summary(Out):
+    scorecard: dict[str, Any]   # model quality (out-of-fold AUCs, prior)
+    allocation: dict[str, Any]  # budget curve + optimizer vs simple-rule comparison
+    updated_at: datetime

@@ -1,71 +1,71 @@
 {
  "budget_inr": 17738060,
- "rate_card_cost_to_fix_everything_inr": 144266965,
+ "rate_card_cost_to_fix_everything_inr": 142535849,
  "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints, under-reported ward) x share of fixes that hold",
  "budget_curve": [
   {
    "share_of_need": 0.1,
-   "budget_inr": 14426696,
-   "optimizer": 4096,
-   "volume_first_cheapest": 2033,
-   "stakes_first_cheapest": 2024
+   "budget_inr": 14253584,
+   "optimizer": 4061,
+   "volume_first_cheapest": 1898,
+   "stakes_first_cheapest": 1930
   },
   {
    "share_of_need": 0.2,
-   "budget_inr": 28853393,
-   "optimizer": 6532,
-   "volume_first_cheapest": 3843,
-   "stakes_first_cheapest": 3908
+   "budget_inr": 28507169,
+   "optimizer": 6463,
+   "volume_first_cheapest": 3774,
+   "stakes_first_cheapest": 3816
   },
   {
    "share_of_need": 0.3,
-   "budget_inr": 43280089,
-   "optimizer": 8513,
-   "volume_first_cheapest": 5638,
-   "stakes_first_cheapest": 5474
+   "budget_inr": 42760754,
+   "optimizer": 8425,
+   "volume_first_cheapest": 5477,
+   "stakes_first_cheapest": 5430
   },
   {
    "share_of_need": 0.5,
-   "budget_inr": 72133482,
-   "optimizer": 11381,
-   "volume_first_cheapest": 9100,
-   "stakes_first_cheapest": 8925
+   "budget_inr": 71267924,
+   "optimizer": 11266,
+   "volume_first_cheapest": 9038,
+   "stakes_first_cheapest": 8804
   },
   {
    "share_of_need": 0.75,
-   "budget_inr": 108200224,
-   "optimizer": 14028,
-   "volume_first_cheapest": 12553,
-   "stakes_first_cheapest": 12198
+   "budget_inr": 106901887,
+   "optimizer": 13901,
+   "volume_first_cheapest": 12352,
+   "stakes_first_cheapest": 12035
   },
   {
    "share_of_need": 1.0,
-   "budget_inr": 144266965,
-   "optimizer": 15562,
-   "volume_first_cheapest": 15097,
-   "stakes_first_cheapest": 15097
+   "budget_inr": 142535849,
+   "optimizer": 15417,
+   "volume_first_cheapest": 14940,
+   "stakes_first_cheapest": 14940
   }
  ],
  "equity_floor_share": 0.5,
  "comparison_same_budget": {
   "optimizer": {
-   "harm_avoided": 4708,
-   "spend_inr": 17738035,
-   "items": 192
+   "harm_avoided": 4694,
+   "spend_inr": 17737353,
+   "items": 196
   },
   "baseline_volume_first_cheapest_patch": {
-   "harm_avoided": 2492,
+   "harm_avoided": 2489,
    "spend_inr": 17735517,
    "items": 16
   },
   "baseline_stakes_first_cheapest_patch": {
-   "harm_avoided": 2294,
-   "spend_inr": 17736575,
-   "items": 88
+   "harm_avoided": 2267,
+   "spend_inr": 17737946,
+   "items": 97
   },
-  "max_possible_harm_avoided": 15678,
-  "uplift_vs_volume_first_pct": 88.9,
-  "uplift_vs_stakes_first_pct": 105.2
+  "max_possible_harm_avoided": 15530,
+  "uplift_vs_volume_first_pct": 88.6,
+  "uplift_vs_stakes_first_pct": 107.1
  },
  "method_failure_rates": [
   {
@@ -130,5 +130,5 @@
   }
  ],
  "dlp_items": 78,
- "dlp_value_owed_inr": 7649623
+ "dlp_value_owed_inr": 7574645
 }
