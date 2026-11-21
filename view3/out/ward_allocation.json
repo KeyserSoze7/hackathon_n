@@ -8,9 +8,9 @@
   "recommended_budget_inr": 109000,
   "equity_floor_inr": 95174,
   "harm_avoided": 13,
-  "harm_avoided_per_next_lakh": 7.0,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 440911
+  "harm_avoided_per_next_lakh": 8.1,
+  "dlp_items_owed_by_contractor": 4,
+  "dlp_value_owed_inr": 286821
  },
  {
   "ward_code": "B",
@@ -22,8 +22,8 @@
   "equity_floor_inr": 255780,
   "harm_avoided": 76,
   "harm_avoided_per_next_lakh": 10.0,
-  "dlp_items_owed_by_contractor": 3,
-  "dlp_value_owed_inr": 399404
+  "dlp_items_owed_by_contractor": 1,
+  "dlp_value_owed_inr": 28322
  },
  {
   "ward_code": "C",
@@ -35,8 +35,8 @@
   "equity_floor_inr": 53535,
   "harm_avoided": 28,
   "harm_avoided_per_next_lakh": 8.1,
-  "dlp_items_owed_by_contractor": 3,
-  "dlp_value_owed_inr": 161804
+  "dlp_items_owed_by_contractor": 2,
+  "dlp_value_owed_inr": 109007
  },
  {
   "ward_code": "D",
@@ -48,8 +48,8 @@
   "equity_floor_inr": 95174,
   "harm_avoided": 51,
   "harm_avoided_per_next_lakh": 14.2,
-  "dlp_items_owed_by_contractor": 7,
-  "dlp_value_owed_inr": 641580
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 112339
  },
  {
   "ward_code": "E",
@@ -57,12 +57,12 @@
   "budget_2025_inr": 5300000,
   "spend_2025_inr": 6322991,
   "remaining_2025_inr": 0,
-  "recommended_budget_inr": 351000,
+  "recommended_budget_inr": 359000,
   "equity_floor_inr": 315263,
-  "harm_avoided": 90,
-  "harm_avoided_per_next_lakh": 12.8,
-  "dlp_items_owed_by_contractor": 14,
-  "dlp_value_owed_inr": 2307865
+  "harm_avoided": 91,
+  "harm_avoided_per_next_lakh": 13.4,
+  "dlp_items_owed_by_contractor": 6,
+  "dlp_value_owed_inr": 460807
  },
  {
   "ward_code": "F/S",
@@ -74,8 +74,8 @@
   "equity_floor_inr": 582940,
   "harm_avoided": 431,
   "harm_avoided_per_next_lakh": 16.4,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 784509
+  "dlp_items_owed_by_contractor": 2,
+  "dlp_value_owed_inr": 325355
  },
  {
   "ward_code": "F/N",
@@ -83,12 +83,12 @@
   "budget_2025_inr": 10500000,
   "spend_2025_inr": 9412574,
   "remaining_2025_inr": 1087426,
-  "recommended_budget_inr": 915000,
+  "recommended_budget_inr": 968000,
   "equity_floor_inr": 624579,
-  "harm_avoided": 220,
-  "harm_avoided_per_next_lakh": 15.0,
-  "dlp_items_owed_by_contractor": 13,
-  "dlp_value_owed_inr": 2166886
+  "harm_avoided": 230,
+  "harm_avoided_per_next_lakh": 15.9,
+  "dlp_items_owed_by_contractor": 6,
+  "dlp_value_owed_inr": 542487
  },
  {
   "ward_code": "G/S",
@@ -99,9 +99,9 @@
   "recommended_budget_inr": 436000,
   "equity_floor_inr": 190348,
   "harm_avoided": 106,
-  "harm_avoided_per_next_lakh": 11.6,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 1368050
+  "harm_avoided_per_next_lakh": 13.5,
+  "dlp_items_owed_by_contractor": 2,
+  "dlp_value_owed_inr": 168984
  },
  {
   "ward_code": "G/N",
@@ -109,12 +109,12 @@
   "budget_2025_inr": 8400000,
   "spend_2025_inr": 6755738,
   "remaining_2025_inr": 1644262,
-  "recommended_budget_inr": 964000,
+  "recommended_budget_inr": 1122000,
   "equity_floor_inr": 499663,
-  "harm_avoided": 247,
+  "harm_avoided": 277,
   "harm_avoided_per_next_lakh": 15.7,
-  "dlp_items_owed_by_contractor": 7,
-  "dlp_value_owed_inr": 1367045
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 695274
  },
  {
   "ward_code": "H/E",
@@ -125,9 +125,9 @@
   "recommended_budget_inr": 911000,
   "equity_floor_inr": 487766,
   "harm_avoided": 197,
-  "harm_avoided_per_next_lakh": 12.9,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 773478
+  "harm_avoided_per_next_lakh": 14.1,
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 378681
  },
  {
   "ward_code": "H/W",
@@ -138,9 +138,9 @@
   "recommended_budget_inr": 289000,
   "equity_floor_inr": 255780,
   "harm_avoided": 71,
-  "harm_avoided_per_next_lakh": 10.1,
-  "dlp_items_owed_by_contractor": 7,
-  "dlp_value_owed_inr": 2224372
+  "harm_avoided_per_next_lakh": 13.0,
+  "dlp_items_owed_by_contractor": 2,
+  "dlp_value_owed_inr": 32368
  },
  {
   "ward_code": "K/E",
@@ -148,12 +148,12 @@
   "budget_2025_inr": 9100000,
   "spend_2025_inr": 8264048,
   "remaining_2025_inr": 835952,
-  "recommended_budget_inr": 3120000,
+  "recommended_budget_inr": 1668000,
   "equity_floor_inr": 541302,
-  "harm_avoided": 685,
-  "harm_avoided_per_next_lakh": 13.3,
-  "dlp_items_owed_by_contractor": 4,
-  "dlp_value_owed_inr": 444685
+  "harm_avoided": 443,
+  "harm_avoided_per_next_lakh": 14.0,
+  "dlp_items_owed_by_contractor": 2,
+  "dlp_value_owed_inr": 289189
  },
  {
   "ward_code": "K/W",
@@ -165,8 +165,8 @@
   "equity_floor_inr": 529405,
   "harm_avoided": 190,
   "harm_avoided_per_next_lakh": 14.8,
-  "dlp_items_owed_by_contractor": 11,
-  "dlp_value_owed_inr": 2397458
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 625957
  },
  {
   "ward_code": "P/S",
@@ -178,8 +178,8 @@
   "equity_floor_inr": 285522,
   "harm_avoided": 102,
   "harm_avoided_per_next_lakh": 14.5,
-  "dlp_items_owed_by_contractor": 10,
-  "dlp_value_owed_inr": 519852
+  "dlp_items_owed_by_contractor": 6,
+  "dlp_value_owed_inr": 189194
  },
  {
   "ward_code": "P/N",
@@ -187,12 +187,12 @@
   "budget_2025_inr": 7700000,
   "spend_2025_inr": 7006462,
   "remaining_2025_inr": 693538,
-  "recommended_budget_inr": 1664000,
+  "recommended_budget_inr": 1987000,
   "equity_floor_inr": 458025,
-  "harm_avoided": 494,
-  "harm_avoided_per_next_lakh": 12.8,
-  "dlp_items_owed_by_contractor": 4,
-  "dlp_value_owed_inr": 761762
+  "harm_avoided": 631,
+  "harm_avoided_per_next_lakh": 13.3,
+  "dlp_items_owed_by_contractor": 1,
+  "dlp_value_owed_inr": 315596
  },
  {
   "ward_code": "R/S",
@@ -200,12 +200,12 @@
   "budget_2025_inr": 6600000,
   "spend_2025_inr": 6642234,
   "remaining_2025_inr": 0,
-  "recommended_budget_inr": 633000,
+  "recommended_budget_inr": 580000,
   "equity_floor_inr": 392592,
-  "harm_avoided": 121,
+  "harm_avoided": 112,
   "harm_avoided_per_next_lakh": 16.9,
-  "dlp_items_owed_by_contractor": 4,
-  "dlp_value_owed_inr": 522674
+  "dlp_items_owed_by_contractor": 1,
+  "dlp_value_owed_inr": 93298
  },
  {
   "ward_code": "R/C",
@@ -213,12 +213,12 @@
   "budget_2025_inr": 2900000,
   "spend_2025_inr": 3312447,
   "remaining_2025_inr": 0,
-  "recommended_budget_inr": 585000,
+  "recommended_budget_inr": 902000,
   "equity_floor_inr": 172502,
-  "harm_avoided": 148,
-  "harm_avoided_per_next_lakh": 12.0,
-  "dlp_items_owed_by_contractor": 16,
-  "dlp_value_owed_inr": 1736314
+  "harm_avoided": 203,
+  "harm_avoided_per_next_lakh": 12.9,
+  "dlp_items_owed_by_contractor": 7,
+  "dlp_value_owed_inr": 632294
  },
  {
   "ward_code": "R/N",
@@ -226,12 +226,12 @@
   "budget_2025_inr": 4800000,
   "spend_2025_inr": 3533838,
   "remaining_2025_inr": 1266162,
-  "recommended_budget_inr": 300000,
+  "recommended_budget_inr": 316000,
   "equity_floor_inr": 285522,
-  "harm_avoided": 105,
-  "harm_avoided_per_next_lakh": 12.4,
-  "dlp_items_owed_by_contractor": 7,
-  "dlp_value_owed_inr": 590893
+  "harm_avoided": 113,
+  "harm_avoided_per_next_lakh": 15.3,
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 348499
  },
  {
   "ward_code": "L",
@@ -239,12 +239,12 @@
   "budget_2025_inr": 11900000,
   "spend_2025_inr": 13043418,
   "remaining_2025_inr": 0,
-  "recommended_budget_inr": 947000,
+  "recommended_budget_inr": 1053000,
   "equity_floor_inr": 707856,
-  "harm_avoided": 255,
+  "harm_avoided": 283,
   "harm_avoided_per_next_lakh": 12.4,
-  "dlp_items_owed_by_contractor": 11,
-  "dlp_value_owed_inr": 4159179
+  "dlp_items_owed_by_contractor": 4,
+  "dlp_value_owed_inr": 367553
  },
  {
   "ward_code": "M/E",
@@ -252,12 +252,12 @@
   "budget_2025_inr": 9100000,
   "spend_2025_inr": 7235685,
   "remaining_2025_inr": 1864315,
-  "recommended_budget_inr": 1302000,
+  "recommended_budget_inr": 1461000,
   "equity_floor_inr": 541302,
-  "harm_avoided": 343,
+  "harm_avoided": 381,
   "harm_avoided_per_next_lakh": 13.2,
-  "dlp_items_owed_by_contractor": 9,
-  "dlp_value_owed_inr": 1388932
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 490371
  },
  {
   "ward_code": "M/W",
@@ -265,12 +265,12 @@
   "budget_2025_inr": 4400000,
   "spend_2025_inr": 4689823,
   "remaining_2025_inr": 0,
-  "recommended_budget_inr": 800000,
+  "recommended_budget_inr": 802000,
   "equity_floor_inr": 261728,
   "harm_avoided": 213,
-  "harm_avoided_per_next_lakh": 13.1,
-  "dlp_items_owed_by_contractor": 9,
-  "dlp_value_owed_inr": 1349506
+  "harm_avoided_per_next_lakh": 13.2,
+  "dlp_items_owed_by_contractor": 5,
+  "dlp_value_owed_inr": 445372
  },
  {
   "ward_code": "N",
@@ -278,12 +278,12 @@
   "budget_2025_inr": 6200000,
   "spend_2025_inr": 5999557,
   "remaining_2025_inr": 200443,
-  "recommended_budget_inr": 391000,
+  "recommended_budget_inr": 496000,
   "equity_floor_inr": 368799,
-  "harm_avoided": 102,
+  "harm_avoided": 126,
   "harm_avoided_per_next_lakh": 15.5,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 742418
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 345934
  },
  {
   "ward_code": "S",
@@ -291,12 +291,12 @@
   "budget_2025_inr": 9500000,
   "spend_2025_inr": 7489270,
   "remaining_2025_inr": 2010730,
-  "recommended_budget_inr": 613000,
+  "recommended_budget_inr": 953000,
   "equity_floor_inr": 565095,
-  "harm_avoided": 182,
-  "harm_avoided_per_next_lakh": 15.1,
-  "dlp_items_owed_by_contractor": 8,
-  "dlp_value_owed_inr": 1149810
+  "harm_avoided": 254,
+  "harm_avoided_per_next_lakh": 16.5,
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 248375
  },
  {
   "ward_code": "T",
@@ -304,11 +304,11 @@
   "budget_2025_inr": 5100000,
   "spend_2025_inr": 3953564,
   "remaining_2025_inr": 1146436,
-  "recommended_budget_inr": 439000,
+  "recommended_budget_inr": 359000,
   "equity_floor_inr": 303367,
-  "harm_avoided": 98,
-  "harm_avoided_per_next_lakh": 11.8,
-  "dlp_items_owed_by_contractor": 6,
-  "dlp_value_owed_inr": 344326
+  "harm_avoided": 87,
+  "harm_avoided_per_next_lakh": 14.3,
+  "dlp_items_owed_by_contractor": 3,
+  "dlp_value_owed_inr": 117534
  }
 ]

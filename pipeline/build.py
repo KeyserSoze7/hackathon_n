@@ -1,15 +1,14 @@
-"""Audit engine: compute every number the four views need, from data/*.csv.
+"""Audit engine: flags + ward audit (View 1) and road receipts (View 2), from data/*.csv.
 
 Stdlib only. Run: python3 pipeline/build.py
 Writes exports/:
-  summary.json, roads_audit.json, contractors.json, next_rupee.json   (frontend contract)
-  flags.csv, ward_audit.csv, contractor_scorecard.csv, road_priority.csv  (Supabase load)
+  summary.json, roads_audit.json        (frontend contract)
+  flags.csv, ward_audit.csv             (Supabase load: supabase/load_audit.sql)
+View 3 (scorecard + next-rupee) lives in view3/ and reads ward_audit for UNDER_REPORTED_WARD.
 Every number is computed here; nothing downstream does arithmetic.
 """
 import csv
 import json
-import math
-import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -25,15 +24,6 @@ HOT_ASPHALT_METHODS = {"Hot mix patch", "Mastic asphalt"}
 HEAVY_RAIN_MM = 64.5  # IMD "Heavy" threshold
 RATE_NORMAL_BAND = 1.30  # dictionary: normal jobs vary ~20-30% around the rate
 RATE_FLAG_RATIO = 1.50  # flag only well outside the band (clean break in the data)
-
-FLOOD_PRONE_LOW_LYING = 0.6  # ward low_lying_index at/above this counts as flood-prone
-HOTSPOT_NEAR_M = 300  # road within this distance of a flood hotspot gets FLOOD_SPOT
-ROAD_CONDITION_CAUSES = {"Pothole", "Uneven road / open chamber", "Waterlogged road"}
-SEVERITY_WEIGHT = {"Minor": 1, "Grievous": 3, "Fatal": 5}
-# Next-rupee priority weights (sum to 1). Under-reported wards get a flat bonus on top.
-PRIORITY_WEIGHTS = {"flood": 0.25, "accidents": 0.25, "ambulance": 0.20, "traffic": 0.15, "repeat": 0.15}
-UNDER_REPORTED_BONUS = 5
-SMALL_SAMPLE_JOBS = 30
 
 
 def read(name):
@@ -129,170 +119,6 @@ def ward_for_unassigned(complaints, localities):
             else:
                 unresolved += 1
     return resolved, unresolved
-
-
-def wilson(k, n, z=1.96):
-    """95% Wilson interval for k successes out of n."""
-    if n == 0:
-        return 0.0, 1.0
-    p = k / n
-    mid = (p + z * z / (2 * n)) / (1 + z * z / n)
-    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
-    return max(0.0, mid - half), min(1.0, mid + half)
-
-
-def contractor_scorecard(work_orders, wards, roads, contractors, rain_by_date, flags):
-    """Context-adjusted reopen performance via indirect standardization.
-
-    Each job's expected reopen chance = city reopen rate for jobs of the same
-    (work_type, flood-prone ward, heavy-rain completion day). A contractor's
-    observed/expected ratio scales the city rate; score = % fixes expected to survive 30 days.
-    """
-    low_lying = {w["ward_code"]: float(w["low_lying_index"]) for w in wards}
-    traffic = {t["road_id"]: int(t["peak_hour_vehicles"]) for t in read("traffic.csv")}
-
-    def stratum(wo):
-        return (wo["work_type"], low_lying[wo["ward_code"]] >= FLOOD_PRONE_LOW_LYING,
-                rain_by_date.get(wo["completed_at"][:10], 0.0) >= HEAVY_RAIN_MM)
-
-    jobs_in, reopens_in = Counter(), Counter()
-    for wo in work_orders:
-        jobs_in[stratum(wo)] += 1
-        reopens_in[stratum(wo)] += wo["reopened_within_30d"] == "Y"
-    city_rate = sum(reopens_in.values()) / len(work_orders)
-
-    by_c = defaultdict(list)
-    for wo in work_orders:
-        by_c[wo["contractor_id"]].append(wo)
-    rows = []
-    for cid, jobs in sorted(by_c.items()):
-        n = len(jobs)
-        observed = sum(w["reopened_within_30d"] == "Y" for w in jobs)
-        expected = sum(reopens_in[stratum(w)] / jobs_in[stratum(w)] for w in jobs)
-        scale = city_rate / (expected / n) if expected else 1.0  # raw rate -> context-adjusted rate
-        lo, hi = wilson(observed, n)
-        adj = min(1.0, observed / n * scale)
-        cflags = [f for f in flags if f["contractor_id"] == cid]
-        rows.append({
-            "contractor_id": cid,
-            "contractor_name": contractors[cid],
-            "jobs_count": n,
-            "total_billed_inr": round(sum(float(w["cost_inr"]) for w in jobs)),
-            "reopen_rate_30d": round(observed / n, 4),
-            "expected_reopen_rate_30d": round(expected / n, 4),
-            "reopen_observed_to_expected": round(observed / expected, 3) if expected else None,
-            "sla_met_rate": round(sum(w["sla_met"] == "Y" for w in jobs) / n, 4),
-            "risk_adjusted_score": round(100 * (1 - adj), 1),
-            "score_low": round(100 * (1 - min(1.0, hi * scale)), 1),
-            "score_high": round(100 * (1 - min(1.0, lo * scale)), 1),
-            "small_sample": n < SMALL_SAMPLE_JOBS,
-            "tier1_flags_count": sum(f["tier"] == 1 for f in cflags),
-            "flags_count": len(cflags),
-            "recoverable_inr": sum(f["rupees_at_stake"] for f in cflags if f["detector"] == "DLP_PAID_TWICE"),
-            "avg_rain_mm_on_completion_day": round(
-                statistics.mean(rain_by_date.get(w["completed_at"][:10], 0.0) for w in jobs), 1),
-            "flood_prone_share": round(
-                sum(low_lying[w["ward_code"]] >= FLOOD_PRONE_LOW_LYING for w in jobs) / n, 3),
-            "avg_peak_vehicles": round(statistics.mean(traffic.get(w["road_id"], 0) for w in jobs)),
-        })
-    return rows
-
-
-def metres_to_segment(lat, lon, road):
-    """Approx distance (m) from a point to a road segment; equirectangular is fine at city scale."""
-    k = math.cos(math.radians(19.05)) * 111320
-    px, py = lon * k, lat * 110540
-    ax, ay = float(road["start_lon"]) * k, float(road["start_lat"]) * 110540
-    bx, by = float(road["end_lon"]) * k, float(road["end_lat"]) * 110540
-    dx, dy = bx - ax, by - ay
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy or 1)))
-    return math.hypot(px - ax - t * dx, py - ay - t * dy)
-
-
-def road_priority(roads, work_orders, ward_rows):
-    """Next-rupee ranking. Bucket A: under DLP (₹0 to BMC). Bucket B: ranked by priority per lakh."""
-    hotspots = read("flood_hotspots.csv")
-    traffic = {t["road_id"]: int(t["peak_hour_vehicles"]) for t in read("traffic.csv")}
-    under_reported = {w["ward_code"] for w in ward_rows if w["under_reported_flag"]}
-
-    ambulance = Counter()
-    for f in read("facilities.csv"):
-        ambulance[f["ambulance_entry_road"]] += 3 if f["emergency_services"] == "Y" else 1
-    accident_harm, accident_ids = Counter(), defaultdict(list)
-    for a in read("accidents.csv"):
-        if a["probable_cause"] in ROAD_CONDITION_CAUSES:
-            accident_harm[a["road_id"]] += SEVERITY_WEIGHT[a["severity"]]
-            accident_ids[a["road_id"]].append(a["accident_id"])
-    reopened, surface_spend = Counter(), Counter()
-    for wo in work_orders:
-        reopened[wo["road_id"]] += wo["reopened_within_30d"] == "Y"
-        if wo["repair_method"] in DLP_SURFACE_METHODS:
-            surface_spend[wo["road_id"]] += float(wo["cost_inr"])
-
-    ids = list(roads)
-    nearest = {}
-    for rid in ids:
-        d, hid = min((metres_to_segment(float(h["lat"]), float(h["lon"]), roads[rid]), h["hotspot_id"]) for h in hotspots)
-        nearest[rid] = (round(d), hid)
-    parts = {
-        "flood": {r: 1.0 if nearest[r][0] <= HOTSPOT_NEAR_M else 0.0 for r in ids},
-        "accidents": pct_rank({r: accident_harm[r] for r in ids}),
-        "ambulance": pct_rank({r: ambulance[r] for r in ids}),
-        "traffic": pct_rank({r: traffic.get(r, 0) for r in ids}),
-        "repeat": pct_rank({r: reopened[r] for r in ids}),
-    }
-    # ponytail: repair cost proxy = this season's surface-repair spend on the road (else ward median), floored.
-    # Swap for an engineering estimate (length x lanes x rate) if the team gets one.
-    ward_spends = defaultdict(list)
-    for rid, s in surface_spend.items():
-        ward_spends[roads[rid]["ward_code"]].append(s)
-    city_median = statistics.median(surface_spend.values())
-
-    rows = []
-    for rid in ids:
-        road = roads[rid]
-        score = 100 * sum(PRIORITY_WEIGHTS[k] * parts[k][rid] for k in PRIORITY_WEIGHTS)
-        if road["ward_code"] in under_reported:
-            score += UNDER_REPORTED_BONUS
-        score = min(100.0, score)
-        ward_median = statistics.median(ward_spends[road["ward_code"]]) if ward_spends[road["ward_code"]] else city_median
-        # Floor at city median so one tiny patch doesn't make a road look absurdly cheap per point of harm.
-        cost = max(surface_spend[rid] or ward_median, city_median)
-        dlp = road["under_dlp"] == "Y"
-        reasons = [code for code, hit in [
-            ("FLOOD_SPOT", parts["flood"][rid] == 1.0),
-            ("AMBULANCE_ROUTE", ambulance[rid] > 0),
-            ("HIGH_TRAFFIC", parts["traffic"][rid] >= 0.75),
-            ("ACCIDENT_PRONE", accident_harm[rid] > 0 and parts["accidents"][rid] >= 0.75),
-            ("REPEAT_FAILURE", reopened[rid] >= 2),
-            ("UNDER_REPORTED_WARD", road["ward_code"] in under_reported),
-        ] if hit]
-        rows.append({
-            "road_id": rid,
-            "road_name": road["road_name"],
-            "ward_code": road["ward_code"],
-            "under_dlp": dlp,
-            "priority_score": round(score, 1),
-            "estimated_repair_cost_inr": round(cost),
-            "cost_to_bmc_inr": 0 if dlp else round(cost),
-            "priority_per_lakh": None if dlp else round(score / (cost / 1e5), 3),
-            "bucket": "A_DLP_OWED" if dlp else "B_INVEST",
-            "reason_codes": reasons,
-            "nearest_hotspot_id": nearest[rid][1],
-            "nearest_hotspot_m": nearest[rid][0],
-            "ambulance_weight": ambulance[rid],
-            "road_condition_accident_harm": accident_harm[rid],
-            "reopened_jobs": reopened[rid],
-            "peak_hour_vehicles": traffic.get(rid),
-            "evidence_row_ids": [rid, *accident_ids[rid]],
-        })
-    # A: highest harm first (contractor owes it). B: most priority per rupee first.
-    rows.sort(key=lambda r: (r["bucket"], -(r["priority_score"] if r["under_dlp"] else r["priority_per_lakh"]), r["road_id"]))
-    rank = Counter()
-    for r in rows:
-        rank[r["bucket"]] += 1
-        r["bucket_rank"] = rank[r["bucket"]]
-    return rows
 
 
 def write_csv(name, rows, cols):
@@ -421,8 +247,6 @@ def build():
         },
     }
     check(summary, wo_by_id, roads)
-    scorecard = contractor_scorecard(work_orders, wards, roads, contractors, rain_by_date, flags)
-    priority = road_priority(roads, work_orders, ward_rows)
 
     flags_by_road, wos_by_road = defaultdict(list), defaultdict(list)
     for f in flags:
@@ -460,14 +284,11 @@ def build():
     } for rid, r in roads.items()]
 
     OUT.mkdir(exist_ok=True)
-    for name, obj in [("summary.json", summary), ("roads_audit.json", roads_audit),
-                      ("contractors.json", scorecard), ("next_rupee.json", priority)]:
+    for name, obj in [("summary.json", summary), ("roads_audit.json", roads_audit)]:
         (OUT / name).write_text(json.dumps(obj, ensure_ascii=False, indent=2), encoding="utf-8")
     write_csv("flags.csv", flags, ["flag_id", "tier", "detector", "status_label", "ward_code", "road_id",
                                    "work_order_id", "contractor_id", "rupees_at_stake", "evidence_row_ids", "rule_text"])
     write_csv("ward_audit.csv", ward_rows, [k for k in ward_rows[0] if k != "ward_name"])
-    write_csv("contractor_scorecard.csv", scorecard, [k for k in scorecard[0] if k != "contractor_name"])
-    write_csv("road_priority.csv", priority, [k for k in priority[0] if k not in ("road_name", "ward_code", "under_dlp")])
     return summary
 
 

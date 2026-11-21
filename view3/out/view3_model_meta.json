@@ -1,79 +1,79 @@
 {
   "scorecard": {
-    "reopen_model_auc_oof": 0.521,
-    "sla_model_auc_oof": 0.779,
+    "reopen_model_auc_oof": 0.528,
+    "sla_model_auc_oof": 0.786,
     "city_reopen_rate": 0.244,
     "prior_k": 10,
     "adjusted_for_method": false
   },
   "allocation": {
     "budget_inr": 17738060,
-    "rate_card_cost_to_fix_everything_inr": 121366770,
-    "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints) x share of fixes that hold",
+    "rate_card_cost_to_fix_everything_inr": 144266965,
+    "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints, under-reported ward) x share of fixes that hold",
     "budget_curve": [
       {
         "share_of_need": 0.1,
-        "budget_inr": 12136677,
-        "optimizer": 3549,
-        "volume_first_cheapest": 1524,
-        "stakes_first_cheapest": 1625
+        "budget_inr": 14426696,
+        "optimizer": 4096,
+        "volume_first_cheapest": 2033,
+        "stakes_first_cheapest": 2024
       },
       {
         "share_of_need": 0.2,
-        "budget_inr": 24273354,
-        "optimizer": 5643,
-        "volume_first_cheapest": 3138,
-        "stakes_first_cheapest": 3098
+        "budget_inr": 28853393,
+        "optimizer": 6532,
+        "volume_first_cheapest": 3843,
+        "stakes_first_cheapest": 3908
       },
       {
         "share_of_need": 0.3,
-        "budget_inr": 36410031,
-        "optimizer": 7267,
-        "volume_first_cheapest": 4700,
-        "stakes_first_cheapest": 4469
+        "budget_inr": 43280089,
+        "optimizer": 8513,
+        "volume_first_cheapest": 5638,
+        "stakes_first_cheapest": 5474
       },
       {
         "share_of_need": 0.5,
-        "budget_inr": 60683385,
-        "optimizer": 9707,
-        "volume_first_cheapest": 7778,
-        "stakes_first_cheapest": 7350
+        "budget_inr": 72133482,
+        "optimizer": 11381,
+        "volume_first_cheapest": 9100,
+        "stakes_first_cheapest": 8925
       },
       {
         "share_of_need": 0.75,
-        "budget_inr": 91025077,
-        "optimizer": 12015,
-        "volume_first_cheapest": 10690,
-        "stakes_first_cheapest": 10361
+        "budget_inr": 108200224,
+        "optimizer": 14028,
+        "volume_first_cheapest": 12553,
+        "stakes_first_cheapest": 12198
       },
       {
         "share_of_need": 1.0,
-        "budget_inr": 121366770,
-        "optimizer": 13340,
-        "volume_first_cheapest": 12867,
-        "stakes_first_cheapest": 12868
+        "budget_inr": 144266965,
+        "optimizer": 15562,
+        "volume_first_cheapest": 15097,
+        "stakes_first_cheapest": 15097
       }
     ],
     "equity_floor_share": 0.5,
     "comparison_same_budget": {
       "optimizer": {
-        "harm_avoided": 4567,
-        "spend_inr": 17737585,
-        "items": 185
+        "harm_avoided": 4708,
+        "spend_inr": 17738035,
+        "items": 192
       },
       "baseline_volume_first_cheapest_patch": {
-        "harm_avoided": 2340,
-        "spend_inr": 17737329,
-        "items": 14
+        "harm_avoided": 2492,
+        "spend_inr": 17735517,
+        "items": 16
       },
       "baseline_stakes_first_cheapest_patch": {
-        "harm_avoided": 2359,
-        "spend_inr": 17737499,
-        "items": 85
+        "harm_avoided": 2294,
+        "spend_inr": 17736575,
+        "items": 88
       },
-      "max_possible_harm_avoided": 13453,
-      "uplift_vs_volume_first_pct": 95.2,
-      "uplift_vs_stakes_first_pct": 93.6
+      "max_possible_harm_avoided": 15678,
+      "uplift_vs_volume_first_pct": 88.9,
+      "uplift_vs_stakes_first_pct": 105.2
     },
     "method_failure_rates": [
       {
@@ -137,7 +137,7 @@
         "reopen": 0.222
       }
     ],
-    "dlp_items": 183,
-    "dlp_value_owed_inr": 28743724
+    "dlp_items": 78,
+    "dlp_value_owed_inr": 7649623
   }
 }

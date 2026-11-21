@@ -20,15 +20,11 @@ where not exists (select 1 from flags_new n where n.flag_id = f.flag_id)
   and not exists (select 1 from flag_replies r where r.flag_id = f.flag_id)
   and not exists (select 1 from citizen_reports c where c.flag_id = f.flag_id);
 
--- Derived tables: nothing references them, full replace.
-truncate ward_audit, contractor_scorecard, road_priority;
+-- Derived table: nothing references it, full replace. (v3_* tables are written by view3/view3_pipeline.py.)
+truncate ward_audit;
 \copy ward_audit from 'exports/ward_audit.csv' csv header
-\copy contractor_scorecard from 'exports/contractor_scorecard.csv' csv header
-\copy road_priority from 'exports/road_priority.csv' csv header
 
 commit;
 
 select 'flags' t, count(*) from flags union all
-select 'ward_audit', count(*) from ward_audit union all
-select 'contractor_scorecard', count(*) from contractor_scorecard union all
-select 'road_priority', count(*) from road_priority;
+select 'ward_audit', count(*) from ward_audit;

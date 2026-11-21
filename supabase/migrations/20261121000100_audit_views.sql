@@ -1,5 +1,6 @@
--- Audit engine outputs (written by pipeline/build.py via supabase/load_audit.sql) and one read
--- view per frontend screen. Column order of the three tables matches exports/*.csv.
+-- Audit engine outputs and one read view per frontend screen.
+--   ward_audit           <- pipeline/build.py via supabase/load_audit.sql (column order = exports/ward_audit.csv)
+--   v3_* (View 3)        <- view3/view3_pipeline.py (truncate + insert; columns = its output dict keys)
 
 -- ── Engine output tables ─────────────────────────────────────────────────────
 create table ward_audit (
@@ -18,51 +19,82 @@ create table ward_audit (
   accidents_count           integer not null
 );
 
-create table contractor_scorecard (
-  contractor_id                 text primary key references contractors,
-  jobs_count                    integer not null,
-  total_billed_inr              bigint not null,
-  reopen_rate_30d               numeric not null,
-  expected_reopen_rate_30d      numeric not null,  -- given work type, flood-prone ward, rain day
-  reopen_observed_to_expected   numeric,           -- 1.0 = as expected for conditions
-  sla_met_rate                  numeric not null,
-  risk_adjusted_score           numeric not null,  -- % fixes expected to survive 30d, context-adjusted
-  score_low                     numeric not null,  -- 95% band
-  score_high                    numeric not null,
-  small_sample                  boolean not null,
-  tier1_flags_count             integer not null,
-  flags_count                   integer not null,
-  recoverable_inr               bigint not null,
-  avg_rain_mm_on_completion_day numeric not null,
-  flood_prone_share             numeric not null,
-  avg_peak_vehicles             integer not null
+-- View 3A: context-adjusted contractor scorecard (XGBoost expected risk; 50 = as expected).
+create table v3_contractor_scorecard (
+  contractor_id                  text primary key references contractors,
+  contractor_name                text not null,
+  jobs_count                     integer not null,
+  total_billed_inr               bigint not null,
+  reopen_rate_30d                numeric not null,
+  expected_reopen_rate_30d       numeric not null,
+  sla_met_rate                   numeric not null,
+  expected_sla_met_rate          numeric not null,
+  durability_index               numeric not null check (durability_index between 0 and 100),
+  durability_verdict             text not null,
+  durability_ratio_obs_over_exp  numeric,
+  durability_ratio_ci90          jsonb,
+  speed_index                    numeric not null check (speed_index between 0 and 100),
+  speed_verdict                  text not null,
+  risk_adjusted_score            numeric not null,  -- 60% durability + 40% speed
+  cost_vs_rate_median            numeric,
+  jobs_over_130pct_rate          integer,
+  method_mix_top3                jsonb,
+  context                        jsonb,
+  drivers                        jsonb,  -- SHAP: why their jobs were harder/easier than average
+  evidence_reopened_wo_ids       jsonb,
+  explanation                    text
 );
 
-create table road_priority (
-  road_id                      text primary key references roads,
-  priority_score               numeric not null check (priority_score between 0 and 100),
-  estimated_repair_cost_inr    bigint not null,
-  cost_to_bmc_inr              bigint not null,  -- 0 when under DLP
-  priority_per_lakh            numeric,          -- null for bucket A
-  bucket                       text not null check (bucket in ('A_DLP_OWED', 'B_INVEST')),
-  reason_codes                 text[] not null,
-  nearest_hotspot_id           text references flood_hotspots,
-  nearest_hotspot_m            integer,
-  ambulance_weight             integer not null,
-  road_condition_accident_harm integer not null,
-  reopened_jobs                integer not null,
-  peak_hour_vehicles           integer,
-  evidence_row_ids             text[] not null,
-  bucket_rank                  integer not null,
-  unique (bucket, bucket_rank)
+create table v3_job_expected_risk (
+  work_order_id       text primary key references work_orders,
+  contractor_id       text not null references contractors,
+  p_reopen_expected   numeric not null,
+  p_sla_miss_expected numeric not null
+);
+
+-- View 3B: one item per (road x issue). Bucket A = DLP surface defect, Rs 0 to BMC.
+create table v3_next_rupee (
+  item_id                   text primary key,  -- <road_id>|<issue>
+  road_id                   text not null references roads,
+  road_name                 text,
+  ward_code                 text not null references wards,
+  issue                     text not null,
+  under_dlp                 boolean not null,
+  bucket                    text not null check (bucket in ('A_OWED_BY_CONTRACTOR_DLP', 'B_NEXT_RUPEE')),
+  funded                    boolean not null,
+  recommended_method        text,
+  method_reopen_rate        numeric,
+  estimated_repair_cost_inr bigint,
+  cost_to_bmc_inr           bigint,
+  harm_avoided              numeric,
+  harm_per_lakh             numeric,
+  priority_score            numeric,
+  reason_codes              jsonb not null,
+  inputs                    jsonb,
+  evidence_wo_ids           jsonb,
+  explanation               text
+);
+
+create table v3_ward_allocation (
+  ward_code                    text primary key references wards,
+  ward_name                    text,
+  budget_2025_inr              bigint not null,
+  spend_2025_inr               bigint not null,
+  remaining_2025_inr           bigint not null,
+  recommended_budget_inr       bigint not null,
+  equity_floor_inr             bigint not null,
+  harm_avoided                 numeric not null,
+  harm_avoided_per_next_lakh   numeric not null,
+  dlp_items_owed_by_contractor integer not null,
+  dlp_value_owed_inr           bigint not null  -- future surface fixes owed (rate card); not ward_audit.recoverable_dlp_inr
 );
 
 -- ── View 1: City & Ward Audit Overview ───────────────────────────────────────
 create view city_kpis with (security_invoker = true) as
-select sum(budget_inr)          as total_budget_inr,
-       sum(spend_inr)           as total_spend_inr,
-       sum(recoverable_dlp_inr) as recoverable_dlp_inr,
-       sum(flagged_bills_count) as flagged_bills_count,
+select sum(budget_inr)::bigint          as total_budget_inr,
+       sum(spend_inr)::bigint           as total_spend_inr,
+       sum(recoverable_dlp_inr)::bigint as recoverable_dlp_inr,
+       sum(flagged_bills_count)::bigint as flagged_bills_count,
        (select jsonb_object_agg(detector, n)
           from (select detector, count(*) n from flags group by detector) d) as flags_by_detector
 from ward_audit;
@@ -96,14 +128,12 @@ select r.road_id, r.road_name, r.ward_code, r.road_type, r.surface, r.under_dlp,
        coalesce(b.total_billed_inr, 0)  as total_billed_inr,
        coalesce(b.work_orders_count, 0) as work_orders_count,
        coalesce(q.rupees_at_stake, 0)   as rupees_at_stake,
-       coalesce(q.flagged_bills, 0)     as flagged_bills_count,
-       p.priority_score, p.reason_codes
+       coalesce(q.flagged_bills, 0)     as flagged_bills_count
 from roads r
 left join (select road_id, sum(cost_inr) total_billed_inr, count(*) work_orders_count
              from work_orders group by road_id) b using (road_id)
 left join (select road_id, sum(rupees_at_stake) rupees_at_stake, count(*) flagged_bills
-             from flagged_queue group by road_id) q using (road_id)
-left join road_priority p using (road_id);
+             from flagged_queue group by road_id) q using (road_id);
 
 -- Chronological trail per road: complaint -> work order -> reopen -> accident -> citizen report.
 create view road_timeline with (security_invoker = true) as
@@ -137,17 +167,8 @@ select cr.road_id, cr.created_at::timestamp, 'citizen_report', cr.id::text,
 from citizen_reports cr
 where cr.road_id is not null;
 
--- ── View 3A: Context-Adjusted Contractor Scorecard ───────────────────────────
-create view contractor_overview with (security_invoker = true) as
-select s.*, c.contractor_name, c.empanelled_since, c.active_wards
-from contractor_scorecard s join contractors c using (contractor_id);
-
--- ── View 3B: Next-Rupee Planner ──────────────────────────────────────────────
--- Slider: show bucket B rows where cumulative_cost_to_bmc_inr <= remaining budget.
-create view next_rupee with (security_invoker = true) as
-select p.*, r.road_name, r.ward_code, r.under_dlp,
-       sum(p.cost_to_bmc_inr) over (partition by p.bucket order by p.bucket_rank) as cumulative_cost_to_bmc_inr
-from road_priority p join roads r using (road_id);
+-- ── View 3: read v3_contractor_scorecard / v3_next_rupee / v3_ward_allocation directly
+--    (queries in view3/sql/02_view3_api.sql; live budget slider = POST /api/v3/allocate).
 
 -- ── View 4: Citizen lookup ───────────────────────────────────────────────────
 -- Landmark text -> locality_aliases -> locality -> nearest road segment in the same ward.
@@ -165,9 +186,11 @@ cross join lateral (
 ) nr;
 
 -- ── RLS: public read on engine outputs (views inherit via security_invoker) ──
-alter table ward_audit enable row level security;
-alter table contractor_scorecard enable row level security;
-alter table road_priority enable row level security;
-create policy "public read" on ward_audit for select to anon, authenticated using (true);
-create policy "public read" on contractor_scorecard for select to anon, authenticated using (true);
-create policy "public read" on road_priority for select to anon, authenticated using (true);
+do $$
+declare t text;
+begin
+  foreach t in array array['ward_audit','v3_contractor_scorecard','v3_job_expected_risk','v3_next_rupee','v3_ward_allocation'] loop
+    execute format('alter table %I enable row level security', t);
+    execute format('create policy "public read" on %I for select to anon, authenticated using (true)', t);
+  end loop;
+end $$;

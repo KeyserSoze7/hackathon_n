@@ -31,19 +31,40 @@ def load(csv_dir):
         eng = engine()
         with eng.begin() as c:
             c.exec_driver_sql(feats_sql)
-        q = lambda s: _floatify(pd.read_sql(s, eng))
+        q = lambda s: _yn(_floatify(pd.read_sql(s, eng)))
     else:
         import duckdb
         con = duckdb.connect()
         for t in TABLES:
             con.execute(f"CREATE TABLE {t} AS SELECT * FROM read_csv_auto('{csv_dir}/{t}.csv', header=true)")
         con.execute(feats_sql)
-        q = lambda s: con.execute(s).df()
+        q = lambda s: _yn(con.execute(s).df())
         eng = None
     d = {v: q(f"SELECT * FROM {v}") for v in ["v_wo_context", "v_road_static", "v_road_activity"]}
     for t in ["wards", "work_orders", "rate_card", "roads"]:
         d[t] = q(f"SELECT * FROM {t}")
+    d["under_reported"] = under_reported_wards(eng)
     return d, eng
+
+
+def under_reported_wards(eng):
+    """UNDER_REPORTED_WARD comes from the audit engine (pipeline/build.py), so both views agree."""
+    if eng is not None:
+        return set(pd.read_sql("SELECT ward_code FROM ward_audit WHERE under_reported_flag", eng).ward_code)
+    path = HERE.parent / "exports" / "ward_audit.csv"
+    if not path.exists():
+        raise SystemExit(f"{path} missing: run `python3 pipeline/build.py` first")
+    wa = pd.read_csv(path)
+    return set(wa.loc[wa.under_reported_flag.astype(str).str.lower() == "true", "ward_code"])
+
+
+def _yn(df):
+    """Supabase stores Y/N flags as boolean; this code compares against 'Y'/'N'. Map back."""
+    for c in df.columns:
+        vals = df[c].dropna()
+        if len(vals) and vals.map(lambda v: isinstance(v, (bool, np.bool_))).all():
+            df[c] = df[c].map({True: "Y", False: "N"})
+    return df
 
 
 def _floatify(df):
@@ -220,22 +241,16 @@ def main():
     dump("view3_model_meta.json", {"scorecard": meta_a, "allocation": meta_b})
     jobs.to_csv(out / "job_expected_risk.csv", index=False)
     if eng is not None:
+        # Tables, types (jsonb for nested fields) and RLS live in supabase/migrations/20261121000100_audit_views.sql.
+        # Truncate + insert in one transaction: readers never see a half-written or unprotected table.
         flat = lambda rows: pd.DataFrame([{k: (json.dumps(v, default=_json) if isinstance(v, (dict, list, tuple)) else v)
                                            for k, v in r.items()} for r in rows])
-        flat(cards).to_sql("v3_contractor_scorecard", eng, if_exists="replace", index=False)
-        flat(roads).to_sql("v3_next_rupee", eng, if_exists="replace", index=False)
-        pd.DataFrame(ward_alloc).to_sql("v3_ward_allocation", eng, if_exists="replace", index=False)
-        jobs.to_sql("v3_job_expected_risk", eng, if_exists="replace", index=False)
-        with eng.begin() as c:  # JSON fields as jsonb so supabase-js returns objects, not strings
-            for tbl, rows in [("v3_contractor_scorecard", cards), ("v3_next_rupee", roads)]:
-                for k, v in rows[0].items():
-                    if isinstance(v, (dict, list, tuple)):
-                        c.exec_driver_sql(f'ALTER TABLE {tbl} ALTER COLUMN "{k}" TYPE jsonb USING "{k}"::jsonb')
-        raw = eng.raw_connection()   # raw cursor: the DO block uses %I, which must not be treated as a bind param
-        try:
-            raw.cursor().execute((HERE / "sql" / "03_security.sql").read_text()); raw.commit()
-        finally:
-            raw.close()
+        out_tables = [("v3_contractor_scorecard", flat(cards)), ("v3_next_rupee", flat(roads)),
+                      ("v3_ward_allocation", pd.DataFrame(ward_alloc)), ("v3_job_expected_risk", jobs)]
+        with eng.begin() as c:
+            c.exec_driver_sql("TRUNCATE " + ", ".join(t for t, _ in out_tables))
+            for t, df in out_tables:
+                df.to_sql(t, c, if_exists="append", index=False, method="multi", chunksize=1000)
     print(json.dumps({"scorecard": meta_a, "allocation": {k: v for k, v in meta_b.items() if k != "method_failure_rates"}}, indent=2))
 
 
