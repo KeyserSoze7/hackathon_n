@@ -1,7 +1,7 @@
 -- Load data/*.csv into the source tables. Rerunnable until users start writing;
 -- refuses once flag_replies/citizen_reports have rows (truncate would cascade into them).
--- Run from repo root, then supabase/load_audit.sql:
---   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source.sql
+-- Run from repo root, then supabase/load_audit_outputs.sql:
+--   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source_data.sql
 begin;
 
 do $$ begin

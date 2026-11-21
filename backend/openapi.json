@@ -2,202 +2,10 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Follow the Rupee: Backend",
-    "description": "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\nEvery number is computed by the audit pipelines (`pipeline/build.py`, `view3/view3_pipeline.py`); endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login.",
+    "description": "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\nEvery number is computed by the pipelines (`audit_engine/run_audit.py`, `scorecard_planner/run_pipeline.py`); endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login.",
     "version": "0.1.0"
   },
   "paths": {
-    "/api/v3/contractors": {
-      "get": {
-        "tags": [
-          "View 3: Scorecard & Next Rupee"
-        ],
-        "summary": "Contractor scorecard (context-adjusted)",
-        "operationId": "contractors_api_v3_contractors_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ContractorScore"
-                  },
-                  "type": "array",
-                  "title": "Response Contractors Api V3 Contractors Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v3/wards": {
-      "get": {
-        "tags": [
-          "View 3: Scorecard & Next Rupee"
-        ],
-        "summary": "Ward allocation: where the next lakh does most good",
-        "operationId": "wards_api_v3_wards_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/WardAllocation"
-                  },
-                  "type": "array",
-                  "title": "Response Wards Api V3 Wards Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v3/next-rupee/{ward_code}": {
-      "get": {
-        "tags": [
-          "View 3: Scorecard & Next Rupee"
-        ],
-        "summary": "Next-rupee items for one ward (Bucket A = DLP, Rs 0)",
-        "operationId": "next_rupee_api_v3_next_rupee__ward_code__get",
-        "parameters": [
-          {
-            "name": "ward_code",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "examples": [
-                "K/W"
-              ],
-              "title": "Ward Code"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NextRupeeItem"
-                  },
-                  "title": "Response Next Rupee Api V3 Next Rupee  Ward Code  Get"
-                }
-              }
-            }
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v3/summary": {
-      "get": {
-        "tags": [
-          "View 3: Scorecard & Next Rupee"
-        ],
-        "summary": "Model quality + budget curve (optimizer vs simple rules)",
-        "description": "View 3 demo chart: harm avoided by the optimizer vs simple rules at each budget level, plus model quality.",
-        "operationId": "v3_summary_api_v3_summary_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/V3Summary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v3/allocate": {
-      "post": {
-        "tags": [
-          "View 3: Scorecard & Next Rupee"
-        ],
-        "summary": "Budget slider: exact re-solve for one ward",
-        "operationId": "allocate_api_v3_allocate_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AllocateReq"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Allocation"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/health": {
       "get": {
         "tags": [
@@ -719,6 +527,198 @@
         }
       }
     },
+    "/api/v3/contractors": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Contractor scorecard (context-adjusted)",
+        "operationId": "contractors_api_v3_contractors_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContractorScore"
+                  },
+                  "type": "array",
+                  "title": "Response Contractors Api V3 Contractors Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/wards": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Ward allocation: where the next lakh does most good",
+        "operationId": "wards_api_v3_wards_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WardAllocation"
+                  },
+                  "type": "array",
+                  "title": "Response Wards Api V3 Wards Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/next-rupee/{ward_code}": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Next-rupee items for one ward (Bucket A = DLP, Rs 0)",
+        "operationId": "next_rupee_api_v3_next_rupee__ward_code__get",
+        "parameters": [
+          {
+            "name": "ward_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "K/W"
+              ],
+              "title": "Ward Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NextRupeeItem"
+                  },
+                  "title": "Response Next Rupee Api V3 Next Rupee  Ward Code  Get"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/summary": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Model quality + budget curve (optimizer vs simple rules)",
+        "description": "View 3 demo chart: harm avoided by the optimizer vs simple rules at each budget level, plus model quality.",
+        "operationId": "v3_summary_api_v3_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V3Summary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v3/allocate": {
+      "post": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Budget slider: exact re-solve for one ward",
+        "operationId": "allocate_api_v3_allocate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AllocateReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Allocation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/lookup": {
       "get": {
         "tags": [
@@ -945,7 +945,6 @@
             "title": "Bucket A Dlp"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "ward_code",
@@ -1001,7 +1000,6 @@
             "title": "Explanation"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "item_id",
@@ -1147,7 +1145,6 @@
             "title": "Tracker"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "id",
@@ -1319,7 +1316,6 @@
             "title": "Under Reported Wards"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "total_budget_inr",
@@ -1360,7 +1356,6 @@
             "title": "Avg Peak Vehicles"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "avg_rain_next7_mm",
@@ -1512,7 +1507,6 @@
             "title": "Explanation"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "contractor_id",
@@ -1559,7 +1553,6 @@
             "title": "Effect Logodds"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "feature",
@@ -1576,7 +1569,6 @@
             "title": "Detail"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "detail"
@@ -1651,7 +1643,6 @@
             "title": "Replies"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "flag_id",
@@ -1757,7 +1748,6 @@
             "title": "Replies Count"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "work_order_id",
@@ -1846,7 +1836,6 @@
             "default": []
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "item_id",
@@ -1884,7 +1873,6 @@
             "title": "V3 Items"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "work_orders",
@@ -1920,7 +1908,6 @@
             "title": "Reopens 2025"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "repairs_this_season",
@@ -1981,7 +1968,6 @@
             "$ref": "#/components/schemas/RoadSummary"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "matched_via",
@@ -2157,7 +2143,6 @@
             "title": "Explanation"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "item_id",
@@ -2222,7 +2207,6 @@
             "title": "Created At"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "id",
@@ -2361,7 +2345,6 @@
             "title": "Flags"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "road_id",
@@ -2449,7 +2432,6 @@
             "title": "Flagged Bills Count"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "road_id",
@@ -2557,7 +2539,6 @@
             "title": "Engineer Remark"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "work_order_id",
@@ -2606,7 +2587,6 @@
             "title": "Detail"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "road_id",
@@ -2634,7 +2614,6 @@
             "title": "Done"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "step",
@@ -2660,7 +2639,6 @@
             "title": "Updated At"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "scorecard",
@@ -2794,7 +2772,6 @@
             "title": "Accidents Count"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "ward_code",
@@ -2871,7 +2848,6 @@
             "title": "Dlp Value Owed Inr"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "ward_code",
@@ -2911,7 +2887,6 @@
             "title": "Geometry"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "type",
@@ -2935,7 +2910,6 @@
             "title": "Features"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
           "type",

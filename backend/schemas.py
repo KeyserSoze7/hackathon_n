@@ -1,4 +1,4 @@
-"""Response models: the typed contract in /openapi.json (for generated clients).
+"""Request and response models: the typed contract in /openapi.json (for generated clients).
 
 Field names/types mirror the SQL views and v3_* tables. When you change a view or table,
 change the model here too. Run the API with STRICT_MODELS=1 (as the Postman run does) to make any
@@ -8,7 +8,7 @@ import os
 from datetime import date, datetime
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Out(BaseModel):
@@ -322,3 +322,34 @@ class V3Summary(Out):
     scorecard: dict[str, Any]   # model quality (out-of-fold AUCs, prior)
     allocation: dict[str, Any]  # budget curve + optimizer vs simple-rule comparison
     updated_at: datetime
+
+
+NOT_FOUND = {404: {"model": Error}}  # shared `responses=` for routes that can 404
+
+
+# ── Request bodies ──────────────────────────────────────────────────────────
+class AllocateReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"ward_code": "K/W", "budget_inr": 500000}]}}
+    ward_code: str
+    budget_inr: float = Field(ge=0, le=5e8)
+
+
+class ReplyReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"author_role": "ward_engineer", "author_name": "AE Roads K/W",
+                                                         "body": "MGL utility trench reopened this stretch; contractor liable under DLP."}]}}
+    author_role: Literal["ward_engineer", "contractor", "other"]
+    author_name: Optional[str] = Field(None, max_length=120)
+    body: str = Field(min_length=1, max_length=4000)
+
+
+class CitizenReportReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"kind": "still_broken", "input_mode": "voice", "language": "hi",
+                                                         "text": "Andheri subway ke bahar wapas khadda ho gaya", "road_id": "RD0153"}]}}
+    kind: Literal["still_broken", "verified_fixed", "new_issue"]
+    input_mode: Literal["text", "voice", "photo", "qr"] = "text"
+    text: Optional[str] = Field(None, max_length=4000)
+    language: Optional[Literal["en", "hi", "mr"]] = None
+    photo_url: Optional[str] = Field(None, max_length=1000)
+    road_id: Optional[str] = None
+    work_order_id: Optional[str] = None
+    matched_locality: Optional[str] = None

@@ -1,23 +1,22 @@
 """
 View 3 backend: fair contractor scorecard (3A) + next-rupee planner (3B).
 
-  python view3_pipeline.py --csv-dir path/to/data            # local, DuckDB on the CSVs
-  DATABASE_URL=postgresql://... python view3_pipeline.py      # Supabase: reads tables, writes results back
+  python -m scorecard_planner.run_pipeline --csv-dir data      # local, DuckDB on the CSVs (run from repo root)
+  python -m scorecard_planner.run_pipeline                    # Supabase: reads tables, writes results back
                                                               # (or put DATABASE_URL in the repo-root .env)
 
-SQL (sql/01_features.sql) builds the feature views; XGBoost + SHAP run here in Python;
-results land in out/*.json (frontend contract) and, with DATABASE_URL, in Supabase tables.
+SQL (sql/feature_views.sql) builds the feature views; XGBoost + SHAP run here in Python;
+results land in output/*.json (frontend contract) and, with DATABASE_URL, in Supabase tables.
 Every number is computed in code. Claude only turns the `drivers` / `explanation` fields into prose.
 """
-import argparse, json, os, pathlib, sys
+import argparse, json, os, pathlib
 import numpy as np, pandas as pd, xgboost as xgb, shap
 from scipy.stats import chi2, spearmanr
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.metrics import roc_auc_score
 
 HERE = pathlib.Path(__file__).parent
-sys.path.insert(1, str(HERE.parent / "backend"))
-import db  # noqa: E402  (loads DATABASE_URL from the repo-root .env, if present)
+from backend import database as db  # noqa: E402  (loads DATABASE_URL from the repo-root .env, if present)
 TABLES = ["work_orders", "wards", "roads", "rate_card", "rainfall_daily", "tides", "traffic",
           "accidents", "facilities", "flood_hotspots", "complaints", "localities", "contractors"]
 SEED = 7
@@ -27,7 +26,7 @@ ADJUST_FOR_METHOD = False  # method choice is treated as the contractor's respon
 
 # ---------------------------------------------------------------- data access
 def load(csv_dir):
-    feats_sql = (HERE / "sql" / "01_features.sql").read_text()
+    feats_sql = (HERE / "sql" / "feature_views.sql").read_text()
     url = os.environ.get("DATABASE_URL")
     if url:
         eng = db.engine()
@@ -55,12 +54,12 @@ def load(csv_dir):
 
 
 def under_reported_wards(eng):
-    """UNDER_REPORTED_WARD comes from the audit engine (pipeline/build.py), so both views agree."""
+    """UNDER_REPORTED_WARD comes from the audit engine (audit_engine/run_audit.py), so both views agree."""
     if eng is not None:
         return set(pd.read_sql("SELECT ward_code FROM ward_audit WHERE under_reported_flag", eng).ward_code)
-    path = HERE.parent / "exports" / "ward_audit.csv"
+    path = HERE.parent / "audit_engine" / "output" / "ward_audit.csv"
     if not path.exists():
-        raise SystemExit(f"{path} missing: run `python3 pipeline/build.py` first")
+        raise SystemExit(f"{path} missing: run `python3 -m audit_engine.run_audit` first")
     wa = pd.read_csv(path)
     return set(wa.loc[wa.under_reported_flag.astype(str).str.lower() == "true", "ward_code"])
 
@@ -228,15 +227,15 @@ def explain_contractor(r, city):
     return s
 
 
-# 3B lives in allocator.py (budget allocation as an exact MILP; no forecasting).
-import sys; sys.path.insert(0, str(HERE)); import allocator
+# 3B lives in budget_allocator.py (budget allocation as an exact MILP; no forecasting).
+from scorecard_planner import budget_allocator as allocator  # noqa: E402
 
 
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv-dir", default="data")
-    ap.add_argument("--out", default=str(HERE / "out"))
+    ap.add_argument("--out", default=str(HERE / "output"))
     ap.add_argument("--budget", type=float, default=None, help="city budget in Rs; default = 2025 money left in wards")
     a = ap.parse_args()
     d, eng = load(a.csv_dir)

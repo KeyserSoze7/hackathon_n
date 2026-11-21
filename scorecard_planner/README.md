@@ -3,9 +3,9 @@
 ## Run locally (no database)
 From the repo root:
 ```bash
-pip install -r view3/requirements.txt      # Python 3.12/3.13; macOS: xgboost needs libomp (`brew install libomp`)
-python3 pipeline/build.py                  # audit engine first: writes exports/ward_audit.csv (UNDER_REPORTED_WARD)
-python view3/view3_pipeline.py --csv-dir data   # DuckDB runs the same SQL on the CSVs
+pip install -r requirements.txt      # Python 3.12/3.13; macOS: xgboost needs libomp (`brew install libomp`)
+python3 -m audit_engine.run_audit                  # audit engine first: writes audit_engine/output/ward_audit.csv (UNDER_REPORTED_WARD)
+python -m scorecard_planner.run_pipeline --csv-dir data   # DuckDB runs the same SQL on the CSVs
 ```
 
 ## Supabase / Postgres integration
@@ -14,19 +14,19 @@ The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipelin
    URL-encode special characters in the password (`@` → `%40`). Put it in `.env` as `DATABASE_URL=...` (gitignored).
 2. **Schema + data** (repo root):
    ```bash
-   python3 pipeline/build.py
+   python3 -m audit_engine.run_audit
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000000_schema.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000100_audit_views.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000200_revoke_truncate.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000300_v3_model_meta.sql
    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261121000400_city_kpis_extra.sql
-   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source.sql
-   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_source_data.sql
+   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit_outputs.sql
    ```
-3. **Build View 3 results:** `python view3/view3_pipeline.py` creates the feature views, trains, solves, and
+3. **Build View 3 results:** `python -m scorecard_planner.run_pipeline` creates the feature views, trains, solves, and
    truncates + inserts `v3_contractor_scorecard`, `v3_next_rupee`, `v3_ward_allocation`, `v3_job_expected_risk`
    in one transaction. Y/N flags are booleans in the DB; `load()` maps them back to 'Y'/'N' for this code.
-4. **Serve** (one FastAPI app for all four views, in `backend/`, see `backend/README.md`): `cd backend && uvicorn api:app --port 8000`
+4. **Serve** (one FastAPI app for all four views, in `backend/`, see `backend/README.md`): `uvicorn backend.main:app --port 8000` (from the repo root)
    - View 1: `GET /api/city`, `GET /api/wards`, `GET /api/flagged-queue?ward=K/W&tier=1&limit=20`
    - View 2: `GET /api/roads/{road_id}`, `GET /api/roads/{road_id}/timeline`, `GET /api/flags/{flag_id}`,
      `POST /api/flags/{flag_id}/replies` (Right-of-Reply)
@@ -35,14 +35,14 @@ The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipelin
    - View 4: `GET /api/lookup?q=...` (road name, locality, alias or Devanagari), `POST /api/citizen-reports`,
      `GET /api/citizen-reports/{id}` (tracker status is set by the server)
    - Tests: `postman collection run postman/backend.postman_collection.json` (23 requests, 59 assertions)
-5. **Refresh** after any data change: `build.py` + `load_audit.sql`, then this pipeline. Restart the API.
+5. **Refresh** after any data change: `audit_engine/run_audit.py` + `supabase/load_audit_outputs.sql`, then this pipeline. Restart the API.
 
 ## Split of work
 | Layer | Where | What |
 |---|---|---|
-| Features | SQL (`sql/01_features.sql`) | rain/tide in the 7 days after each job, hotspot distance, road age, traffic, rate-card ratio, complaints mapped to nearest road, accident harm, hospitals/schools per road |
+| Features | SQL (`sql/feature_views.sql`) | rain/tide in the 7 days after each job, hotspot distance, road age, traffic, rate-card ratio, complaints mapped to nearest road, accident harm, hospitals/schools per road |
 | Models | Python | 3A: XGBoost + SHAP (can't run inside Postgres). 3B: exact MILP budget allocation |
-| Serving | SQL (`sql/02_view3_api.sql`) + `allocate_ward()` | scorecard list, ward allocation, DLP money owed, evidence drill-down; slider re-solves live |
+| Serving | SQL (`sql/example_queries.sql`) + `allocate_ward()` | scorecard list, ward allocation, DLP money owed, evidence drill-down; slider re-solves live |
 
 ## 3A: how "fair" works
 1. XGBoost predicts each job's chance of failing within 30 days (and of missing its SLA) from context only:
@@ -60,7 +60,7 @@ for the hard conditions, which makes it stronger evidence, not weaker.
 
 Method choice is *not* adjusted for (`ADJUST_FOR_METHOD = False`): picking cold mix in the monsoon counts against the contractor.
 
-## 3B: next rupee as budget allocation (`allocator.py`)
+## 3B: next rupee as budget allocation (`budget_allocator.py`)
 No forecasting. This season's history is the demand; the model decides **what to fund and with which method**.
 
 **Items:** one per (road segment × issue type) seen this season, 867 in total. Demand `n` = repairs needed this season, plus open complaints.

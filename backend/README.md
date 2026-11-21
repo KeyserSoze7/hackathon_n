@@ -1,16 +1,28 @@
 # Backend API (FastAPI)
 
-One FastAPI app (`api.py`) serves all four views. All backend endpoints go here; don't add a second server.
+One FastAPI app serves all four views. All backend endpoints go here; don't add a second server.
+
+| File | What it does |
+|---|---|
+| `main.py` | Creates the app (title, tags, CORS), mounts the routers, warms the View 3 slider at startup |
+| `database.py` | Reads `DATABASE_URL` (env or repo-root `.env`), shared engine, `rows()` / `one()` / `norm_ward()` helpers |
+| `schemas.py` | Every request and response model (the typed OpenAPI contract) |
+| `routes/health.py` | `GET /api/health` |
+| `routes/city_overview.py` | View 1: KPI strip, wards, ward map, flagged queue |
+| `routes/road_story.py` | View 2: road receipt, timeline, flags, Right-of-Reply |
+| `routes/scorecard_planner.py` | View 3: contractor scorecard, ward allocation, next rupee, summary, budget slider |
+| `routes/citizen.py` | View 4: free-text lookup, citizen reports + tracker |
+| `openapi.json` | Exported spec for client generation |
 
 ## Configure
 Copy `.env.example` to `.env` at the repo root and fill in the Supabase Session pooler URI (or `export DATABASE_URL=...`).
 
 ## Run locally
-From the repo root, with the database already loaded (see `view3/README.md` → Supabase / Postgres integration):
+From the repo root, with the database already loaded (see `scorecard_planner/README.md` → Supabase / Postgres integration):
 ```bash
-pip install -r view3/requirements.txt     # Python 3.12/3.13; macOS: brew install libomp (xgboost)
-cd backend
-DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
+pip install -r requirements.txt     # Python 3.12/3.13; macOS: brew install libomp (xgboost)
+cp .env.example .env                     # then fill in DATABASE_URL (Supabase Session pooler URI)
+uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to serve the LAN
 ```
 
 ## API docs (Swagger)
@@ -18,7 +30,7 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 - ReDoc: http://127.0.0.1:8000/redoc
 - Spec: `GET /openapi.json`, committed as `backend/openapi.json` (import into Postman or a client generator).
   Regenerate after changing endpoints: `curl -s http://127.0.0.1:8000/openapi.json > backend/openapi.json`
-- Every endpoint has a response model (`models.py`), so the spec is fully typed (31 schemas, enums for labels/codes,
+- Every endpoint has a response model (`schemas.py`), so the spec is fully typed (31 schemas, enums for labels/codes,
   typed 404 `{detail}`). Generate a client from `backend/openapi.json`, e.g.
   `npx openapi-typescript backend/openapi.json -o src/api.d.ts` (TS types) or
   `openapi-generator-cli generate -i backend/openapi.json -g typescript-fetch -o src/api` (full client).
@@ -39,7 +51,7 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 | 3 | `GET /api/v3/wards` | `v3_ward_allocation` |
 | 3 | `GET /api/v3/next-rupee/{ward}` | `v3_next_rupee` |
 | 3 | `GET /api/v3/summary` | `v3_model_meta` (model quality + budget curve for the demo chart) |
-| 3 | `POST /api/v3/allocate` | live MILP re-solve (`view3/allocator.py`) |
+| 3 | `POST /api/v3/allocate` | live MILP re-solve (`scorecard_planner/budget_allocator.py`) |
 | 4 | `GET /api/lookup?q=...` | `roads`, `locality_aliases`, `locality_nearest_road`, `road_audit` |
 | 4 | `POST /api/citizen-reports` | writes `citizen_reports` (server sets tracker status) |
 | 4 | `GET /api/citizen-reports/{id}` | `citizen_reports` |
@@ -49,12 +61,12 @@ Ward codes are accepted as `K/W`, `K-W` or `k_w` everywhere (the frontend contra
 Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (View 4), the two Claude endpoints.
 
 ## Changing an endpoint (e.g. View 2)
-- View 2 routes are the `/api/roads/...` and `/api/flags/...` functions in `api.py`.
+- Each view's routes are in `routes/<view>.py` (View 2: `routes/road_story.py`). New endpoint for a view → add it to that file.
 - SQL views they read are in `supabase/migrations/20261121000100_audit_views.sql` (`road_audit`, `road_timeline`, `flagged_queue`).
   Change the schema with a **new** migration file rather than editing an applied one (all three are applied on Supabase).
-- Full schema at a glance (every table, view, constraint, RLS policy): `supabase/schema.sql`. Reference snapshot
+- Full schema at a glance (every table, view, constraint, RLS policy): `supabase/schema_snapshot.sql`. Reference snapshot
   dumped from Supabase; don't run it. Regenerate it after a schema change (command in its header).
-- Every route declares `response_model=` from `models.py`. Change the model with the SQL view/table it mirrors.
+- Every route declares `response_model=` from `schemas.py`. Change the model with the SQL view/table it mirrors.
   Run with `STRICT_MODELS=1` while developing/testing: an undeclared or mistyped field then fails loudly (500)
   instead of being silently dropped from the response.
 - Validate request bodies with Pydantic models, query params with `Query(...)`. Use `rows()` / `one()` for reads

@@ -5,13 +5,13 @@
 --   pg_dump "$DATABASE_URL" --schema-only --schema=public --no-owner --no-privileges --restrict-key=schemadump
 -- Contains: 24 tables, 13 views, 26 RLS policies, constraints and indexes, as they exist after
 --   supabase/migrations/*.sql  (source tables, flags, user writes, engine outputs, v3_*, read views, RLS)
---   view3/view3_pipeline.py    (runtime feature views v_*, security_invoker + read-only)
+--   scorecard_planner/run_pipeline.py    (runtime feature views v_*, security_invoker + read-only)
 --
--- To build a database, run the migrations + loaders in order (see backend/README.md and view3/README.md):
+-- To build a database, run the migrations + loaders in order (see backend/README.md and scorecard_planner/README.md):
 --   supabase/migrations/20261121000000_schema.sql
 --   supabase/migrations/20261121000100_audit_views.sql
 --   supabase/migrations/20261121000200_revoke_truncate.sql
---   supabase/load_source.sql, supabase/load_audit.sql, then python view3/view3_pipeline.py
+--   supabase/load_source_data.sql, supabase/load_audit_outputs.sql, then python -m scorecard_planner.run_pipeline
 -- Regenerate this snapshot after any schema change (same pg_dump command, prepend this header).
 -- =============================================================================================
 

@@ -26,7 +26,7 @@ from scipy.sparse import lil_matrix
 MIN_METHOD_JOBS = 15
 EQUITY_FLOOR = 0.5   # each ward gets >= 50% of its proportional share of the budget (if it has the demand)
 # Issue types the original contractor's DLP covers (road-surface defects). Matches the audit engine's
-# DLP_PAID_TWICE detector (pipeline/build.py: cold/hot mix, mastic, paver relaid). Cave-ins are excluded:
+# DLP_PAID_TWICE detector (audit_engine/detectors.py: cold/hot mix, mastic, paver relaid). Cave-ins are excluded:
 # they are excavation/pipeline (utility) jobs in this data.
 DLP_WORK_TYPES = {"Pothole", "Broken paver blocks"}
 UNDER_REPORTED_IMPACT = 0.3  # silence-adjusted need: wards with high physical risk but few complaints

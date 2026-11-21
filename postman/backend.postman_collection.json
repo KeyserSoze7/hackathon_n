@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Follow the Rupee - Backend (local)",
-    "description": "All four views + writes. Start the API (see view3/README.md), then run in order: later requests reuse IDs captured by earlier ones.",
+    "description": "All four views + writes. Start the API (see backend/README.md), then run in order: later requests reuse IDs captured by earlier ones.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

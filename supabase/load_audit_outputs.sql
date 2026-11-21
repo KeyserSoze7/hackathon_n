@@ -1,11 +1,11 @@
--- Load audit engine output (exports/*.csv). Safe anytime: never touches user-written tables.
--- Run from repo root after `python3 pipeline/build.py`:
---   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit.sql
+-- Load audit engine output (audit_engine/output/*.csv). Safe anytime: never touches user-written tables.
+-- Run from repo root after `python3 -m audit_engine.run_audit`:
+--   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/load_audit_outputs.sql
 begin;
 
 -- Flags: upsert so replies/reports keep pointing at the same stable flag_id.
 create temp table flags_new (like flags) on commit drop;
-\copy flags_new from 'exports/flags.csv' csv header
+\copy flags_new from 'audit_engine/output/flags.csv' csv header
 
 insert into flags select * from flags_new
 on conflict (flag_id) do update set
@@ -20,9 +20,9 @@ where not exists (select 1 from flags_new n where n.flag_id = f.flag_id)
   and not exists (select 1 from flag_replies r where r.flag_id = f.flag_id)
   and not exists (select 1 from citizen_reports c where c.flag_id = f.flag_id);
 
--- Derived table: nothing references it, full replace. (v3_* tables are written by view3/view3_pipeline.py.)
+-- Derived table: nothing references it, full replace. (v3_* tables are written by scorecard_planner/run_pipeline.py.)
 truncate ward_audit;
-\copy ward_audit from 'exports/ward_audit.csv' csv header
+\copy ward_audit from 'audit_engine/output/ward_audit.csv' csv header
 
 commit;
 
