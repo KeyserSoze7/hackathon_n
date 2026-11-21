@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Follow the Rupee: Backend",
-    "description": "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\nEvery number is computed by the pipelines (`audit_engine/run_audit.py`, `scorecard_planner/run_pipeline.py`); endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login.",
+    "description": "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\nEvery number is computed by the pipelines (`audit_engine/run_audit.py`, `scorecard_planner/run_pipeline.py`); endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login wall for citizens: an anonymous account (POST /api/citizens) gives a bearer token for 'my reports'. Officers sign in at POST /api/admin/login.",
     "version": "0.1.0"
   },
   "paths": {
@@ -643,9 +643,14 @@
         "tags": [
           "View 2: Road Story"
         ],
-        "summary": "Add Right-of-Reply to a flag",
-        "description": "View 2 Right-of-Reply.",
+        "summary": "Add Right-of-Reply to a flag (officer token)",
+        "description": "View 2 Right-of-Reply, signed in: a ward officer for the flag's ward (or an admin). author_name defaults to the\nofficer's name; use author_role=contractor to log a reply the contractor gave the ward office.",
         "operationId": "add_reply_api_flags__flag_id__replies_post",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "parameters": [
           {
             "name": "flag_id",
@@ -687,6 +692,26 @@
               }
             },
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1251,7 +1276,7 @@
           "View 4: Citizen Layer"
         ],
         "summary": "Submit citizen report (server sets tracker status)",
-        "description": "View 4 report. The server resolves the road (road_id -> location within 500 m -> landmark/text), links the latest\nmatching work order, detects a duplicate (same road + issue in 7 days) and sets the tracker status; anon clients\ncannot set it. contact_phone is stored privately and never returned.",
+        "description": "View 4 report. The server resolves the road (road_id -> location within 500 m -> landmark/text), links the latest\nmatching work order, detects a duplicate (same road + issue in 7 days) and sets the status: matched_to_contract when\na road matched, else reported. Officers move it on (payment hold, contractor notice, ...); clients cannot set it.\nWith `Authorization: Bearer <citizen token>` the report is saved to that citizen (GET /api/me/reports).\ncontact_phone is stored privately and never returned.",
         "operationId": "add_citizen_report_api_citizen_reports_post",
         "requestBody": {
           "content": {
@@ -1284,6 +1309,16 @@
               }
             }
           },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -1294,7 +1329,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "CitizenToken": []
+          }
+        ]
       }
     },
     "/api/citizen-reports/{report_id}": {
@@ -1303,6 +1343,7 @@
           "View 4: Citizen Layer"
         ],
         "summary": "Citizen report status + tracker",
+        "description": "Public status page for a report: tracker, events[] (history), sla_due_at, rejection_reason. No contact data.",
         "operationId": "citizen_report_api_citizen_reports__report_id__get",
         "parameters": [
           {
@@ -1335,6 +1376,278 @@
               }
             },
             "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizens": {
+      "post": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Create an anonymous citizen account (returns the bearer token once)",
+        "description": "No login: the app calls this once, stores `token` and sends `Authorization: Bearer <token>` on citizen calls.\nThe token is shown only here (the database keeps its hash). `phone` is optional and never returned.",
+        "operationId": "create_citizen_api_citizens_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CitizenCreateReq"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Req"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitizenToken"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "The signed-in citizen + report stats",
+        "description": "stats: reports, distinct roads, open, resolved (resolved + confirmed_fixed), confirmed_fixed, and the rupees at\nstake on bills matched to these reports (rupees_flagged_inr) / on reports currently in payment_held (rupees_held_inr).",
+        "operationId": "me_api_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CitizenToken": []
+          }
+        ]
+      }
+    },
+    "/api/me/reports": {
+      "get": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "The signed-in citizen's reports, newest first, with history",
+        "operationId": "my_reports_api_me_reports_get",
+        "security": [
+          {
+            "CitizenToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "reported",
+                    "matched_to_contract",
+                    "payment_held",
+                    "contractor_notified",
+                    "resolved",
+                    "confirmed_fixed",
+                    "reopened",
+                    "rejected",
+                    "duplicate"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "enum": [
+                    "open",
+                    "closed"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "One status, or open / closed (closed = resolved, confirmed_fixed, rejected, duplicate)",
+              "title": "Status"
+            },
+            "description": "One status, or open / closed (closed = resolved, confirmed_fixed, rejected, duplicate)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyReport"
+                  },
+                  "title": "Response My Reports Api Me Reports Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/citizen-reports/{report_id}/confirm": {
+      "post": {
+        "tags": [
+          "View 4: Citizen Layer"
+        ],
+        "summary": "Citizen confirms a fix holds (resolved -> confirmed_fixed) or reopens it",
+        "description": "Only the citizen who filed the report (with their token) can confirm it. fixed=true needs status resolved;\nfixed=false reopens a resolved or confirmed_fixed report. Photos are kept on the history event.",
+        "operationId": "confirm_report_api_citizen_reports__report_id__confirm_post",
+        "security": [
+          {
+            "CitizenToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitizenReport"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1449,6 +1762,1103 @@
           },
           "307": {
             "description": "Redirect to the Supabase Storage public URL"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/access-requests": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Request officer access (public; an admin approves it)",
+        "description": "Anyone can ask for ward-officer access. One pending request per email; 409 if pending or already an account.",
+        "operationId": "request_access_api_admin_access_requests_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessRequestReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessRequestCreated"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List access requests (admin only)",
+        "operationId": "list_access_requests_api_admin_access_requests_get",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccessRequest"
+                  },
+                  "title": "Response List Access Requests Api Admin Access Requests Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/access-requests/{request_id}/approve": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Approve: creates the ward-officer account",
+        "description": "Creates a ward_officer for the requested ward and returns a temporary password ONCE.\nPass it to the officer; they sign in with POST /api/admin/login.",
+        "operationId": "approve_access_request_api_admin_access_requests__request_id__approve_post",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessDecision"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/access-requests/{request_id}/reject": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Reject an access request",
+        "operationId": "reject_access_request_api_admin_access_requests__request_id__reject_post",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessDecision"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/login": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Sign in (email + password) -> bearer token",
+        "description": "Returns a session token valid for ADMIN_SESSION_HOURS (default 12). Wrong email or password -> 401.",
+        "operationId": "login_api_admin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/logout": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "End this session",
+        "operationId": "logout_api_admin_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ]
+      }
+    },
+    "/api/admin/me": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "The signed-in officer",
+        "operationId": "admin_me_api_admin_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMe"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ]
+      }
+    },
+    "/api/admin/summary": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Dashboard tiles",
+        "description": "reports_by_status, new_today (IST), overdue_sla (open and past sla_due_at), median_hours_to_resolve\n(created -> first resolved), rupees_held_inr (bills of reports in payment_held, each once), flags_awaiting_reply.",
+        "operationId": "summary_api_admin_summary_get",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ward code (K/W or K-W); default: all your wards",
+              "title": "Ward"
+            },
+            "description": "Ward code (K/W or K-W); default: all your wards"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSummary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/reports": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Report queue (paged cards)",
+        "description": "Cards: id, created_at, age_hours, sla_due_at, status, issue_type, road, flag, first photo, citizen pseudonym.\nNever a phone number.",
+        "operationId": "list_reports_api_admin_reports_get",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ward code; default: all your wards",
+              "title": "Ward"
+            },
+            "description": "Ward code; default: all your wards"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "reported",
+                    "matched_to_contract",
+                    "payment_held",
+                    "contractor_notified",
+                    "resolved",
+                    "confirmed_fixed",
+                    "reopened",
+                    "rejected",
+                    "duplicate"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "still_broken",
+                    "verified_fixed",
+                    "new_issue"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "issue_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pothole",
+                    "waterlogging",
+                    "open_manhole",
+                    "broken_paver",
+                    "cave_in",
+                    "choked_drain",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Issue Type"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Report id, road name, landmark or text",
+              "title": "Q"
+            },
+            "description": "Report id, road name, landmark or text"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "newest",
+                "oldest",
+                "sla_due"
+              ],
+              "type": "string",
+              "default": "newest",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/reports/{report_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Full report for triage",
+        "description": "Events, photos (incl. confirmation photos), location, matched flags and work orders, duplicate candidates\n(same road + issue within 7 days, or within 200 m), notices sent, and allowed_next statuses.",
+        "operationId": "get_report_api_admin_reports__report_id__get",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReportDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Triage: change status, add a note, set repair due date",
+        "description": "Validates the transition (422 lists allowed_next). rejected needs rejection_reason; duplicate needs\nduplicate_of (follows a chain to the original). Every change writes a history event.",
+        "operationId": "patch_report_api_admin_reports__report_id__patch",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportPatchReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReportDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/reports/{report_id}/notify-contractor": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Record a notice to the responsible contractor",
+        "description": "Contractor = the contractor of the report's flagged bill; without a flag, the linked work order's contractor,\nelse the road's latest surface-repair contractor, else its latest contractor. Without `message`, the notice is drafted from the report's flag via the\ndraft-notice logic (Claude, template fallback). The notice is RECORDED (delivery: recorded), not sent. Moves the\nreport to contractor_notified when that transition is allowed; closed reports -> 409.",
+        "operationId": "notify_contractor_api_admin_reports__report_id__notify_contractor_post",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Report Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotifyReq"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorNotice"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/flags": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Flags in your wards (awaiting reply)",
+        "description": "Ranked by rupees at stake. Reply with POST /api/flags/{flag_id}/replies (officer token).",
+        "operationId": "list_flags_api_admin_flags_get",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ward",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ward"
+            }
+          },
+          {
+            "name": "awaiting_reply",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "true: only flags with no Right-of-Reply yet; false: only replied flags",
+              "title": "Awaiting Reply"
+            },
+            "description": "true: only flags with no Right-of-Reply yet; false: only replied flags"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlagPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Signed in, but not allowed (role or ward)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1776,6 +3186,1022 @@
   },
   "components": {
     "schemas": {
+      "AccessDecision": {
+        "properties": {
+          "request_id": {
+            "type": "integer",
+            "title": "Request Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ],
+            "title": "Status"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "admin_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Admin Id"
+          },
+          "temporary_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temporary Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "status",
+          "email",
+          "admin_id",
+          "temporary_password"
+        ],
+        "title": "AccessDecision",
+        "examples": [
+          {
+            "admin_id": "ff70271f-222d-4645-8163-6f9baaacc8c9",
+            "email": "a.patil@example.org",
+            "request_id": 1,
+            "status": "approved",
+            "temporary_password": "<shown once>"
+          }
+        ]
+      },
+      "AccessRequest": {
+        "properties": {
+          "request_id": {
+            "type": "integer",
+            "title": "Request Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "designation": {
+            "type": "string",
+            "title": "Designation"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "admin_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Admin Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "name",
+          "email",
+          "designation",
+          "ward_code",
+          "reason",
+          "status",
+          "created_at",
+          "decided_at",
+          "decision_note",
+          "admin_id"
+        ],
+        "title": "AccessRequest"
+      },
+      "AccessRequestCreated": {
+        "properties": {
+          "request_id": {
+            "type": "integer",
+            "title": "Request Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "pending",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "status"
+        ],
+        "title": "AccessRequestCreated",
+        "examples": [
+          {
+            "request_id": 1,
+            "status": "pending"
+          }
+        ]
+      },
+      "AccessRequestReq": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+            "title": "Email"
+          },
+          "designation": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Designation"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code",
+            "description": "K/W, K-W or k_w"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "designation",
+          "ward_code",
+          "reason"
+        ],
+        "title": "AccessRequestReq",
+        "examples": [
+          {
+            "designation": "Assistant Engineer (Roads)",
+            "email": "a.patil@example.org",
+            "name": "A. Patil",
+            "reason": "Triage citizen reports for K/W during the monsoon",
+            "ward_code": "K/W"
+          }
+        ]
+      },
+      "AdminFlag": {
+        "properties": {
+          "flag_id": {
+            "type": "string",
+            "title": "Flag Id"
+          },
+          "tier": {
+            "type": "integer",
+            "title": "Tier"
+          },
+          "detector": {
+            "type": "string",
+            "enum": [
+              "DLP_PAID_TWICE",
+              "RATE_INFLATION",
+              "OVERLAPPING_WORK_ORDER",
+              "RAIN_DAY_WORK",
+              "REPEAT_BILL_NO_COMPLAINT"
+            ],
+            "title": "Detector"
+          },
+          "status_label": {
+            "type": "string",
+            "enum": [
+              "Needs Explanation",
+              "Recoverable under DLP"
+            ],
+            "title": "Status Label"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "rupees_at_stake": {
+            "type": "integer",
+            "title": "Rupees At Stake"
+          },
+          "rule_text": {
+            "type": "string",
+            "title": "Rule Text"
+          },
+          "replies_count": {
+            "type": "integer",
+            "title": "Replies Count"
+          },
+          "last_reply_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Reply At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "flag_id",
+          "tier",
+          "detector",
+          "status_label",
+          "ward_code",
+          "road_id",
+          "road_name",
+          "work_order_id",
+          "contractor_id",
+          "contractor_name",
+          "rupees_at_stake",
+          "rule_text",
+          "replies_count",
+          "last_reply_at"
+        ],
+        "title": "AdminFlag"
+      },
+      "AdminMe": {
+        "properties": {
+          "admin_id": {
+            "type": "string",
+            "title": "Admin Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "designation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Designation"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ward_officer",
+              "admin"
+            ],
+            "title": "Role"
+          },
+          "ward_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ward Codes"
+          },
+          "session_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Session Expires At",
+            "example": "2025-06-22T02:59:00+05:30"
+          }
+        },
+        "type": "object",
+        "required": [
+          "admin_id",
+          "email",
+          "name",
+          "designation",
+          "role",
+          "ward_codes",
+          "session_expires_at"
+        ],
+        "title": "AdminMe"
+      },
+      "AdminReportDetail": {
+        "properties": {
+          "report_id": {
+            "type": "integer",
+            "title": "Report Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
+            ],
+            "title": "Status"
+          },
+          "road": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportRoad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of"
+          },
+          "linked_work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linked Work Order Id"
+          },
+          "responsible": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Responsible"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sla_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Hours"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/ReportPhoto"
+            },
+            "type": "array",
+            "title": "Photos"
+          },
+          "tracker": {
+            "items": {
+              "$ref": "#/components/schemas/TrackerStepDetail"
+            },
+            "type": "array",
+            "title": "Tracker"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "landmark": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landmark"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportLocation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": [
+              "text",
+              "voice",
+              "photo",
+              "qr"
+            ],
+            "title": "Input Mode"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "en",
+                  "hi",
+                  "mr"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "matched_locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Locality"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ReportEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "sla_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Due At"
+          },
+          "repair_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Due At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "payment_hold_eligible": {
+            "type": "boolean",
+            "title": "Payment Hold Eligible"
+          },
+          "citizen": {
+            "type": "string",
+            "title": "Citizen"
+          },
+          "confirm_photos": {
+            "items": {
+              "$ref": "#/components/schemas/ReportPhoto"
+            },
+            "type": "array",
+            "title": "Confirm Photos"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/AdminFlag"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "work_orders": {
+            "items": {
+              "$ref": "#/components/schemas/AdminWorkOrder"
+            },
+            "type": "array",
+            "title": "Work Orders"
+          },
+          "duplicate_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/DuplicateCandidate"
+            },
+            "type": "array",
+            "title": "Duplicate Candidates"
+          },
+          "notices": {
+            "items": {
+              "$ref": "#/components/schemas/ContractorNotice"
+            },
+            "type": "array",
+            "title": "Notices"
+          },
+          "allowed_next": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "reported",
+                "matched_to_contract",
+                "payment_held",
+                "contractor_notified",
+                "resolved",
+                "confirmed_fixed",
+                "reopened",
+                "rejected",
+                "duplicate"
+              ]
+            },
+            "type": "array",
+            "title": "Allowed Next"
+          }
+        },
+        "type": "object",
+        "required": [
+          "report_id",
+          "kind",
+          "issue_type",
+          "status",
+          "road",
+          "duplicate_of",
+          "linked_work_order_id",
+          "responsible",
+          "sla_hours",
+          "photos",
+          "tracker",
+          "flag_id",
+          "landmark",
+          "location",
+          "input_mode",
+          "language",
+          "text",
+          "matched_locality",
+          "created_at",
+          "events",
+          "sla_due_at",
+          "repair_due_at",
+          "resolved_at",
+          "rejection_reason",
+          "payment_hold_eligible",
+          "citizen",
+          "confirm_photos",
+          "flags",
+          "work_orders",
+          "duplicate_candidates",
+          "notices",
+          "allowed_next"
+        ],
+        "title": "AdminReportDetail",
+        "examples": [
+          {
+            "created_at": "2026-11-21T16:49:17+05:30",
+            "events": [
+              {
+                "actor": "citizen",
+                "at": "2026-11-21T16:49:17+05:30",
+                "event_type": "created",
+                "photo_ids": [],
+                "to_status": "matched_to_contract"
+              }
+            ],
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "input_mode": "text",
+            "issue_type": "pothole",
+            "kind": "still_broken",
+            "language": "en",
+            "linked_work_order_id": "WO25-00646",
+            "payment_hold_eligible": true,
+            "photos": [],
+            "report_id": 1,
+            "responsible": {
+              "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2027-04-03), so surface defects are the contractor's to fix at no cost to BMC.",
+              "name": "Arabian Sea Engineering (synthetic)",
+              "party": "contractor_under_dlp",
+              "ward_office": "M/W Ward Office (synthetic)"
+            },
+            "road": {
+              "road_id": "RD0240",
+              "road_name": "Sion Trombay Road",
+              "under_dlp": true,
+              "ward_code": "M/W"
+            },
+            "sla_due_at": "2026-11-24T16:49:17+05:30",
+            "sla_hours": 72,
+            "status": "matched_to_contract",
+            "text": "Pothole back again",
+            "tracker": [
+              {
+                "at": "2026-11-21T16:49:17+05:30",
+                "label": "Reported",
+                "status": "done",
+                "step": "reported"
+              },
+              {
+                "at": "2026-11-21T16:49:17+05:30",
+                "label": "Matched to contract",
+                "status": "current",
+                "step": "matched_to_contract"
+              },
+              {
+                "label": "Payment held (DLP)",
+                "status": "pending",
+                "step": "payment_held"
+              },
+              {
+                "label": "Contractor notified",
+                "status": "pending",
+                "step": "contractor_notified"
+              },
+              {
+                "label": "Resolved by ward office",
+                "status": "pending",
+                "step": "resolved"
+              },
+              {
+                "label": "Confirmed fixed by citizen",
+                "status": "pending",
+                "step": "confirmed_fixed"
+              }
+            ]
+          }
+        ]
+      },
+      "AdminSession": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ward_officer",
+              "admin"
+            ],
+            "title": "Role"
+          },
+          "ward_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ward Codes"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At",
+            "example": "2025-06-22T02:59:00+05:30"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "role",
+          "ward_codes",
+          "expires_at"
+        ],
+        "title": "AdminSession",
+        "examples": [
+          {
+            "expires_at": "2026-11-22T04:49:18+05:30",
+            "role": "ward_officer",
+            "token": "adm_<send as Authorization: Bearer>",
+            "ward_codes": [
+              "M/W"
+            ]
+          }
+        ]
+      },
+      "AdminSummary": {
+        "properties": {
+          "ward_codes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ward Codes"
+          },
+          "reports_by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Reports By Status"
+          },
+          "new_today": {
+            "type": "integer",
+            "title": "New Today"
+          },
+          "overdue_sla": {
+            "type": "integer",
+            "title": "Overdue Sla"
+          },
+          "median_hours_to_resolve": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Hours To Resolve"
+          },
+          "rupees_held_inr": {
+            "type": "integer",
+            "title": "Rupees Held Inr"
+          },
+          "flags_awaiting_reply": {
+            "type": "integer",
+            "title": "Flags Awaiting Reply"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ward_codes",
+          "reports_by_status",
+          "new_today",
+          "overdue_sla",
+          "median_hours_to_resolve",
+          "rupees_held_inr",
+          "flags_awaiting_reply"
+        ],
+        "title": "AdminSummary"
+      },
+      "AdminWorkOrder": {
+        "properties": {
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "work_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Type"
+          },
+          "repair_method": {
+            "type": "string",
+            "title": "Repair Method"
+          },
+          "cost_inr": {
+            "type": "integer",
+            "title": "Cost Inr"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "sla_met": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Met"
+          },
+          "reopened_within_30d": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reopened Within 30D"
+          },
+          "linked": {
+            "type": "boolean",
+            "title": "Linked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "work_order_id",
+          "contractor_id",
+          "contractor_name",
+          "work_type",
+          "repair_method",
+          "cost_inr",
+          "completed_at",
+          "sla_met",
+          "reopened_within_30d",
+          "linked"
+        ],
+        "title": "AdminWorkOrder"
+      },
       "AllocateReq": {
         "properties": {
           "ward_code": {
@@ -2027,6 +4453,45 @@
         ],
         "title": "BudgetRange"
       },
+      "CitizenCreateReq": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name",
+            "description": "Default: 'Citizen XXXX'"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\+?[0-9 -]{6,20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone",
+            "description": "Optional, for SMS later. Stored privately, never returned"
+          }
+        },
+        "type": "object",
+        "title": "CitizenCreateReq",
+        "examples": [
+          {
+            "display_name": "Andheri walker",
+            "phone": "+91 98200 00000"
+          }
+        ]
+      },
       "CitizenQueryReply": {
         "properties": {
           "matched_locality": {
@@ -2264,7 +4729,12 @@
               "reported",
               "matched_to_contract",
               "payment_held",
-              "contractor_notified"
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
             ],
             "title": "Status"
           },
@@ -2420,6 +4890,67 @@
             "format": "date-time",
             "title": "Created At",
             "example": "2025-06-22T02:59:00+05:30"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ReportEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "sla_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Due At"
+          },
+          "repair_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Due At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason"
+          },
+          "payment_hold_eligible": {
+            "type": "boolean",
+            "title": "Payment Hold Eligible"
           }
         },
         "type": "object",
@@ -2442,72 +4973,84 @@
           "language",
           "text",
           "matched_locality",
-          "created_at"
+          "created_at",
+          "events",
+          "sla_due_at",
+          "repair_due_at",
+          "resolved_at",
+          "rejection_reason",
+          "payment_hold_eligible"
         ],
         "title": "CitizenReport",
         "examples": [
           {
-            "created_at": "2026-11-21T16:14:01+05:30",
-            "flag_id": "DLP_PAID_TWICE:WO25-01947",
-            "input_mode": "photo",
-            "issue_type": "pothole",
-            "kind": "still_broken",
-            "landmark": "opposite KEM Hospital gate",
-            "language": "en",
-            "linked_work_order_id": "WO25-02017",
-            "location": {
-              "accuracy_m": 12.0,
-              "lat": 19.0058,
-              "lon": 72.8425,
-              "source": "gps"
-            },
-            "photos": [
+            "created_at": "2026-11-21T16:49:17+05:30",
+            "events": [
               {
-                "height": 600,
-                "photo_id": "1aee300d99da4b9b8078e80913f5903c",
-                "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
-                "width": 800
+                "actor": "citizen",
+                "at": "2026-11-21T16:49:17+05:30",
+                "event_type": "created",
+                "photo_ids": [],
+                "to_status": "matched_to_contract"
               }
             ],
-            "report_id": 24,
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "input_mode": "text",
+            "issue_type": "pothole",
+            "kind": "still_broken",
+            "language": "en",
+            "linked_work_order_id": "WO25-00646",
+            "payment_hold_eligible": true,
+            "photos": [],
+            "report_id": 1,
             "responsible": {
-              "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2026-02-18), so surface defects are the contractor's to fix at no cost to BMC.",
-              "name": "Konkan Roadcon Pvt Ltd (synthetic)",
+              "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2027-04-03), so surface defects are the contractor's to fix at no cost to BMC.",
+              "name": "Arabian Sea Engineering (synthetic)",
               "party": "contractor_under_dlp",
-              "ward_office": "F/S Ward Office (synthetic)"
+              "ward_office": "M/W Ward Office (synthetic)"
             },
             "road": {
-              "road_id": "RD0048",
-              "road_name": "Dr Babasaheb Ambedkar Road",
+              "road_id": "RD0240",
+              "road_name": "Sion Trombay Road",
               "under_dlp": true,
-              "ward_code": "F/S"
+              "ward_code": "M/W"
             },
+            "sla_due_at": "2026-11-24T16:49:17+05:30",
             "sla_hours": 72,
-            "status": "payment_held",
-            "text": "Pothole is back after the repair",
+            "status": "matched_to_contract",
+            "text": "Pothole back again",
             "tracker": [
               {
-                "at": "2026-11-21T16:14:01+05:30",
+                "at": "2026-11-21T16:49:17+05:30",
                 "label": "Reported",
                 "status": "done",
                 "step": "reported"
               },
               {
-                "at": "2026-11-21T16:14:01+05:30",
+                "at": "2026-11-21T16:49:17+05:30",
                 "label": "Matched to contract",
-                "status": "done",
+                "status": "current",
                 "step": "matched_to_contract"
               },
               {
-                "at": "2026-11-21T16:14:01+05:30",
-                "label": "Payment auto-held (DLP)",
-                "status": "current",
+                "label": "Payment held (DLP)",
+                "status": "pending",
                 "step": "payment_held"
               },
               {
                 "label": "Contractor notified",
                 "status": "pending",
                 "step": "contractor_notified"
+              },
+              {
+                "label": "Resolved by ward office",
+                "status": "pending",
+                "step": "resolved"
+              },
+              {
+                "label": "Confirmed fixed by citizen",
+                "status": "pending",
+                "step": "confirmed_fixed"
               }
             ]
           }
@@ -2705,6 +5248,79 @@
           }
         ]
       },
+      "CitizenStats": {
+        "properties": {
+          "reports": {
+            "type": "integer",
+            "title": "Reports"
+          },
+          "roads": {
+            "type": "integer",
+            "title": "Roads"
+          },
+          "open": {
+            "type": "integer",
+            "title": "Open"
+          },
+          "resolved": {
+            "type": "integer",
+            "title": "Resolved"
+          },
+          "confirmed_fixed": {
+            "type": "integer",
+            "title": "Confirmed Fixed"
+          },
+          "rupees_flagged_inr": {
+            "type": "integer",
+            "title": "Rupees Flagged Inr"
+          },
+          "rupees_held_inr": {
+            "type": "integer",
+            "title": "Rupees Held Inr"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reports",
+          "roads",
+          "open",
+          "resolved",
+          "confirmed_fixed",
+          "rupees_flagged_inr",
+          "rupees_held_inr"
+        ],
+        "title": "CitizenStats"
+      },
+      "CitizenToken": {
+        "properties": {
+          "citizen_id": {
+            "type": "string",
+            "title": "Citizen Id"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "citizen_id",
+          "token",
+          "display_name"
+        ],
+        "title": "CitizenToken",
+        "examples": [
+          {
+            "citizen_id": "d59630cf-8acd-4a48-939a-2233c9f6f3cd",
+            "display_name": "Andheri walker",
+            "token": "cit_<shown once; store it>"
+          }
+        ]
+      },
       "CityKPIs": {
         "properties": {
           "total_budget_inr": {
@@ -2788,6 +5404,48 @@
           "recoverable_dlp_rule"
         ],
         "title": "CityKPIs"
+      },
+      "ConfirmReq": {
+        "properties": {
+          "fixed": {
+            "type": "boolean",
+            "title": "Fixed",
+            "description": "true: the repair holds (resolved -> confirmed_fixed); false: still broken (resolved / confirmed_fixed -> reopened)"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "photo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Photo Ids",
+            "description": "Up to 3 ids from POST /api/uploads/photo",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "fixed"
+        ],
+        "title": "ConfirmReq",
+        "examples": [
+          {
+            "fixed": true,
+            "note": "Patched and holding after rain"
+          }
+        ]
       },
       "ContractorContext": {
         "properties": {
@@ -2932,6 +5590,131 @@
           "evidence_work_order_ids"
         ],
         "title": "ContractorMonth"
+      },
+      "ContractorNotice": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "report_id": {
+            "type": "integer",
+            "title": "Report Id"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "sms",
+              "letter"
+            ],
+            "title": "Channel"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Name"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "generated_by": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "template",
+              "officer"
+            ],
+            "title": "Generated By"
+          },
+          "sent_by": {
+            "type": "string",
+            "title": "Sent By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "delivery": {
+            "type": "string",
+            "const": "recorded",
+            "title": "Delivery"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "report_id",
+          "channel",
+          "flag_id",
+          "work_order_id",
+          "contractor_id",
+          "contractor_name",
+          "message",
+          "generated_by",
+          "sent_by",
+          "created_at",
+          "delivery"
+        ],
+        "title": "ContractorNotice",
+        "examples": [
+          {
+            "channel": "letter",
+            "contractor_id": "CT02",
+            "contractor_name": "Konkan Roadcon Pvt Ltd (synthetic)",
+            "created_at": "2026-11-21T16:49:18+05:30",
+            "delivery": "recorded",
+            "flag_id": "DLP_PAID_TWICE:WO25-01994",
+            "generated_by": "template",
+            "id": 1,
+            "message": "Defect notice: Paver blocks relaid on Sion Trombay Road (RD0240), work order WO25-01994\n\nTo: Konkan Roadcon Pvt Ltd (synthetic)\nThrough: Executive Engineer (Roads), Ward M/W, Brihanmumbai Municipal Corporation\n\nSubject: Defect notice for work order WO25-01994 on Sion Trombay Road (RD0240), Ward M/W\n\nThe road audit has flagged work order WO25-01994 as \"Recoverable under DLP\".\n\nWork: Paver blocks relaid, cost ₹1,48,557, completed on 2025-09-03.\nFinding: Paver blocks relaid billed at ₹148,557 on RD0240, which is under the original contractor's Defect Liability Period (last resurfaced 2024-04-03).\nAmount at stake: ₹1,48,557.\nThe road is under the Defect Liability Period until 2027-04-03.\n\nYou are requested to submit a written explanation and, where the work falls within the Defect Liability Period, to rectify the defect at your own cost, within 15 days of this notice.\n\nEvidence rows: WO25-01994, RD0240\n\nExecutive Engineer (Roads), Ward M/W",
+            "report_id": 1,
+            "sent_by": "A. Patil",
+            "work_order_id": "WO25-01994"
+          }
+        ]
       },
       "ContractorScore": {
         "properties": {
@@ -3421,6 +6204,96 @@
         ],
         "title": "Driver"
       },
+      "DuplicateCandidate": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
+            ],
+            "title": "Status"
+          },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "road_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Id"
+          },
+          "distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance M"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "same_road_and_issue_7d",
+              "within_200m"
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "status",
+          "issue_type",
+          "road_id",
+          "distance_m",
+          "reason"
+        ],
+        "title": "DuplicateCandidate"
+      },
       "Eligibility": {
         "properties": {
           "eligible": {
@@ -3468,6 +6341,37 @@
           "detail"
         ],
         "title": "Error"
+      },
+      "FlagPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminFlag"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "FlagPage"
       },
       "FlagWithReplies": {
         "properties": {
@@ -4007,6 +6911,33 @@
         ],
         "title": "Locality"
       },
+      "LoginReq": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginReq",
+        "examples": [
+          {
+            "email": "a.patil@example.org",
+            "password": "<password>"
+          }
+        ]
+      },
       "Lookup": {
         "properties": {
           "matched_via": {
@@ -4092,6 +7023,35 @@
           "road"
         ],
         "title": "Lookup"
+      },
+      "Me": {
+        "properties": {
+          "citizen_id": {
+            "type": "string",
+            "title": "Citizen Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "joined_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Joined At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/CitizenStats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "citizen_id",
+          "display_name",
+          "joined_at",
+          "stats"
+        ],
+        "title": "Me"
       },
       "MethodologyDoc": {
         "properties": {
@@ -4217,6 +7177,115 @@
           "months"
         ],
         "title": "MonthlyResponse"
+      },
+      "MyReport": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "road": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportRoad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportFlagRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ReportEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "issue_type",
+          "road",
+          "status",
+          "created_at",
+          "photo_url",
+          "flag",
+          "events"
+        ],
+        "title": "MyReport"
       },
       "NextRupeeItem": {
         "properties": {
@@ -4404,6 +7473,54 @@
         ],
         "title": "NextRupeeItem"
       },
+      "NotifyReq": {
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "sms",
+              "letter"
+            ],
+            "title": "Channel"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message",
+            "description": "Omit to draft one from the report's flag (Claude, template fallback)"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "hi",
+              "mr"
+            ],
+            "title": "Language",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel"
+        ],
+        "title": "NotifyReq",
+        "examples": [
+          {
+            "channel": "letter",
+            "language": "en"
+          }
+        ]
+      },
       "PhotoUpload": {
         "properties": {
           "photo_id": {
@@ -4546,6 +7663,21 @@
         ],
         "title": "RateMetric"
       },
+      "RejectReq": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "RejectReq"
+      },
       "Reply": {
         "properties": {
           "id": {
@@ -4652,6 +7784,253 @@
           }
         ]
       },
+      "ReportCard": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "age_hours": {
+            "type": "number",
+            "title": "Age Hours"
+          },
+          "sla_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Due At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
+            ],
+            "title": "Status"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "issue_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pothole",
+                  "waterlogging",
+                  "open_manhole",
+                  "broken_paver",
+                  "cave_in",
+                  "choked_drain",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Type"
+          },
+          "road": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportRoad"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flag": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReportFlagRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "citizen": {
+            "type": "string",
+            "title": "Citizen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "age_hours",
+          "sla_due_at",
+          "status",
+          "kind",
+          "issue_type",
+          "road",
+          "flag",
+          "photo_url",
+          "citizen"
+        ],
+        "title": "ReportCard"
+      },
+      "ReportEvent": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At",
+            "example": "2025-06-22T02:59:00+05:30"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "created",
+              "status_change",
+              "note",
+              "confirm",
+              "duplicate",
+              "contractor_notified"
+            ],
+            "title": "Event Type"
+          },
+          "actor": {
+            "type": "string",
+            "enum": [
+              "citizen",
+              "ward_office",
+              "system"
+            ],
+            "title": "Actor"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reported",
+                  "matched_to_contract",
+                  "payment_held",
+                  "contractor_notified",
+                  "resolved",
+                  "confirmed_fixed",
+                  "reopened",
+                  "rejected",
+                  "duplicate"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "to_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reported",
+                  "matched_to_contract",
+                  "payment_held",
+                  "contractor_notified",
+                  "resolved",
+                  "confirmed_fixed",
+                  "reopened",
+                  "rejected",
+                  "duplicate"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Status"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "photo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Photo Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "event_type",
+          "actor",
+          "from_status",
+          "to_status",
+          "note",
+          "photo_ids"
+        ],
+        "title": "ReportEvent"
+      },
+      "ReportFlagRef": {
+        "properties": {
+          "flag_id": {
+            "type": "string",
+            "title": "Flag Id"
+          },
+          "rupees_at_stake": {
+            "type": "integer",
+            "title": "Rupees At Stake"
+          }
+        },
+        "type": "object",
+        "required": [
+          "flag_id",
+          "rupees_at_stake"
+        ],
+        "title": "ReportFlagRef"
+      },
       "ReportLocation": {
         "properties": {
           "lat": {
@@ -4697,6 +8076,134 @@
           "lon"
         ],
         "title": "ReportLocation"
+      },
+      "ReportPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReportCard"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "ReportPage"
+      },
+      "ReportPatchReq": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reported",
+                  "matched_to_contract",
+                  "payment_held",
+                  "contractor_notified",
+                  "resolved",
+                  "confirmed_fixed",
+                  "reopened",
+                  "rejected",
+                  "duplicate"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "duplicate_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate Of",
+            "description": "Required with status=duplicate"
+          },
+          "rejection_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejection Reason",
+            "description": "Required with status=rejected"
+          },
+          "repair_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Due At",
+            "description": "Overrides sla_due_at (ISO 8601; naive = IST)"
+          }
+        },
+        "type": "object",
+        "title": "ReportPatchReq",
+        "examples": [
+          {
+            "note": "Defect notice issued to the DLP contractor",
+            "status": "contractor_notified"
+          },
+          {
+            "rejection_reason": "Private society road, not BMC",
+            "status": "rejected"
+          },
+          {
+            "duplicate_of": 12,
+            "status": "duplicate"
+          },
+          {
+            "note": "Site visit booked",
+            "repair_due_at": "2025-07-20T18:00:00+05:30"
+          }
+        ]
       },
       "ReportPhoto": {
         "properties": {
@@ -5104,7 +8611,12 @@
               "reported",
               "matched_to_contract",
               "payment_held",
-              "contractor_notified"
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed",
+              "reopened",
+              "rejected",
+              "duplicate"
             ],
             "title": "Status"
           },
@@ -5565,7 +9077,9 @@
               "reported",
               "matched_to_contract",
               "payment_held",
-              "contractor_notified"
+              "contractor_notified",
+              "resolved",
+              "confirmed_fixed"
             ],
             "title": "Step"
           },
@@ -5578,7 +9092,9 @@
             "enum": [
               "done",
               "current",
-              "pending"
+              "pending",
+              "skipped",
+              "stopped"
             ],
             "title": "Status"
           },
@@ -5902,6 +9418,18 @@
         ],
         "title": "WardMap"
       }
+    },
+    "securitySchemes": {
+      "AdminToken": {
+        "type": "http",
+        "description": "Token from POST /api/admin/login (adm_...)",
+        "scheme": "bearer"
+      },
+      "CitizenToken": {
+        "type": "http",
+        "description": "Token from POST /api/citizens (cit_...)",
+        "scheme": "bearer"
+      }
     }
   },
   "tags": [
@@ -5923,7 +9451,11 @@
     },
     {
       "name": "View 4: Citizen Layer",
-      "description": "Landmark lookup and citizen reports with accountability tracker."
+      "description": "Landmark lookup, citizen accounts (anonymous bearer token), citizen reports with accountability tracker."
+    },
+    {
+      "name": "Admin",
+      "description": "Ward-officer / admin dashboard: access requests, login, report queue and triage, contractor notices, flags awaiting reply. Bearer token from POST /api/admin/login."
     }
   ]
 }

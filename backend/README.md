@@ -16,10 +16,27 @@ One FastAPI app serves all four views (frontend-facing endpoint guide: `docs/api
 | `features/contractor_performance/` | View 3: monthly contractor scorecards (four separate ranks, no composite); see below |
 | `routes/citizen.py` | View 4: localities, lookup with candidates, livability, citizen query, citizen reports (report form) + tracker |
 | `routes/uploads.py` | View 4: photo upload (validated, EXIF read then stripped, HEIC to JPEG) and photo serving |
+| `routes/citizen_accounts.py` | View 4: anonymous citizen accounts (bearer token), `GET /api/me` + stats, my reports, confirm / reopen a fix |
+| `routes/admin.py` | Admin dashboard: access requests, login, summary, report queue + triage (PATCH), contractor notices, flags awaiting reply |
+| `auth.py` | Bearer tokens (citizen `cit_…`, officer `adm_…`; only sha256 stored), scrypt passwords, `require_citizen` / `require_admin()` / ward-scope dependencies |
+| `report_lifecycle.py` | Report statuses, allowed transitions, citizen confirmation, `sla_due_at`, tracker steps (pure, unit-tested) |
+| `admin_cli.py` | `python -m backend.admin_cli create-admin ...`: create the first admin (or reset an account) |
 | `openapi.json` | Exported spec for client generation |
 
 ## Configure
 Copy `.env.example` to `.env` at the repo root and fill in the Supabase Session pooler URI (or `export DATABASE_URL=...`).
+
+### Citizen accounts + admin dashboard (once per database)
+1. Apply `supabase/migrations/20261121000800_citizen_accounts_admin.sql`. It is safe to re-run, and the rollback is in its header.
+2. Create the first admin. Nobody can approve the first account, so this happens on the server:
+   ```bash
+   python -m backend.admin_cli create-admin --email ops@example.org --name "Ops Admin"   # prompts for a password (min 10)
+   ```
+   Ward officers then ask through `POST /api/admin/access-requests`. An admin approves them, which returns a
+   one-time temporary password. The CLI can also create an officer directly
+   (`--role ward_officer --ward K/W`); set `ADMIN_PASSWORD` to script it.
+3. Optional: `ADMIN_SESSION_HOURS` (default 12).
+Accounts are not touched by `load_source_data.sql`. Reports, their history and contractor notices are truncated with the source data.
 
 ## Run locally
 From the repo root, with the database already loaded (see `scorecard_planner/README.md` → Supabase / Postgres integration):
@@ -52,7 +69,7 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | 2 | `GET /api/roads/{road_id}/timeline` | `road_timeline` |
 | 2 | `GET /api/roads/{road_id}/reports?limit=20` | citizen reports on the road (newest first, first photo) |
 | 2 | `GET /api/flags/{flag_id}` | `flags`, `flag_replies` |
-| 2 | `POST /api/flags/{flag_id}/replies` | writes `flag_replies` (Right-of-Reply) |
+| 2 | `POST /api/flags/{flag_id}/replies` | writes `flag_replies` (Right-of-Reply). **Officer token required**, flag's ward only; stores `admin_id` |
 | 2 | `POST /api/draft-notice` | Claude-written defect notice / RTI (en/hi/mr) from the flag's facts; filled template if Claude is slow or down (`generated_by`) |
 | 3 | `GET /api/v3/contractors` | `v3_contractor_scorecard` |
 | 3 | `GET /api/v3/wards` | `v3_ward_allocation` |
@@ -70,7 +87,20 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | 4 | `POST /api/uploads/photo` | multipart `file` (JPEG/PNG/WebP/HEIC, max 8 MB; 413 / 415) → `{photo_id, photo_url, width, height, taken_at, exif_lat, exif_lon}` |
 | 4 | `GET /api/uploads/photo/{photo_id}` | the stored photo (local) or a redirect to its Supabase public URL |
 | 4 | `POST /api/citizen-reports` | report form: issue_type, photo_ids (≤3), location, landmark, flag_id, contact_phone (private) → road, duplicate_of, linked work order, responsible party, SLA, photos, tracker |
-| 4 | `GET /api/citizen-reports/{id}` | same shape as the POST (incl. `tracker[]` {step, label, status, at}) |
+| 4 | `GET /api/citizen-reports/{id}` | same shape as the POST (incl. `tracker[]` {step, label, status, at}, `events[]`, `sla_due_at`, `rejection_reason`) |
+| 4 | `POST /api/citizens` | anonymous account → `{citizen_id, token, display_name}` (token shown once) |
+| 4 | `GET /api/me` · `GET /api/me/reports?status=` | citizen token: profile + stats (rupees from `flagged_queue`, each bill once) · own reports with history |
+| 4 | `POST /api/citizen-reports/{id}/confirm` | citizen token (owner): `{fixed}` resolved → confirmed_fixed, or → reopened |
+| A | `POST /api/admin/access-requests` · `GET /api/admin/access-requests?status=` · `POST …/{id}/approve` · `POST …/{id}/reject` | `admin_access_requests`, `admin_users` (approve/list: admin role) |
+| A | `POST /api/admin/login` · `POST /api/admin/logout` · `GET /api/admin/me` | `admin_users`, `admin_sessions` |
+| A | `GET /api/admin/summary?ward=` | report counts by status, new today, overdue SLA, median hours to resolve, rupees held, flags awaiting reply |
+| A | `GET /api/admin/reports?ward=&status=&kind=&issue_type=&q=&sort=&page=` · `GET /api/admin/reports/{id}` | report queue (paged cards) · full triage detail |
+| A | `PATCH /api/admin/reports/{id}` | status transition (`report_lifecycle.py`), note, duplicate_of, rejection_reason, repair_due_at → `citizen_report_events` |
+| A | `POST /api/admin/reports/{id}/notify-contractor` | records a `contractor_notices` row (drafted via draft-notice when no message); nothing is sent |
+| A | `GET /api/admin/flags?ward=&awaiting_reply=` | flags in scope with reply counts |
+
+View `A` = Admin (officer/admin bearer token from `POST /api/admin/login`; ward officers see only their wards).
+Lifecycle, auth rules and examples for the frontend: `docs/api_reference.md`.
 
 Ward codes are accepted as `K/W`, `K-W` or `k_w` everywhere (the frontend contract uses `K-W`; the database stores `K/W`).
 
@@ -150,4 +180,8 @@ Tests (no database): `pytest backend/tests -q` (from the repo root).
   (`%(name)s` params; never format user input into SQL) and `ENG.begin()` + `text()` for writes.
 - Numbers come from the database/pipeline; endpoints only select and shape. No arithmetic in prompts or UI.
 - Update `postman/backend.postman_collection.json` and run it against an API started with `STRICT_MODELS=1`:
-  `postman collection run postman/backend.postman_collection.json --working-dir .` (counts in the run summary)
+  `postman collection run postman/backend.postman_collection.json --working-dir .` (counts in the run summary).
+  The Admin folder logs in with the `adminEmail` / `adminPassword` collection variables, so create that admin with
+  `admin_cli` first (default variables: `ops@example.org` / `change-me-please`; change both for a shared database).
+  Last full run: 108 requests, 266 assertions, 0 failures.
+- Unit tests (no database): `pytest backend/tests -q`.
