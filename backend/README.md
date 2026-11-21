@@ -9,14 +9,19 @@ pip install -r view3/requirements.txt     # Python 3.12/3.13; macOS: brew instal
 cd backend
 DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 ```
-Interactive docs: http://127.0.0.1:8000/docs
+
+## API docs (Swagger)
+- Swagger UI: http://127.0.0.1:8000/docs (grouped by view, with examples; "Try it out" works against the local DB)
+- ReDoc: http://127.0.0.1:8000/redoc
+- Spec: `GET /openapi.json`, committed as `backend/openapi.json` (import into Postman or a client generator).
+  Regenerate after changing endpoints: `curl -s http://127.0.0.1:8000/openapi.json > backend/openapi.json`
 
 ## Endpoints
 | View | Method + path | Reads |
 |---|---|---|
 | — | `GET /api/health` | row counts |
 | 1 | `GET /api/city` | `city_kpis` |
-| 1 | `GET /api/wards` | `ward_overview` |
+| 1 | `GET /api/wards` (all, list) · `GET /api/wards?ward=K/W` or header `X-Ward-Code: K/W` (one, object; query wins; case-insensitive; 404 if unknown) | `ward_overview` |
 | 1 | `GET /api/flagged-queue?ward=K/W&tier=1&limit=20` | `flagged_queue` |
 | 2 | `GET /api/roads/{road_id}` | `road_audit`, `work_orders`, `flags`, `flag_replies` |
 | 2 | `GET /api/roads/{road_id}/timeline` | `road_timeline` |
@@ -40,4 +45,4 @@ Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (
   (`%(name)s` params; never format user input into SQL) and `ENG.begin()` + `text()` for writes.
 - Numbers come from the database/pipeline; endpoints only select and shape. No arithmetic in prompts or UI.
 - Update `postman/backend.postman_collection.json` and run it:
-  `postman collection run postman/backend.postman_collection.json`
+  `postman collection run postman/backend.postman_collection.json` (28 requests, 70 assertions)

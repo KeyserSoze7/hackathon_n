@@ -5,7 +5,7 @@ re-solves the View 3 budget slider live; accepts Right-of-Reply and citizen repo
 import json, pathlib, sys
 from functools import lru_cache
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Literal, Optional
 from pydantic import BaseModel, Field
@@ -17,7 +17,25 @@ sys.path.insert(0, str(HERE.parent / "view3"))  # View 3 model code (allocator, 
 import allocator, view3_pipeline as vp
 from db import engine
 
-app = FastAPI(title="Follow the Rupee: Backend")
+app = FastAPI(
+    title="Follow the Rupee: Backend",
+    version="0.1.0",
+    description=(
+        "Pre-Payment Audit Gate + Citizen Rupee Receipt for Mumbai monsoon road repairs (synthetic dataset).\n\n"
+        "Every number is computed by the audit pipelines (`pipeline/build.py`, `view3/view3_pipeline.py`); "
+        "endpoints only select and shape. Flags are labelled *Needs Explanation* or *Recoverable under DLP*, "
+        "and every flag carries `evidence_row_ids`. Amounts are whole rupees (INR). No login."
+    ),
+    openapi_tags=[
+        {"name": "Meta", "description": "Health check."},
+        {"name": "View 1: City & Ward Overview", "description": "KPI strip, ward map, flagged bills queue."},
+        {"name": "View 2: Road Story", "description": "Rupee receipt, connected trail, flags, Right-of-Reply."},
+        {"name": "View 3: Scorecard & Next Rupee", "description": "Context-adjusted contractor scorecard, budget allocation, live slider."},
+        {"name": "View 4: Citizen Layer", "description": "Landmark lookup and citizen reports with accountability tracker."},
+    ],
+)
+V1, V2, V3, V4 = ("View 1: City & Ward Overview", "View 2: Road Story",
+                  "View 3: Scorecard & Next Rupee", "View 4: Citizen Layer")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 ENG = engine()
 
@@ -45,18 +63,18 @@ def warm():
     model_inputs()
 
 
-@app.get("/api/v3/contractors")
+@app.get("/api/v3/contractors", tags=[V3], summary="Contractor scorecard (context-adjusted)")
 def contractors():
     return rows("SELECT * FROM v3_contractor_scorecard ORDER BY risk_adjusted_score DESC")
 
 
-@app.get("/api/v3/wards")
+@app.get("/api/v3/wards", tags=[V3], summary="Ward allocation: where the next lakh does most good")
 def wards():
     return rows("SELECT * FROM v3_ward_allocation ORDER BY harm_avoided_per_next_lakh DESC")
 
 
-@app.get("/api/v3/next-rupee/{ward_code:path}")
-def next_rupee(ward_code: str):
+@app.get("/api/v3/next-rupee/{ward_code:path}", tags=[V3], summary="Next-rupee items for one ward (Bucket A = DLP, Rs 0)")
+def next_rupee(ward_code: str = Path(examples=["K/W"])):
     r = rows("SELECT * FROM v3_next_rupee WHERE ward_code = %(w)s "
              "ORDER BY bucket, funded DESC, priority_score DESC", w=ward_code)
     if not r:
@@ -65,11 +83,12 @@ def next_rupee(ward_code: str):
 
 
 class AllocateReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"ward_code": "K/W", "budget_inr": 500000}]}}
     ward_code: str
     budget_inr: float = Field(ge=0, le=5e8)
 
 
-@app.post("/api/v3/allocate")
+@app.post("/api/v3/allocate", tags=[V3], summary="Budget slider: exact re-solve for one ward")
 def allocate(req: AllocateReq):
     items, opts = model_inputs()
     if req.ward_code not in set(items.ward_code):
@@ -87,34 +106,41 @@ def allocate(req: AllocateReq):
 
 
 # ---------------------------------------------------------------- Views 1, 2, 4 (audit engine tables/views)
-@app.get("/api/health")
+@app.get("/api/health", tags=["Meta"], summary="Health + row counts")
 def health():
     return one("SELECT (SELECT count(*) FROM work_orders) AS work_orders, (SELECT count(*) FROM flags) AS flags, "
                "(SELECT count(*) FROM v3_next_rupee) AS v3_items", "db")
 
 
-@app.get("/api/city")
+@app.get("/api/city", tags=[V1], summary="City KPI strip")
 def city():
     """View 1 KPI strip."""
     return one("SELECT * FROM city_kpis", "city")
 
 
-@app.get("/api/wards")
-def ward_list():
-    """View 1 ward map (colour by dlp_leakage_rate; join to wards.geojson on ward_code)."""
+@app.get("/api/wards", tags=[V1], summary="All wards, or one ward via ?ward= / X-Ward-Code")
+def ward_list(ward: Optional[str] = Query(None, description="Ward code, e.g. K/W. Returns that ward only."),
+              x_ward_code: Optional[str] = Header(None, description="Same as ?ward=; the query param wins if both are sent.")):
+    """View 1 ward map: all wards as a list, or one ward as an object when a ward code is given
+    (query param or X-Ward-Code header). Colour the map by dlp_leakage_rate; join to wards.geojson on ward_code."""
+    code = (ward or x_ward_code or "").strip().upper()
+    if code:
+        return one("SELECT * FROM ward_overview WHERE ward_code = %(w)s", f"ward {code}", w=code)
     return rows("SELECT * FROM ward_overview ORDER BY ward_code")
 
 
-@app.get("/api/flagged-queue")
-def flagged_queue(ward: Optional[str] = None, tier: Optional[int] = Query(None, ge=1, le=3), limit: int = 50):
+@app.get("/api/flagged-queue", tags=[V1], summary="Flagged bills ranked by rupees at stake")
+def flagged_queue(ward: Optional[str] = Query(None, description="Ward code filter", examples=["K/W"]),
+                  tier: Optional[int] = Query(None, ge=1, le=3, description="Top tier filter: 1 contractual, 2 implausible, 3 lead"),
+                  limit: int = Query(50, ge=1, le=500)):
     """View 1 flagged bills, ranked by rupees at stake. ?ward=K/W&tier=1&limit=20"""
     return rows("SELECT * FROM flagged_queue WHERE (%(w)s IS NULL OR ward_code = %(w)s) "
                 "AND (%(t)s IS NULL OR top_tier = %(t)s) ORDER BY rupees_at_stake DESC, work_order_id LIMIT %(n)s",
                 w=ward, t=tier, n=max(1, min(limit, 500)))
 
 
-@app.get("/api/roads/{road_id}")
-def road(road_id: str):
+@app.get("/api/roads/{road_id}", tags=[V2], summary="Road receipt: header, work orders, flags + replies")
+def road(road_id: str = Path(examples=["RD0058"])):
     """View 2 header card + work orders + flags (with replies)."""
     r = one("SELECT * FROM road_audit WHERE road_id = %(r)s", f"road {road_id}", r=road_id)
     r["work_orders"] = rows(
@@ -129,27 +155,29 @@ def road(road_id: str):
     return r
 
 
-@app.get("/api/roads/{road_id}/timeline")
-def road_timeline(road_id: str):
+@app.get("/api/roads/{road_id}/timeline", tags=[V2], summary="Connected trail: complaints -> work orders -> accidents -> reports")
+def road_timeline(road_id: str = Path(examples=["RD0058"])):
     """View 2 connected trail, chronological."""
     one("SELECT 1 FROM roads WHERE road_id = %(r)s", f"road {road_id}", r=road_id)
     return rows("SELECT * FROM road_timeline WHERE road_id = %(r)s ORDER BY event_at, event_type", r=road_id)
 
 
-@app.get("/api/flags/{flag_id}")
-def flag(flag_id: str):
+@app.get("/api/flags/{flag_id}", tags=[V2], summary="One flag with its replies")
+def flag(flag_id: str = Path(description="<DETECTOR>:<work_order_id>", examples=["DLP_PAID_TWICE:WO25-01994"])):
     f = one("SELECT * FROM flags WHERE flag_id = %(f)s", f"flag {flag_id}", f=flag_id)
     f["replies"] = rows("SELECT * FROM flag_replies WHERE flag_id = %(f)s ORDER BY created_at", f=flag_id)
     return f
 
 
 class ReplyReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"author_role": "ward_engineer", "author_name": "AE Roads K/W",
+                                                         "body": "MGL utility trench reopened this stretch; contractor liable under DLP."}]}}
     author_role: Literal["ward_engineer", "contractor", "other"]
     author_name: Optional[str] = Field(None, max_length=120)
     body: str = Field(min_length=1, max_length=4000)
 
 
-@app.post("/api/flags/{flag_id}/replies", status_code=201)
+@app.post("/api/flags/{flag_id}/replies", status_code=201, tags=[V2], summary="Add Right-of-Reply to a flag")
 def add_reply(flag_id: str, req: ReplyReq):
     """View 2 Right-of-Reply."""
     one("SELECT 1 FROM flags WHERE flag_id = %(f)s", f"flag {flag_id}", f=flag_id)
@@ -160,8 +188,9 @@ def add_reply(flag_id: str, req: ReplyReq):
     return json.loads(json.dumps(dict(r), default=str))
 
 
-@app.get("/api/lookup")
-def lookup(q: str = Query(min_length=2, max_length=200)):
+@app.get("/api/lookup", tags=[V4], summary="Free-text landmark/road lookup -> road receipt")
+def lookup(q: str = Query(min_length=2, max_length=200, description="Free text: road name, locality, alias or Devanagari",
+                          examples=["Andheri subway ke bahar wapas khadda ho gaya, paisa kahan gaya?"])):
     """View 4 deterministic lookup: free text -> road receipt.
     Tries a road name in the text first ("Andheri subway ke bahar..."), then any locality name/alias/Devanagari.
     Fuzzy/vernacular parsing beyond this is the Claude /api/citizen-query layer's job."""
@@ -184,6 +213,8 @@ def lookup(q: str = Query(min_length=2, max_length=200)):
 
 
 class CitizenReportReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"kind": "still_broken", "input_mode": "voice", "language": "hi",
+                                                         "text": "Andheri subway ke bahar wapas khadda ho gaya", "road_id": "RD0153"}]}}
     kind: Literal["still_broken", "verified_fixed", "new_issue"]
     input_mode: Literal["text", "voice", "photo", "qr"] = "text"
     text: Optional[str] = Field(None, max_length=4000)
@@ -197,7 +228,7 @@ class CitizenReportReq(BaseModel):
 TRACKER = ["reported", "matched_to_contract", "payment_held", "contractor_notified"]
 
 
-@app.post("/api/citizen-reports", status_code=201)
+@app.post("/api/citizen-reports", status_code=201, tags=[V4], summary="Submit citizen report (server sets tracker status)")
 def add_citizen_report(req: CitizenReportReq):
     """View 4 report. Tracker status is set deterministically here (anon clients cannot set it)."""
     status, flag_id = "reported", None
@@ -220,7 +251,7 @@ def add_citizen_report(req: CitizenReportReq):
     return out
 
 
-@app.get("/api/citizen-reports/{report_id}")
+@app.get("/api/citizen-reports/{report_id}", tags=[V4], summary="Citizen report status + tracker")
 def citizen_report(report_id: int):
     r = one("SELECT * FROM citizen_reports WHERE id = %(i)s", f"report {report_id}", i=report_id)
     r["tracker"] = [{"step": s_, "done": TRACKER.index(s_) <= TRACKER.index(r["status"])} for s_ in TRACKER]
