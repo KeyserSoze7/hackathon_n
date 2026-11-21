@@ -1,6 +1,6 @@
 """Backend API (FastAPI) for all four views. Reads precomputed results from Supabase/Postgres;
 re-solves the View 3 budget slider live; accepts Right-of-Reply and citizen reports.
-   DATABASE_URL=... uvicorn api:app --port 8000      (run from view3/)
+   DATABASE_URL=... uvicorn api:app --port 8000      (run from backend/; see backend/README.md)
 """
 import json, pathlib, sys
 from functools import lru_cache
@@ -13,6 +13,7 @@ from sqlalchemy import text
 
 HERE = pathlib.Path(__file__).parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "view3"))  # View 3 model code (allocator, feature pipeline)
 import allocator, view3_pipeline as vp
 from db import engine
 

@@ -27,7 +27,7 @@ def load(csv_dir):
     feats_sql = (HERE / "sql" / "01_features.sql").read_text()
     url = os.environ.get("DATABASE_URL")
     if url:
-        import sys; sys.path.insert(0, str(HERE)); from db import engine
+        import sys; sys.path.insert(0, str(HERE.parent / "backend")); from db import engine
         eng = engine()
         with eng.begin() as c:
             c.exec_driver_sql(feats_sql)

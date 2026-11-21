@@ -23,7 +23,7 @@ The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipelin
 3. **Build View 3 results:** `python view3/view3_pipeline.py` creates the feature views, trains, solves, and
    truncates + inserts `v3_contractor_scorecard`, `v3_next_rupee`, `v3_ward_allocation`, `v3_job_expected_risk`
    in one transaction. Y/N flags are booleans in the DB; `load()` maps them back to 'Y'/'N' for this code.
-4. **Serve** (one API for all four views): `cd view3 && uvicorn api:app --port 8000`
+4. **Serve** (one FastAPI app for all four views, in `backend/`, see `backend/README.md`): `cd backend && uvicorn api:app --port 8000`
    - View 1: `GET /api/city`, `GET /api/wards`, `GET /api/flagged-queue?ward=K/W&tier=1&limit=20`
    - View 2: `GET /api/roads/{road_id}`, `GET /api/roads/{road_id}/timeline`, `GET /api/flags/{flag_id}`,
      `POST /api/flags/{flag_id}/replies` (Right-of-Reply)
