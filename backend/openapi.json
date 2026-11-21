@@ -18,7 +18,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContractorScore"
+                  },
+                  "type": "array",
+                  "title": "Response Contractors Api V3 Contractors Get"
+                }
               }
             }
           }
@@ -37,7 +43,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WardAllocation"
+                  },
+                  "type": "array",
+                  "title": "Response Wards Api V3 Wards Get"
+                }
               }
             }
           }
@@ -70,9 +82,25 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NextRupeeItem"
+                  },
+                  "title": "Response Next Rupee Api V3 Next Rupee  Ward Code  Get"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -109,7 +137,19 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Allocation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -138,7 +178,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
               }
             }
           }
@@ -158,7 +200,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CityKPIs"
+                }
               }
             }
           }
@@ -216,9 +260,32 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Ward"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Ward"
+                      }
+                    }
+                  ],
+                  "title": "Response Ward List Api Wards Get"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -301,7 +368,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FlaggedBill"
+                  },
+                  "title": "Response Flagged Queue Api Flagged Queue Get"
+                }
               }
             }
           },
@@ -345,9 +418,21 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RoadReceipt"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -389,9 +474,25 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimelineEvent"
+                  },
+                  "title": "Response Road Timeline Api Roads  Road Id  Timeline Get"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -434,9 +535,21 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/FlagWithReplies"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -485,9 +598,21 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Reply"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -533,9 +658,21 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Lookup"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -573,7 +710,19 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CitizenReport"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           },
@@ -613,9 +762,21 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CitizenReport"
+                }
               }
             }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
           },
           "422": {
             "description": "Validation Error",
@@ -658,6 +819,261 @@
             "ward_code": "K/W"
           }
         ]
+      },
+      "Allocation": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "budget_inr": {
+            "type": "number",
+            "title": "Budget Inr"
+          },
+          "spend_inr": {
+            "type": "integer",
+            "title": "Spend Inr"
+          },
+          "harm_avoided": {
+            "type": "number",
+            "title": "Harm Avoided"
+          },
+          "funded": {
+            "items": {
+              "$ref": "#/components/schemas/FundedItem"
+            },
+            "type": "array",
+            "title": "Funded"
+          },
+          "bucket_a_dlp": {
+            "items": {
+              "$ref": "#/components/schemas/BucketAItem"
+            },
+            "type": "array",
+            "title": "Bucket A Dlp"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ward_code",
+          "budget_inr",
+          "spend_inr",
+          "harm_avoided",
+          "funded",
+          "bucket_a_dlp"
+        ],
+        "title": "Allocation"
+      },
+      "BucketAItem": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "road_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Name"
+          },
+          "issue": {
+            "type": "string",
+            "title": "Issue"
+          },
+          "estimated_repair_cost_inr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Repair Cost Inr"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "item_id",
+          "road_name",
+          "issue",
+          "estimated_repair_cost_inr",
+          "explanation"
+        ],
+        "title": "BucketAItem"
+      },
+      "CitizenReport": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "still_broken",
+              "verified_fixed",
+              "new_issue"
+            ],
+            "title": "Kind"
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": [
+              "text",
+              "voice",
+              "photo",
+              "qr"
+            ],
+            "title": "Input Mode"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "en",
+                  "hi",
+                  "mr"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "matched_locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Locality"
+          },
+          "road_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Id"
+          },
+          "work_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Order Id"
+          },
+          "flag_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified"
+            ],
+            "title": "Status"
+          },
+          "status_updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Status Updated At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "tracker": {
+            "items": {
+              "$ref": "#/components/schemas/TrackerStep"
+            },
+            "type": "array",
+            "title": "Tracker"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "input_mode",
+          "text",
+          "language",
+          "photo_url",
+          "matched_locality",
+          "road_id",
+          "work_order_id",
+          "flag_id",
+          "status",
+          "status_updated_at",
+          "created_at",
+          "tracker"
+        ],
+        "title": "CitizenReport"
       },
       "CitizenReportReq": {
         "properties": {
@@ -770,6 +1186,564 @@
           }
         ]
       },
+      "CityKPIs": {
+        "properties": {
+          "total_budget_inr": {
+            "type": "integer",
+            "title": "Total Budget Inr"
+          },
+          "total_spend_inr": {
+            "type": "integer",
+            "title": "Total Spend Inr"
+          },
+          "recoverable_dlp_inr": {
+            "type": "integer",
+            "title": "Recoverable Dlp Inr"
+          },
+          "flagged_bills_count": {
+            "type": "integer",
+            "title": "Flagged Bills Count"
+          },
+          "flags_by_detector": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Flags By Detector"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total_budget_inr",
+          "total_spend_inr",
+          "recoverable_dlp_inr",
+          "flagged_bills_count",
+          "flags_by_detector"
+        ],
+        "title": "CityKPIs"
+      },
+      "ContractorContext": {
+        "properties": {
+          "avg_rain_next7_mm": {
+            "type": "number",
+            "title": "Avg Rain Next7 Mm"
+          },
+          "city_avg_rain_next7_mm": {
+            "type": "number",
+            "title": "City Avg Rain Next7 Mm"
+          },
+          "avg_big_tides_next7": {
+            "type": "number",
+            "title": "Avg Big Tides Next7"
+          },
+          "avg_low_lying_index": {
+            "type": "number",
+            "title": "Avg Low Lying Index"
+          },
+          "flood_prone_share": {
+            "type": "number",
+            "title": "Flood Prone Share"
+          },
+          "avg_peak_vehicles": {
+            "type": "integer",
+            "title": "Avg Peak Vehicles"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "avg_rain_next7_mm",
+          "city_avg_rain_next7_mm",
+          "avg_big_tides_next7",
+          "avg_low_lying_index",
+          "flood_prone_share",
+          "avg_peak_vehicles"
+        ],
+        "title": "ContractorContext"
+      },
+      "ContractorScore": {
+        "properties": {
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "jobs_count": {
+            "type": "integer",
+            "title": "Jobs Count"
+          },
+          "total_billed_inr": {
+            "type": "integer",
+            "title": "Total Billed Inr"
+          },
+          "reopen_rate_30d": {
+            "type": "number",
+            "title": "Reopen Rate 30D"
+          },
+          "expected_reopen_rate_30d": {
+            "type": "number",
+            "title": "Expected Reopen Rate 30D"
+          },
+          "sla_met_rate": {
+            "type": "number",
+            "title": "Sla Met Rate"
+          },
+          "expected_sla_met_rate": {
+            "type": "number",
+            "title": "Expected Sla Met Rate"
+          },
+          "durability_index": {
+            "type": "number",
+            "title": "Durability Index"
+          },
+          "durability_verdict": {
+            "type": "string",
+            "enum": [
+              "better than expected",
+              "within the normal range",
+              "worse than expected"
+            ],
+            "title": "Durability Verdict"
+          },
+          "durability_ratio_obs_over_exp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durability Ratio Obs Over Exp"
+          },
+          "durability_ratio_ci90": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Durability Ratio Ci90"
+          },
+          "speed_index": {
+            "type": "number",
+            "title": "Speed Index"
+          },
+          "speed_verdict": {
+            "type": "string",
+            "enum": [
+              "better than expected",
+              "within the normal range",
+              "worse than expected"
+            ],
+            "title": "Speed Verdict"
+          },
+          "risk_adjusted_score": {
+            "type": "number",
+            "title": "Risk Adjusted Score"
+          },
+          "cost_vs_rate_median": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Vs Rate Median"
+          },
+          "jobs_over_130pct_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jobs Over 130Pct Rate"
+          },
+          "method_mix_top3": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Method Mix Top3"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ContractorContext"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/Driver"
+            },
+            "type": "array",
+            "title": "Drivers"
+          },
+          "evidence_reopened_wo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Reopened Wo Ids"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contractor_id",
+          "contractor_name",
+          "jobs_count",
+          "total_billed_inr",
+          "reopen_rate_30d",
+          "expected_reopen_rate_30d",
+          "sla_met_rate",
+          "expected_sla_met_rate",
+          "durability_index",
+          "durability_verdict",
+          "durability_ratio_obs_over_exp",
+          "durability_ratio_ci90",
+          "speed_index",
+          "speed_verdict",
+          "risk_adjusted_score",
+          "cost_vs_rate_median",
+          "jobs_over_130pct_rate",
+          "method_mix_top3",
+          "context",
+          "drivers",
+          "evidence_reopened_wo_ids",
+          "explanation"
+        ],
+        "title": "ContractorScore"
+      },
+      "Driver": {
+        "properties": {
+          "feature": {
+            "type": "string",
+            "title": "Feature"
+          },
+          "plain": {
+            "type": "string",
+            "title": "Plain"
+          },
+          "direction": {
+            "type": "string",
+            "title": "Direction"
+          },
+          "effect_logodds": {
+            "type": "number",
+            "title": "Effect Logodds"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feature",
+          "plain",
+          "direction",
+          "effect_logodds"
+        ],
+        "title": "Driver"
+      },
+      "Error": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "Error"
+      },
+      "FlagWithReplies": {
+        "properties": {
+          "flag_id": {
+            "type": "string",
+            "title": "Flag Id"
+          },
+          "tier": {
+            "type": "integer",
+            "title": "Tier"
+          },
+          "detector": {
+            "type": "string",
+            "enum": [
+              "DLP_PAID_TWICE",
+              "RATE_INFLATION",
+              "OVERLAPPING_WORK_ORDER",
+              "RAIN_DAY_WORK"
+            ],
+            "title": "Detector"
+          },
+          "status_label": {
+            "type": "string",
+            "enum": [
+              "Needs Explanation",
+              "Recoverable under DLP"
+            ],
+            "title": "Status Label"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "rupees_at_stake": {
+            "type": "integer",
+            "title": "Rupees At Stake"
+          },
+          "evidence_row_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Row Ids"
+          },
+          "rule_text": {
+            "type": "string",
+            "title": "Rule Text"
+          },
+          "replies": {
+            "items": {
+              "$ref": "#/components/schemas/Reply"
+            },
+            "type": "array",
+            "title": "Replies"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "flag_id",
+          "tier",
+          "detector",
+          "status_label",
+          "ward_code",
+          "road_id",
+          "work_order_id",
+          "contractor_id",
+          "rupees_at_stake",
+          "evidence_row_ids",
+          "rule_text",
+          "replies"
+        ],
+        "title": "FlagWithReplies"
+      },
+      "FlaggedBill": {
+        "properties": {
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "repair_method": {
+            "type": "string",
+            "title": "Repair Method"
+          },
+          "cost_inr": {
+            "type": "number",
+            "title": "Cost Inr"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "top_tier": {
+            "type": "integer",
+            "title": "Top Tier"
+          },
+          "rupees_at_stake": {
+            "type": "integer",
+            "title": "Rupees At Stake"
+          },
+          "status_label": {
+            "type": "string",
+            "enum": [
+              "Needs Explanation",
+              "Recoverable under DLP"
+            ],
+            "title": "Status Label"
+          },
+          "flag_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Flag Ids"
+          },
+          "detectors": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "DLP_PAID_TWICE",
+                "RATE_INFLATION",
+                "OVERLAPPING_WORK_ORDER",
+                "RAIN_DAY_WORK"
+              ]
+            },
+            "type": "array",
+            "title": "Detectors"
+          },
+          "replies_count": {
+            "type": "integer",
+            "title": "Replies Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "work_order_id",
+          "road_id",
+          "road_name",
+          "ward_code",
+          "contractor_id",
+          "contractor_name",
+          "repair_method",
+          "cost_inr",
+          "completed_at",
+          "top_tier",
+          "rupees_at_stake",
+          "status_label",
+          "flag_ids",
+          "detectors",
+          "replies_count"
+        ],
+        "title": "FlaggedBill"
+      },
+      "FundedItem": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "cost": {
+            "type": "number",
+            "title": "Cost"
+          },
+          "benefit": {
+            "type": "number",
+            "title": "Benefit"
+          },
+          "road_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Name"
+          },
+          "issue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "FLOOD_SPOT",
+                "AMBULANCE_ROUTE",
+                "SCHOOL_ZONE",
+                "HIGH_TRAFFIC",
+                "ACCIDENT_PRONE",
+                "REPEAT_FAILURE",
+                "OPEN_COMPLAINTS",
+                "UNDER_DLP",
+                "UNDER_REPORTED_WARD"
+              ]
+            },
+            "type": "array",
+            "title": "Reason Codes",
+            "default": []
+          },
+          "evidence_wo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Wo Ids",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "item_id",
+          "method",
+          "cost",
+          "benefit"
+        ],
+        "title": "FundedItem"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -782,6 +1756,371 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "work_orders": {
+            "type": "integer",
+            "title": "Work Orders"
+          },
+          "flags": {
+            "type": "integer",
+            "title": "Flags"
+          },
+          "v3_items": {
+            "type": "integer",
+            "title": "V3 Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "work_orders",
+          "flags",
+          "v3_items"
+        ],
+        "title": "Health"
+      },
+      "ItemInputs": {
+        "properties": {
+          "repairs_this_season": {
+            "type": "integer",
+            "title": "Repairs This Season"
+          },
+          "open_complaints_attached": {
+            "type": "integer",
+            "title": "Open Complaints Attached"
+          },
+          "severity": {
+            "type": "number",
+            "title": "Severity"
+          },
+          "impact": {
+            "type": "number",
+            "title": "Impact"
+          },
+          "spent_2025_inr": {
+            "type": "integer",
+            "title": "Spent 2025 Inr"
+          },
+          "reopens_2025": {
+            "type": "integer",
+            "title": "Reopens 2025"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "repairs_this_season",
+          "open_complaints_attached",
+          "severity",
+          "impact",
+          "spent_2025_inr",
+          "reopens_2025"
+        ],
+        "title": "ItemInputs"
+      },
+      "Lookup": {
+        "properties": {
+          "matched_via": {
+            "type": "string",
+            "enum": [
+              "road_name",
+              "locality"
+            ],
+            "title": "Matched Via"
+          },
+          "matched_text": {
+            "type": "string",
+            "title": "Matched Text"
+          },
+          "matched_locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matched Locality"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "matched_road_id": {
+            "type": "string",
+            "title": "Matched Road Id"
+          },
+          "road_distance_m": {
+            "type": "integer",
+            "title": "Road Distance M"
+          },
+          "warranty_status": {
+            "type": "string",
+            "enum": [
+              "UNDER_DLP",
+              "OUT_OF_DLP"
+            ],
+            "title": "Warranty Status"
+          },
+          "road": {
+            "$ref": "#/components/schemas/RoadSummary"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "matched_via",
+          "matched_text",
+          "matched_locality",
+          "ward_code",
+          "matched_road_id",
+          "road_distance_m",
+          "warranty_status",
+          "road"
+        ],
+        "title": "Lookup"
+      },
+      "NextRupeeItem": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "issue": {
+            "type": "string",
+            "title": "Issue"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          },
+          "bucket": {
+            "type": "string",
+            "enum": [
+              "A_OWED_BY_CONTRACTOR_DLP",
+              "B_NEXT_RUPEE"
+            ],
+            "title": "Bucket"
+          },
+          "funded": {
+            "type": "boolean",
+            "title": "Funded"
+          },
+          "recommended_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Method"
+          },
+          "method_reopen_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method Reopen Rate"
+          },
+          "estimated_repair_cost_inr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Repair Cost Inr"
+          },
+          "cost_to_bmc_inr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost To Bmc Inr"
+          },
+          "harm_avoided": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Harm Avoided"
+          },
+          "harm_per_lakh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Harm Per Lakh"
+          },
+          "priority_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority Score"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "FLOOD_SPOT",
+                "AMBULANCE_ROUTE",
+                "SCHOOL_ZONE",
+                "HIGH_TRAFFIC",
+                "ACCIDENT_PRONE",
+                "REPEAT_FAILURE",
+                "OPEN_COMPLAINTS",
+                "UNDER_DLP",
+                "UNDER_REPORTED_WARD"
+              ]
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ItemInputs"
+          },
+          "evidence_wo_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Wo Ids"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "item_id",
+          "road_id",
+          "road_name",
+          "ward_code",
+          "issue",
+          "under_dlp",
+          "bucket",
+          "funded",
+          "recommended_method",
+          "method_reopen_rate",
+          "estimated_repair_cost_inr",
+          "cost_to_bmc_inr",
+          "harm_avoided",
+          "harm_per_lakh",
+          "priority_score",
+          "reason_codes",
+          "inputs",
+          "evidence_wo_ids",
+          "explanation"
+        ],
+        "title": "NextRupeeItem"
+      },
+      "Reply": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "flag_id": {
+            "type": "string",
+            "title": "Flag Id"
+          },
+          "author_role": {
+            "type": "string",
+            "enum": [
+              "ward_engineer",
+              "contractor",
+              "other"
+            ],
+            "title": "Author Role"
+          },
+          "author_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Name"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "flag_id",
+          "author_role",
+          "author_name",
+          "body",
+          "created_at"
+        ],
+        "title": "Reply"
       },
       "ReplyReq": {
         "properties": {
@@ -827,6 +2166,370 @@
           }
         ]
       },
+      "RoadReceipt": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "road_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Type"
+          },
+          "surface": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surface"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          },
+          "last_resurfaced": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Resurfaced"
+          },
+          "total_billed_inr": {
+            "type": "number",
+            "title": "Total Billed Inr"
+          },
+          "work_orders_count": {
+            "type": "integer",
+            "title": "Work Orders Count"
+          },
+          "rupees_at_stake": {
+            "type": "number",
+            "title": "Rupees At Stake"
+          },
+          "flagged_bills_count": {
+            "type": "integer",
+            "title": "Flagged Bills Count"
+          },
+          "work_orders": {
+            "items": {
+              "$ref": "#/components/schemas/RoadWorkOrder"
+            },
+            "type": "array",
+            "title": "Work Orders"
+          },
+          "flags": {
+            "items": {
+              "$ref": "#/components/schemas/FlagWithReplies"
+            },
+            "type": "array",
+            "title": "Flags"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "road_id",
+          "road_name",
+          "ward_code",
+          "road_type",
+          "surface",
+          "under_dlp",
+          "last_resurfaced",
+          "total_billed_inr",
+          "work_orders_count",
+          "rupees_at_stake",
+          "flagged_bills_count",
+          "work_orders",
+          "flags"
+        ],
+        "title": "RoadReceipt"
+      },
+      "RoadSummary": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "road_name": {
+            "type": "string",
+            "title": "Road Name"
+          },
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "road_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Road Type"
+          },
+          "surface": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surface"
+          },
+          "under_dlp": {
+            "type": "boolean",
+            "title": "Under Dlp"
+          },
+          "last_resurfaced": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Resurfaced"
+          },
+          "total_billed_inr": {
+            "type": "number",
+            "title": "Total Billed Inr"
+          },
+          "work_orders_count": {
+            "type": "integer",
+            "title": "Work Orders Count"
+          },
+          "rupees_at_stake": {
+            "type": "number",
+            "title": "Rupees At Stake"
+          },
+          "flagged_bills_count": {
+            "type": "integer",
+            "title": "Flagged Bills Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "road_id",
+          "road_name",
+          "ward_code",
+          "road_type",
+          "surface",
+          "under_dlp",
+          "last_resurfaced",
+          "total_billed_inr",
+          "work_orders_count",
+          "rupees_at_stake",
+          "flagged_bills_count"
+        ],
+        "title": "RoadSummary"
+      },
+      "RoadWorkOrder": {
+        "properties": {
+          "work_order_id": {
+            "type": "string",
+            "title": "Work Order Id"
+          },
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "work_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Type"
+          },
+          "repair_method": {
+            "type": "string",
+            "title": "Repair Method"
+          },
+          "cost_inr": {
+            "type": "number",
+            "title": "Cost Inr"
+          },
+          "assigned_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "sla_met": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sla Met"
+          },
+          "reopened_within_30d": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reopened Within 30D"
+          },
+          "engineer_remark": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engineer Remark"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "work_order_id",
+          "contractor_id",
+          "contractor_name",
+          "work_type",
+          "repair_method",
+          "cost_inr",
+          "assigned_at",
+          "completed_at",
+          "sla_met",
+          "reopened_within_30d",
+          "engineer_remark"
+        ],
+        "title": "RoadWorkOrder"
+      },
+      "TimelineEvent": {
+        "properties": {
+          "road_id": {
+            "type": "string",
+            "title": "Road Id"
+          },
+          "event_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event At"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "complaint",
+              "work_order_assigned",
+              "work_order_completed",
+              "accident",
+              "citizen_report"
+            ],
+            "title": "Event Type"
+          },
+          "ref_id": {
+            "type": "string",
+            "title": "Ref Id"
+          },
+          "detail": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Detail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "road_id",
+          "event_at",
+          "event_type",
+          "ref_id",
+          "detail"
+        ],
+        "title": "TimelineEvent"
+      },
+      "TrackerStep": {
+        "properties": {
+          "step": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "matched_to_contract",
+              "payment_held",
+              "contractor_notified"
+            ],
+            "title": "Step"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "step",
+          "done"
+        ],
+        "title": "TrackerStep"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -866,6 +2569,185 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Ward": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "ward_name": {
+            "type": "string",
+            "title": "Ward Name"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "centroid_lat": {
+            "type": "number",
+            "title": "Centroid Lat"
+          },
+          "centroid_lon": {
+            "type": "number",
+            "title": "Centroid Lon"
+          },
+          "budget_inr": {
+            "type": "integer",
+            "title": "Budget Inr"
+          },
+          "spend_inr": {
+            "type": "integer",
+            "title": "Spend Inr"
+          },
+          "recoverable_dlp_inr": {
+            "type": "integer",
+            "title": "Recoverable Dlp Inr"
+          },
+          "flagged_bills_count": {
+            "type": "integer",
+            "title": "Flagged Bills Count"
+          },
+          "warranty_enforcement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warranty Enforcement Rate"
+          },
+          "dlp_eligible_jobs": {
+            "type": "integer",
+            "title": "Dlp Eligible Jobs"
+          },
+          "dlp_leakage_rate": {
+            "type": "number",
+            "title": "Dlp Leakage Rate"
+          },
+          "physical_risk_score": {
+            "type": "number",
+            "title": "Physical Risk Score"
+          },
+          "complaints_per_lakh": {
+            "type": "number",
+            "title": "Complaints Per Lakh"
+          },
+          "under_reported_flag": {
+            "type": "boolean",
+            "title": "Under Reported Flag"
+          },
+          "flood_hotspots_count": {
+            "type": "integer",
+            "title": "Flood Hotspots Count"
+          },
+          "accidents_count": {
+            "type": "integer",
+            "title": "Accidents Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ward_code",
+          "ward_name",
+          "zone",
+          "centroid_lat",
+          "centroid_lon",
+          "budget_inr",
+          "spend_inr",
+          "recoverable_dlp_inr",
+          "flagged_bills_count",
+          "warranty_enforcement_rate",
+          "dlp_eligible_jobs",
+          "dlp_leakage_rate",
+          "physical_risk_score",
+          "complaints_per_lakh",
+          "under_reported_flag",
+          "flood_hotspots_count",
+          "accidents_count"
+        ],
+        "title": "Ward"
+      },
+      "WardAllocation": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "ward_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ward Name"
+          },
+          "budget_2025_inr": {
+            "type": "integer",
+            "title": "Budget 2025 Inr"
+          },
+          "spend_2025_inr": {
+            "type": "integer",
+            "title": "Spend 2025 Inr"
+          },
+          "remaining_2025_inr": {
+            "type": "integer",
+            "title": "Remaining 2025 Inr"
+          },
+          "recommended_budget_inr": {
+            "type": "integer",
+            "title": "Recommended Budget Inr"
+          },
+          "equity_floor_inr": {
+            "type": "integer",
+            "title": "Equity Floor Inr"
+          },
+          "harm_avoided": {
+            "type": "number",
+            "title": "Harm Avoided"
+          },
+          "harm_avoided_per_next_lakh": {
+            "type": "number",
+            "title": "Harm Avoided Per Next Lakh"
+          },
+          "dlp_items_owed_by_contractor": {
+            "type": "integer",
+            "title": "Dlp Items Owed By Contractor"
+          },
+          "dlp_value_owed_inr": {
+            "type": "integer",
+            "title": "Dlp Value Owed Inr"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ward_code",
+          "ward_name",
+          "budget_2025_inr",
+          "spend_2025_inr",
+          "remaining_2025_inr",
+          "recommended_budget_inr",
+          "equity_floor_inr",
+          "harm_avoided",
+          "harm_avoided_per_next_lakh",
+          "dlp_items_owed_by_contractor",
+          "dlp_value_owed_inr"
+        ],
+        "title": "WardAllocation"
       }
     }
   },

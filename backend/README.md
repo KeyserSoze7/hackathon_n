@@ -15,6 +15,10 @@ DATABASE_URL=postgresql://... uvicorn api:app --port 8000 --reload
 - ReDoc: http://127.0.0.1:8000/redoc
 - Spec: `GET /openapi.json`, committed as `backend/openapi.json` (import into Postman or a client generator).
   Regenerate after changing endpoints: `curl -s http://127.0.0.1:8000/openapi.json > backend/openapi.json`
+- Every endpoint has a response model (`models.py`), so the spec is fully typed (28 schemas, enums for labels/codes,
+  typed 404 `{detail}`). Generate a client from `backend/openapi.json`, e.g.
+  `npx openapi-typescript backend/openapi.json -o src/api.d.ts` (TS types) or
+  `openapi-generator-cli generate -i backend/openapi.json -g typescript-fetch -o src/api` (full client).
 
 ## Endpoints
 | View | Method + path | Reads |
@@ -41,8 +45,11 @@ Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (
 - View 2 routes are the `/api/roads/...` and `/api/flags/...` functions in `api.py`.
 - SQL views they read are in `supabase/migrations/20261121000100_audit_views.sql` (`road_audit`, `road_timeline`, `flagged_queue`).
   Change the schema with a **new** migration file rather than editing an applied one.
+- Every route declares `response_model=` from `models.py`. Change the model with the SQL view/table it mirrors.
+  Run with `STRICT_MODELS=1` while developing/testing: an undeclared or mistyped field then fails loudly (500)
+  instead of being silently dropped from the response.
 - Validate request bodies with Pydantic models, query params with `Query(...)`. Use `rows()` / `one()` for reads
   (`%(name)s` params; never format user input into SQL) and `ENG.begin()` + `text()` for writes.
 - Numbers come from the database/pipeline; endpoints only select and shape. No arithmetic in prompts or UI.
-- Update `postman/backend.postman_collection.json` and run it:
+- Update `postman/backend.postman_collection.json` and run it against an API started with `STRICT_MODELS=1`:
   `postman collection run postman/backend.postman_collection.json` (28 requests, 70 assertions)
