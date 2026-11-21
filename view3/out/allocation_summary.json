@@ -1,0 +1,134 @@
+{
+ "budget_inr": 17738060,
+ "rate_card_cost_to_fix_everything_inr": 121366770,
+ "harm_units": "harm points = repairs needed x severity (from SLA class) x impact (flood, hospital, school, traffic, bus, accidents, open complaints) x share of fixes that hold",
+ "budget_curve": [
+  {
+   "share_of_need": 0.1,
+   "budget_inr": 12136677,
+   "optimizer": 3549,
+   "volume_first_cheapest": 1524,
+   "stakes_first_cheapest": 1625
+  },
+  {
+   "share_of_need": 0.2,
+   "budget_inr": 24273354,
+   "optimizer": 5643,
+   "volume_first_cheapest": 3138,
+   "stakes_first_cheapest": 3098
+  },
+  {
+   "share_of_need": 0.3,
+   "budget_inr": 36410031,
+   "optimizer": 7267,
+   "volume_first_cheapest": 4700,
+   "stakes_first_cheapest": 4469
+  },
+  {
+   "share_of_need": 0.5,
+   "budget_inr": 60683385,
+   "optimizer": 9707,
+   "volume_first_cheapest": 7778,
+   "stakes_first_cheapest": 7350
+  },
+  {
+   "share_of_need": 0.75,
+   "budget_inr": 91025077,
+   "optimizer": 12015,
+   "volume_first_cheapest": 10690,
+   "stakes_first_cheapest": 10361
+  },
+  {
+   "share_of_need": 1.0,
+   "budget_inr": 121366770,
+   "optimizer": 13340,
+   "volume_first_cheapest": 12867,
+   "stakes_first_cheapest": 12868
+  }
+ ],
+ "equity_floor_share": 0.5,
+ "comparison_same_budget": {
+  "optimizer": {
+   "harm_avoided": 4567,
+   "spend_inr": 17737585,
+   "items": 185
+  },
+  "baseline_volume_first_cheapest_patch": {
+   "harm_avoided": 2340,
+   "spend_inr": 17737329,
+   "items": 14
+  },
+  "baseline_stakes_first_cheapest_patch": {
+   "harm_avoided": 2359,
+   "spend_inr": 17737499,
+   "items": 85
+  },
+  "max_possible_harm_avoided": 13453,
+  "uplift_vs_volume_first_pct": 95.2,
+  "uplift_vs_stakes_first_pct": 93.6
+ },
+ "method_failure_rates": [
+  {
+   "work_type": "Broken paver blocks",
+   "repair_method": "Paver blocks relaid",
+   "jobs": 132,
+   "reopen": 0.227
+  },
+  {
+   "work_type": "Choked drain / nullah overflow",
+   "repair_method": "Desilting and garbage removal",
+   "jobs": 232,
+   "reopen": 0.224
+  },
+  {
+   "work_type": "Open or broken manhole",
+   "repair_method": "Manhole cover replaced + grating",
+   "jobs": 202,
+   "reopen": 0.173
+  },
+  {
+   "work_type": "Pothole",
+   "repair_method": "Cold mix patch",
+   "jobs": 602,
+   "reopen": 0.322
+  },
+  {
+   "work_type": "Pothole",
+   "repair_method": "Hot mix patch",
+   "jobs": 318,
+   "reopen": 0.226
+  },
+  {
+   "work_type": "Pothole",
+   "repair_method": "Mastic asphalt",
+   "jobs": 298,
+   "reopen": 0.258
+  },
+  {
+   "work_type": "Road cave-in",
+   "repair_method": "Excavation, pipeline repair, PQC patch",
+   "jobs": 96,
+   "reopen": 0.219
+  },
+  {
+   "work_type": "Waterlogging",
+   "repair_method": "Dewatering pump deployed",
+   "jobs": 200,
+   "reopen": 0.14
+  },
+  {
+   "work_type": "Waterlogging",
+   "repair_method": "Drain desilting",
+   "jobs": 221,
+   "reopen": 0.262
+  },
+  {
+   "work_type": "Waterlogging",
+   "repair_method": "Pump + debris removal",
+   "jobs": 198,
+   "reopen": 0.222
+  }
+ ],
+ "dlp_items": 183,
+ "dlp_value_owed_inr": 28743724
+}

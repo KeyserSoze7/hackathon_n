@@ -1,0 +1,11 @@
+pandas
+numpy
+scipy>=1.9
+scikit-learn
+xgboost
+shap
+duckdb
+sqlalchemy>=2
+psycopg2-binary
+fastapi
+uvicorn
