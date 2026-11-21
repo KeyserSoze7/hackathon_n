@@ -36,6 +36,82 @@
     {
       "key": "formRoadId",
       "value": ""
+    },
+    {
+      "key": "adminEmail",
+      "value": "ops@example.org"
+    },
+    {
+      "key": "adminPassword",
+      "value": "change-me-please"
+    },
+    {
+      "key": "citizenToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "officerToken",
+      "value": ""
+    },
+    {
+      "key": "officerEmail",
+      "value": ""
+    },
+    {
+      "key": "officerPassword",
+      "value": ""
+    },
+    {
+      "key": "accessRequestId",
+      "value": ""
+    },
+    {
+      "key": "reportWard",
+      "value": ""
+    },
+    {
+      "key": "reportFlagId",
+      "value": ""
+    },
+    {
+      "key": "otherWard",
+      "value": ""
+    },
+    {
+      "key": "ownFlagId",
+      "value": ""
+    },
+    {
+      "key": "otherFlagId",
+      "value": ""
+    },
+    {
+      "key": "awaitingBefore",
+      "value": ""
+    },
+    {
+      "key": "badToken",
+      "value": ""
+    },
+    {
+      "key": "signupEmail",
+      "value": ""
+    },
+    {
+      "key": "signupToken",
+      "value": ""
+    },
+    {
+      "key": "loginToken",
+      "value": ""
+    },
+    {
+      "key": "unifiedAdminToken",
+      "value": ""
     }
   ],
   "item": [
@@ -72,7 +148,7 @@
             "exec": [
               "pm.test('200', () => pm.response.to.have.status(200));",
               "const b = pm.response.json();",
-              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(29));",
+              "pm.test('all endpoints documented', () => pm.expect(Object.keys(b.paths).length).to.eql(47));",
               "pm.test('every operation tagged + summarized', () => Object.values(b.paths).forEach(p => Object.values(p).forEach(op => { pm.expect(op.tags.length).to.be.above(0); pm.expect(op.summary).to.be.a('string'); })));"
             ]
           }
@@ -528,6 +604,68 @@
               }
             }
           ]
+        },
+        {
+          "name": "Money trail (ward)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards/{{ward}}/money-trail",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('spend = sum by contractor = sum by method', () => { const c = b.by_contractor.reduce((a, x) => a + x.spend_inr, 0); const m = b.by_repair_method.reduce((a, x) => a + x.spend_inr, 0); pm.expect(c).to.eql(b.spend_inr); pm.expect(m).to.eql(b.spend_inr); });",
+                  "pm.test('failed jobs consistent', () => pm.expect(b.by_contractor.reduce((a, x) => a + x.failed_30d, 0)).to.eql(b.failed_within_30d.jobs));",
+                  "pm.test('canonical contractor names, summary', () => { b.by_contractor.forEach(x => pm.expect(x.contractor_id).to.match(/^CT/)); pm.expect(b.summary).to.include('₹'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Money trail - ward as K-W",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards/K-W/money-trail",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('K/W', () => pm.expect(pm.response.json().ward_code).to.eql('K/W'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Money trail - unknown ward (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/wards/ZZ/money-trail",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -709,7 +847,7 @@
           ]
         },
         {
-          "name": "Right-of-Reply (201)",
+          "name": "Right-of-Reply - no officer token (401)",
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/flags/{{flagId}}/replies",
@@ -729,35 +867,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('201', () => pm.response.to.have.status(201));",
-                  "pm.test('stored on flag', () => pm.expect(pm.response.json().flag_id).to.eql(pm.collectionVariables.get('flagId')));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Right-of-Reply - invalid role (422)",
-          "request": {
-            "method": "POST",
-            "url": "{{baseUrl}}/api/flags/{{flagId}}/replies",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"author_role\": \"admin\", \"body\": \"x\" }"
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('422', () => pm.response.to.have.status(422));"
+                  "pm.test('401', () => pm.response.to.have.status(401));",
+                  "pm.test('detail', () => pm.expect(pm.response.json().detail).to.match(/token/));"
                 ]
               }
             }
@@ -1291,6 +1402,38 @@
       "name": "View 4",
       "item": [
         {
+          "name": "Citizen account - create (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizens",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"Postman citizen\",\n  \"phone\": \"+91 98200 00000\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('token once, prefixed', () => pm.expect(b.token).to.match(/^cit_/));",
+                  "pm.test('phone never returned', () => pm.expect(pm.response.text()).to.not.include('98200'));",
+                  "pm.collectionVariables.set('citizenToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Localities (picker)",
           "request": {
             "method": "GET",
@@ -1681,12 +1824,12 @@
                 "exec": [
                   "pm.test('201', () => pm.response.to.have.status(201));",
                   "const b = pm.response.json();",
-                  "pm.test('contract shape', () => ['report_id','status','road','duplicate_of','linked_work_order_id','responsible','sla_hours','photos','tracker'].forEach(k => pm.expect(b).to.have.property(k)));",
+                  "pm.test('contract shape', () => ['report_id','status','road','duplicate_of','linked_work_order_id','responsible','sla_hours','photos','tracker','events','sla_due_at','payment_hold_eligible'].forEach(k => pm.expect(b).to.have.property(k)));",
                   "pm.test('road resolved from location', () => pm.expect(b.road.road_id).to.match(/^RD\\d{4}$/));",
                   "pm.test('photo attached', () => pm.expect(b.photos[0].photo_id).to.eql(pm.collectionVariables.get('photoId')));",
                   "pm.test('responsible + sla', () => { pm.expect(['contractor_under_dlp','bmc_ward']).to.include(b.responsible.party); pm.expect(b.sla_hours).to.eql(72); });",
                   "pm.test('phone never returned', () => pm.expect(pm.response.text()).to.not.include('98200'));",
-                  "pm.test('tracker steps', () => b.tracker.forEach(x => pm.expect(['done','current','pending']).to.include(x.status)));",
+                  "pm.test('tracker steps', () => b.tracker.forEach(x => pm.expect(['done','current','pending','skipped','stopped']).to.include(x.status)));",
                   "pm.collectionVariables.set('formReportId', b.report_id); pm.collectionVariables.set('formRoadId', b.road.road_id);"
                 ]
               }
@@ -1781,7 +1924,7 @@
           ]
         },
         {
-          "name": "Citizen report - still broken on DLP road (201)",
+          "name": "Citizen report - still broken on DLP road, signed in (201)",
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/citizen-reports",
@@ -1789,6 +1932,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
               }
             ],
             "body": {
@@ -1803,10 +1950,13 @@
                 "exec": [
                   "pm.test('201', () => pm.response.to.have.status(201));",
                   "const b = pm.response.json();",
-                  "pm.test('payment auto-held on DLP road', () => pm.expect(b.status).to.eql('payment_held'));",
+                  "pm.test('insert stops at matched_to_contract', () => pm.expect(b.status).to.eql('matched_to_contract'));",
+                  "pm.test('eligible for an officer payment hold', () => pm.expect(b.payment_hold_eligible).to.be.true);",
                   "pm.test('linked to DLP flag', () => pm.expect(b.flag_id).to.match(/^DLP_PAID_TWICE:/));",
-                  "pm.test('tracker: payment held is current', () => pm.expect(b.tracker.map(x => x.status)).to.eql(['done','done','current','pending']));",
-                  "pm.collectionVariables.set('reportId', b.report_id);"
+                  "pm.test('tracker: 6 steps, matched current', () => pm.expect(b.tracker.map(x => x.status)).to.eql(['done','current','pending','pending','pending','pending']));",
+                  "pm.test('created event by citizen', () => { pm.expect(b.events[0].event_type).to.eql('created'); pm.expect(b.events[0].actor).to.eql('citizen'); });",
+                  "pm.collectionVariables.set('reportId', b.report_id); pm.collectionVariables.set('reportWard', b.road.ward_code);",
+                  "pm.collectionVariables.set('reportFlagId', b.flag_id);"
                 ]
               }
             }
@@ -1824,9 +1974,228 @@
               "script": {
                 "exec": [
                   "pm.test('200', () => pm.response.to.have.status(200));",
-                  "pm.test('same status', () => pm.expect(pm.response.json().status).to.eql('payment_held'));",
-                  "const s = pm.response.json().tracker;",
-                  "pm.test('steps with done/current/pending', () => { pm.expect(s.map(x => x.status)).to.eql(['done','done','current','pending']); pm.expect(s[3].at).to.be.null; pm.expect(s[0].at).to.match(/\\+05:30$/); });"
+                  "const b = pm.response.json();",
+                  "pm.test('same status', () => pm.expect(b.status).to.eql('matched_to_contract'));",
+                  "const s = b.tracker;",
+                  "pm.test('steps done/current/pending', () => { pm.expect(s.map(x => x.status)).to.eql(['done','current','pending','pending','pending','pending']); pm.expect(s[2].at).to.be.null; pm.expect(s[0].at).to.match(/\\+05:30$/); });",
+                  "pm.test('history + SLA fields', () => { pm.expect(b.events).to.be.an('array').that.is.not.empty; pm.expect(b).to.have.property('sla_due_at'); pm.expect(b).to.have.property('rejection_reason'); });",
+                  "pm.test('events carry status + by_role (frontend Tracker)', () => { pm.expect(b.events[0].status).to.eql('matched_to_contract'); pm.expect(b.events[0].by_role).to.eql('citizen'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen account - no body, default name (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizens",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('default name', () => pm.expect(pm.response.json().display_name).to.match(/^Citizen [0-9A-F]{4}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - no token (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - invalid token (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{badToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('badToken', 'cit_not-a-real-token');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - profile + stats",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('stats shape', () => ['reports','roads','open','resolved','confirmed_fixed','rupees_flagged_inr','rupees_held_inr'].forEach(k => pm.expect(b.stats[k]).to.be.a('number')));",
+                  "pm.test('report counted, flagged bill counted', () => { pm.expect(b.stats.reports).to.be.at.least(1); pm.expect(b.stats.rupees_flagged_inr).to.be.above(0); pm.expect(b.stats.rupees_held_inr).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My reports",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me/reports",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const mine = b.find(x => x.id === Number(pm.collectionVariables.get('reportId')));",
+                  "pm.test('contains the signed-in report', () => pm.expect(mine).to.be.an('object'));",
+                  "pm.test('item shape', () => { pm.expect(mine.flag.flag_id).to.match(/^DLP_PAID_TWICE:/); pm.expect(mine.road.road_id).to.match(/^RD/); pm.expect(mine.events).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My reports - status=closed",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me/reports?status=closed",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('open report not listed', () => pm.expect(pm.response.json().map(x => x.id)).to.not.include(Number(pm.collectionVariables.get('reportId'))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm - before resolved (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports/{{reportId}}/confirm",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fixed\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report - invalid citizen token (401)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{badToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"x\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
                 ]
               }
             }
@@ -1855,6 +2224,1353 @@
                 "exec": [
                   "pm.test('201', () => pm.response.to.have.status(201));",
                   "pm.test('status set by server', () => pm.expect(pm.response.json().status).to.eql('reported'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin login - wrong password (401)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"definitely-wrong\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin login (admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('admin role, token', () => { pm.expect(b.role).to.eql('admin'); pm.expect(b.token).to.match(/^adm_/); pm.expect(b.expires_at).to.match(/\\+05:30$/); });",
+                  "pm.collectionVariables.set('adminToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('email', () => pm.expect(pm.response.json().email).to.eql(pm.collectionVariables.get('adminEmail').toLowerCase()));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin me - citizen token (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access request (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/access-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Officer\",\n  \"email\": \"{{officerEmail}}\",\n  \"designation\": \"AE Roads\",\n  \"ward_code\": \"{{reportWard}}\",\n  \"reason\": \"Triage citizen reports\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('officerEmail', 'officer' + Date.now() + '@example.org');",
+                  "const w = pm.collectionVariables.get('reportWard'); pm.collectionVariables.set('otherWard', w === 'A' ? 'B' : 'A');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('pending', () => pm.expect(b.status).to.eql('pending'));",
+                  "pm.collectionVariables.set('accessRequestId', b.request_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access request - duplicate pending (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/access-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Officer\",\n  \"email\": \"{{officerEmail}}\",\n  \"designation\": \"AE Roads\",\n  \"ward_code\": \"{{reportWard}}\",\n  \"reason\": \"again\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access request - unknown ward (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/access-requests",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"email\": \"nobody@example.org\",\n  \"designation\": \"X\",\n  \"ward_code\": \"ZZ\",\n  \"reason\": \"x\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access requests - no token (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/access-requests",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access requests (admin, pending)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/access-requests?status=pending",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('lists the request', () => pm.expect(pm.response.json().map(x => x.request_id)).to.include(Number(pm.collectionVariables.get('accessRequestId'))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access request - approve (200)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/access-requests/{{accessRequestId}}/approve",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('approved with one-time password', () => { pm.expect(b.status).to.eql('approved'); pm.expect(b.temporary_password).to.be.a('string'); });",
+                  "pm.collectionVariables.set('officerPassword', b.temporary_password);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Access request - approve again (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/access-requests/{{accessRequestId}}/approve",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Officer login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{officerEmail}}\",\n  \"password\": \"{{officerPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('ward officer scoped to the ward', () => { pm.expect(b.role).to.eql('ward_officer'); pm.expect(b.ward_codes).to.eql([pm.collectionVariables.get('reportWard')]); });",
+                  "pm.collectionVariables.set('officerToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Officer cannot list access requests (403)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/access-requests",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard summary (officer)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/summary",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('scope', () => pm.expect(b.ward_codes).to.eql([pm.collectionVariables.get('reportWard')]));",
+                  "pm.test('every status', () => pm.expect(Object.keys(b.reports_by_status)).to.have.length(9));",
+                  "pm.test('tiles are numbers', () => ['new_today','overdue_sla','rupees_held_inr','flags_awaiting_reply'].forEach(k => pm.expect(b[k]).to.be.a('number')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard summary - other ward (403)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/summary?ward={{otherWard}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report queue (officer, sla_due)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/reports?sort=sla_due&page_size=50",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const total = Number(pm.response.headers.get('X-Total-Count'));",
+                  "pm.test('array + paging headers', () => { pm.expect(b).to.be.an('array'); pm.expect(total).to.be.at.least(1); pm.expect(pm.response.headers.get('X-Page')).to.eql('1'); });",
+                  "pm.test('contains the report', () => pm.expect(b.map(x => x.id)).to.include(Number(pm.collectionVariables.get('reportId'))));",
+                  "pm.test('pseudonym, never a phone', () => { b.forEach(x => pm.expect(x.citizen).to.be.a('string')); pm.expect(pm.response.text()).to.not.include('98200'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report detail (officer)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('hold allowed next', () => pm.expect(b.allowed_next).to.include('payment_held'));",
+                  "pm.test('report flag first', () => pm.expect(b.flags[0].flag_id).to.eql(pm.collectionVariables.get('reportFlagId')));",
+                  "pm.test('triage context', () => ['work_orders','duplicate_candidates','notices','events','confirm_photos'].forEach(k => pm.expect(b[k]).to.be.an('array')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - illegal transition (422)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed_fixed\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - rejected without reason (422)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - payment_held",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"payment_held\",\n  \"note\": \"DLP: hold the bill\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('held', () => pm.expect(pm.response.json().status).to.eql('payment_held'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me - rupees held after the hold",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('held > 0', () => pm.expect(pm.response.json().stats.rupees_held_inr).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notify contractor (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}/notify-contractor",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"letter\",\n  \"language\": \"en\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('recorded, not sent', () => pm.expect(b.delivery).to.eql('recorded'));",
+                  "pm.test('drafted from the flag', () => pm.expect(['claude','template']).to.include(b.generated_by));",
+                  "pm.test('flagged bill contractor', () => pm.expect(b.message).to.include(b.contractor_name));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - note + repair due",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Site visit booked\",\n  \"repair_due_at\": \"2025-12-01T18:00:00\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('contractor notified', () => pm.expect(b.status).to.eql('contractor_notified'));",
+                  "pm.test('sla_due_at = repair_due_at', () => pm.expect(b.sla_due_at).to.eql('2025-12-01T18:00:00+05:30'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - resolved",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"note\": \"Patched by the DLP contractor\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('resolved', () => { pm.expect(pm.response.json().status).to.eql('resolved'); pm.expect(pm.response.json().resolved_at).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm - still broken, reopens",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports/{{reportId}}/confirm",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fixed\": false,\n  \"note\": \"Broke again after rain\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('reopened', () => pm.expect(pm.response.json().status).to.eql('reopened'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Report patch - resolved again",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/reports/{{reportId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm - fixed",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports/{{reportId}}/confirm",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{citizenToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fixed\": true,\n  \"note\": \"Holding now\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('confirmed_fixed', () => pm.expect(b.status).to.eql('confirmed_fixed'));",
+                  "pm.test('tracker all done', () => b.tracker.forEach(x => pm.expect(x.status).to.eql('done')));",
+                  "pm.test('no officer identity in history', () => b.events.forEach(e => pm.expect(['citizen','ward_office','system']).to.include(e.actor)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flags awaiting reply (officer)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/flags?awaiting_reply=true&page_size=5",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "const total = Number(pm.response.headers.get('X-Total-Count'));",
+                  "pm.test('scoped to ward', () => b.forEach(f => pm.expect(f.ward_code).to.eql(pm.collectionVariables.get('reportWard'))));",
+                  "pm.test('no replies yet', () => b.forEach(f => pm.expect(f.replies_count).to.eql(0)));",
+                  "pm.collectionVariables.set('ownFlagId', b[0].flag_id); pm.collectionVariables.set('awaitingBefore', total);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flags - other ward (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/flags?ward={{otherWard}}&page_size=1",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('otherFlagId', pm.response.json()[0].flag_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Right-of-Reply - officer (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/flags/{{ownFlagId}}/replies",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author_role\": \"contractor\",\n  \"body\": \"Contractor says: MGL utility trench reopened this stretch.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('author from account', () => pm.expect(b.author_name).to.eql('Postman Officer'));",
+                  "pm.test('contractor reply logged', () => pm.expect(b.author_role).to.eql('contractor'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Right-of-Reply - invalid role (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/flags/{{ownFlagId}}/replies",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author_role\": \"admin\",\n  \"body\": \"x\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Right-of-Reply - other ward (403)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/flags/{{otherFlagId}}/replies",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author_role\": \"ward_engineer\",\n  \"body\": \"x\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Flags awaiting reply - one fewer",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/flags?awaiting_reply=true&page_size=1",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('total dropped by one', () => pm.expect(Number(pm.response.headers.get('X-Total-Count'))).to.eql(Number(pm.collectionVariables.get('awaitingBefore')) - 1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Officer logout (204)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/admin/logout",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Officer token after logout (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{officerToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Sign up - citizen (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/signup",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Signup Citizen\",\n  \"email\": \"{{signupEmail}}\",\n  \"password\": \"signup-pass-123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('signupEmail', 'citizen' + Date.now() + '@example.org');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test('citizen token + role', () => { pm.expect(b.role).to.eql('citizen'); pm.expect(b.token).to.match(/^cit_/); pm.expect(b.expires_at).to.be.null; });",
+                  "pm.collectionVariables.set('signupToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign up - same email (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/signup",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Again\",\n  \"email\": \"{{signupEmail}}\",\n  \"password\": \"signup-pass-123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign up - officer email (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/signup",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Officer\",\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"signup-pass-123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign up - short password (422)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/signup",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"email\": \"short@example.org\",\n  \"password\": \"short\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - citizen (200)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{signupEmail}}\",\n  \"password\": \"signup-pass-123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('citizen session', () => { pm.expect(b.role).to.eql('citizen'); pm.expect(b.citizen_id).to.be.a('string'); pm.expect(b.token).to.not.eql(pm.collectionVariables.get('signupToken')); });",
+                  "pm.collectionVariables.set('loginToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - citizen token works on /api/me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{loginToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('same account', () => pm.expect(pm.response.json().display_name).to.eql('Signup Citizen'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - wrong password (401)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{signupEmail}}\",\n  \"password\": \"wrong-password\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - admin via /api/auth/login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('admin role + expiry', () => { pm.expect(b.role).to.eql('admin'); pm.expect(b.token).to.match(/^adm_/); pm.expect(b.expires_at).to.match(/\\+05:30$/); });",
+                  "pm.collectionVariables.set('unifiedAdminToken', b.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin token on citizen report -> anonymous (201)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/citizen-reports",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{unifiedAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Reported by a signed-in officer from the citizen screen\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('filed, not attached to any citizen', () => pm.expect(pm.response.json().report_id).to.be.a('number'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin token on /api/me (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{unifiedAdminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unified admin token works on admin routes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/me",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{unifiedAdminToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
                 ]
               }
             }

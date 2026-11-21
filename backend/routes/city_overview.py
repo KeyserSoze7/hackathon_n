@@ -8,6 +8,7 @@ from fastapi import APIRouter, Header, Query
 
 from backend import schemas as s
 from backend.database import norm_ward, one, rows
+from backend.routes.road_story import inr  # shared ₹ formatter
 
 router = APIRouter(tags=["View 1: City & Ward Overview"])
 WARDS_GEOJSON = pathlib.Path(__file__).resolve().parents[2] / "data" / "wards.geojson"
@@ -57,3 +58,29 @@ def flagged_queue(ward: Optional[str] = Query(None, description="Ward code filte
                 "AND (%(t)s IS NULL OR top_tier = %(t)s) AND (%(d)s IS NULL OR %(d)s = ANY(detectors)) "
                 "ORDER BY rupees_at_stake DESC, work_order_id LIMIT %(n)s OFFSET %(o)s",
                 w=norm_ward(ward), t=tier, d=detector, n=max(1, min(limit, 500)), o=offset)
+
+
+@router.get("/api/wards/{ward_code:path}/money-trail", response_model=s.MoneyTrail, responses=s.NOT_FOUND,
+            summary="Ward money trail: budget vs spend, by contractor and repair method, failed repairs")
+def money_trail(ward_code: str):
+    """Where a ward's monsoon repair money went: budget vs billed spend, spend and 30-day failures by contractor
+    (canonical names) and by repair method, and the spend on jobs that failed within 30 days. Every job counts once
+    (work_orders grain; no joins that multiply rows). `summary` is one sentence built from these numbers."""
+    w = norm_ward(ward_code)
+    ward = one("SELECT ward_code, monsoon_repair_budget_inr_2025 AS budget_inr FROM wards WHERE ward_code = %(w)s",
+               f"ward {ward_code}", w=w)
+    by_c = rows("SELECT wo.contractor_id, c.contractor_name, count(*) AS jobs, COALESCE(sum(wo.cost_inr), 0)::bigint AS spend_inr, "
+                "count(*) FILTER (WHERE wo.reopened_within_30d) AS failed_30d, "
+                "COALESCE(sum(wo.cost_inr) FILTER (WHERE wo.reopened_within_30d), 0)::bigint AS failed_spend_inr "
+                "FROM work_orders wo JOIN contractors c ON c.contractor_id = wo.contractor_id WHERE wo.ward_code = %(w)s "
+                "GROUP BY wo.contractor_id, c.contractor_name ORDER BY spend_inr DESC, wo.contractor_id", w=w)
+    by_m = rows("SELECT repair_method, count(*) AS jobs, COALESCE(sum(cost_inr), 0)::bigint AS spend_inr, "
+                "count(*) FILTER (WHERE reopened_within_30d) AS failed_30d FROM work_orders WHERE ward_code = %(w)s "
+                "GROUP BY repair_method ORDER BY spend_inr DESC, repair_method", w=w)
+    spend = sum(c["spend_inr"] for c in by_c)
+    failed = {"jobs": sum(c["failed_30d"] for c in by_c), "spend_inr": sum(c["failed_spend_inr"] for c in by_c)}
+    jobs = sum(c["jobs"] for c in by_c)
+    summary = (f"Ward {w} billed {inr(spend)} against a {inr(ward['budget_inr'])} monsoon budget across {jobs} jobs; "
+               f"{failed['jobs']} of them failed within 30 days ({inr(failed['spend_inr'])} billed on those).")
+    return {"ward_code": w, "budget_inr": ward["budget_inr"], "spend_inr": spend, "by_contractor": by_c,
+            "by_repair_method": by_m, "failed_within_30d": failed, "summary": summary}

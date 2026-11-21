@@ -4,10 +4,10 @@ import json
 import re
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Path, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy import text
 
-from backend import claude_writer
+from backend import auth, claude_writer
 from backend import schemas as s
 from backend.database import get_engine, norm_ward, one, rows
 from backend.photos import public_url
@@ -78,14 +78,19 @@ def flag(flag_id: str = Path(description="<DETECTOR>:<work_order_id>", examples=
     return f
 
 
-@router.post("/api/flags/{flag_id}/replies", status_code=201, response_model=s.Reply, responses=s.NOT_FOUND, summary="Add Right-of-Reply to a flag")
-def add_reply(flag_id: str, req: s.ReplyReq):
-    """View 2 Right-of-Reply."""
-    one("SELECT 1 FROM flags WHERE flag_id = %(f)s", f"flag {flag_id}", f=flag_id)
+@router.post("/api/flags/{flag_id}/replies", status_code=201, response_model=s.Reply,
+             responses={**s.NOT_FOUND, **s.AUTH}, summary="Add Right-of-Reply to a flag (officer token)")
+def add_reply(flag_id: str, req: s.ReplyReq, admin: dict = Depends(auth.require_admin())):
+    """View 2 Right-of-Reply, signed in: a ward officer for the flag's ward (or an admin). author_name defaults to the
+    officer's name; use author_role=contractor to log a reply the contractor gave the ward office."""
+    f = one("SELECT ward_code FROM flags WHERE flag_id = %(f)s", f"flag {flag_id}", f=flag_id)
+    auth.require_ward(admin, f["ward_code"])
     with get_engine().begin() as c:
-        r = c.execute(text("INSERT INTO flag_replies (flag_id, author_role, author_name, body) "
-                           "VALUES (:f, :role, :name, :body) RETURNING id, flag_id, author_role, author_name, body, created_at"),
-                      {"f": flag_id, "role": req.author_role, "name": req.author_name, "body": req.body}).mappings().one()
+        r = c.execute(text("INSERT INTO flag_replies (flag_id, author_role, author_name, body, admin_id) "
+                           "VALUES (:f, :role, :name, :body, CAST(:a AS uuid)) "
+                           "RETURNING id, flag_id, author_role, author_name, body, created_at"),
+                      {"f": flag_id, "role": req.author_role, "name": req.author_name or admin["name"],
+                       "body": req.body, "a": admin["admin_id"]}).mappings().one()
     return dict(r)
 
 

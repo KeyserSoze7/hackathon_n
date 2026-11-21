@@ -3,8 +3,9 @@
 DATABASE_URL comes from the environment, or from a `.env` file at the repo root (see `.env.example`).
 A variable already set in the environment wins over `.env`.
 """
-import json, os, pathlib
+import json, os, pathlib, uuid
 from functools import lru_cache
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
@@ -55,8 +56,12 @@ def get_engine():
 
 
 def rows(sql, **params):
-    """Run a SELECT (%(name)s params) and return JSON-ready dicts (ISO dates)."""
-    return json.loads(pd.read_sql_query(sql, get_engine(), params=params).to_json(orient="records", date_format="iso"))
+    """Run a SELECT (%(name)s params) and return JSON-ready dicts (ISO dates, uuids as strings)."""
+    df = pd.read_sql_query(sql, get_engine(), params=params)
+    for col in df.columns[df.dtypes == object]:  # pandas' JSON encoder cannot serialise uuid.UUID
+        if df[col].map(lambda v: isinstance(v, uuid.UUID)).any():
+            df[col] = df[col].map(lambda v: str(v) if isinstance(v, uuid.UUID) else v)
+    return json.loads(df.to_json(orient="records", date_format="iso"))
 
 
 def one(sql, what, **params):
@@ -65,6 +70,18 @@ def one(sql, what, **params):
     if not r:
         raise HTTPException(404, f"unknown {what}")
     return r[0]
+
+
+def invalid(field, msg):
+    """422 in FastAPI's validation-error shape, so clients parse every 422 the same way."""
+    return HTTPException(422, [{"loc": ["body", field], "msg": msg, "type": "value_error"}])
+
+
+def parse_ts(v) -> Optional[datetime]:
+    """ISO string from rows() (or a datetime) -> datetime. rows() gives timestamptz as UTC ('...Z'), naive as IST."""
+    if v is None or isinstance(v, datetime):
+        return v
+    return datetime.fromisoformat(str(v).replace("Z", "+00:00"))
 
 
 def norm_ward(code: Optional[str]) -> Optional[str]:

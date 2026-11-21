@@ -8,72 +8,88 @@
   "created_at": "2026-11-21T16:01:15+05:30"
  },
  "CitizenReport": {
-  "report_id": 24,
+  "report_id": 1,
   "kind": "still_broken",
   "issue_type": "pothole",
-  "status": "payment_held",
+  "status": "matched_to_contract",
   "road": {
-   "road_id": "RD0048",
-   "road_name": "Dr Babasaheb Ambedkar Road",
-   "ward_code": "F/S",
+   "road_id": "RD0240",
+   "road_name": "Sion Trombay Road",
+   "ward_code": "M/W",
    "under_dlp": true
   },
   "duplicate_of": null,
-  "linked_work_order_id": "WO25-02017",
+  "linked_work_order_id": "WO25-00646",
   "responsible": {
    "party": "contractor_under_dlp",
-   "name": "Konkan Roadcon Pvt Ltd (synthetic)",
-   "ward_office": "F/S Ward Office (synthetic)",
-   "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2026-02-18), so surface defects are the contractor's to fix at no cost to BMC."
+   "name": "Arabian Sea Engineering (synthetic)",
+   "ward_office": "M/W Ward Office (synthetic)",
+   "basis": "The dataset marks this road under the original contractor's Defect Liability Period (estimated to run until 2027-04-03), so surface defects are the contractor's to fix at no cost to BMC."
   },
   "sla_hours": 72,
-  "photos": [
-   {
-    "photo_id": "1aee300d99da4b9b8078e80913f5903c",
-    "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c",
-    "width": 800,
-    "height": 600
-   }
-  ],
+  "photos": [],
   "tracker": [
    {
     "step": "reported",
     "label": "Reported",
     "status": "done",
-    "at": "2026-11-21T16:14:01+05:30"
+    "at": "2026-11-21T16:49:17+05:30"
    },
    {
     "step": "matched_to_contract",
     "label": "Matched to contract",
-    "status": "done",
-    "at": "2026-11-21T16:14:01+05:30"
+    "status": "current",
+    "at": "2026-11-21T16:49:17+05:30"
    },
    {
     "step": "payment_held",
-    "label": "Payment auto-held (DLP)",
-    "status": "current",
-    "at": "2026-11-21T16:14:01+05:30"
+    "label": "Payment held (DLP)",
+    "status": "pending",
+    "at": null
    },
    {
     "step": "contractor_notified",
     "label": "Contractor notified",
     "status": "pending",
     "at": null
+   },
+   {
+    "step": "resolved",
+    "label": "Resolved by ward office",
+    "status": "pending",
+    "at": null
+   },
+   {
+    "step": "confirmed_fixed",
+    "label": "Confirmed fixed by citizen",
+    "status": "pending",
+    "at": null
    }
   ],
-  "flag_id": "DLP_PAID_TWICE:WO25-01947",
-  "landmark": "opposite KEM Hospital gate",
-  "location": {
-   "lat": 19.0058,
-   "lon": 72.8425,
-   "accuracy_m": 12.0,
-   "source": "gps"
-  },
-  "input_mode": "photo",
+  "flag_id": "DLP_PAID_TWICE:WO25-01994",
+  "landmark": null,
+  "location": null,
+  "input_mode": "text",
   "language": "en",
-  "text": "Pothole is back after the repair",
+  "text": "Pothole back again",
   "matched_locality": null,
-  "created_at": "2026-11-21T16:14:01+05:30"
+  "created_at": "2026-11-21T16:49:17+05:30",
+  "events": [
+   {
+    "at": "2026-11-21T16:49:17+05:30",
+    "event_type": "created",
+    "actor": "citizen",
+    "from_status": null,
+    "to_status": "matched_to_contract",
+    "note": null,
+    "photo_ids": []
+   }
+  ],
+  "sla_due_at": "2026-11-24T16:49:17+05:30",
+  "repair_due_at": null,
+  "resolved_at": null,
+  "rejection_reason": null,
+  "payment_hold_eligible": true
  },
  "Allocation": {
   "ward_code": "K/W",
@@ -222,5 +238,53 @@
   "created_at": "2026-11-21T16:14:01+05:30",
   "status": "payment_held",
   "photo_url": "https://<api-host>/api/uploads/photo/1aee300d99da4b9b8078e80913f5903c"
+ },
+ "CitizenToken": {
+  "citizen_id": "d59630cf-8acd-4a48-939a-2233c9f6f3cd",
+  "token": "cit_<shown once; store it>",
+  "display_name": "Andheri walker"
+ },
+ "AccessRequestCreated": {
+  "request_id": 1,
+  "status": "pending"
+ },
+ "AccessDecision": {
+  "request_id": 1,
+  "status": "approved",
+  "email": "a.patil@example.org",
+  "admin_id": "ff70271f-222d-4645-8163-6f9baaacc8c9",
+  "temporary_password": "<shown once>"
+ },
+ "AdminSession": {
+  "token": "adm_<send as Authorization: Bearer>",
+  "role": "ward_officer",
+  "ward_codes": [
+   "M/W"
+  ],
+  "expires_at": "2026-11-22T04:49:18+05:30"
+ },
+ "ContractorNotice": {
+  "id": 1,
+  "report_id": 1,
+  "channel": "letter",
+  "flag_id": "DLP_PAID_TWICE:WO25-01994",
+  "work_order_id": "WO25-01994",
+  "contractor_id": "CT02",
+  "contractor_name": "Konkan Roadcon Pvt Ltd (synthetic)",
+  "message": "Defect notice: Paver blocks relaid on Sion Trombay Road (RD0240), work order WO25-01994\n\nTo: Konkan Roadcon Pvt Ltd (synthetic)\nThrough: Executive Engineer (Roads), Ward M/W, Brihanmumbai Municipal Corporation\n\nSubject: Defect notice for work order WO25-01994 on Sion Trombay Road (RD0240), Ward M/W\n\nThe road audit has flagged work order WO25-01994 as \"Recoverable under DLP\".\n\nWork: Paver blocks relaid, cost ₹1,48,557, completed on 2025-09-03.\nFinding: Paver blocks relaid billed at ₹148,557 on RD0240, which is under the original contractor's Defect Liability Period (last resurfaced 2024-04-03).\nAmount at stake: ₹1,48,557.\nThe road is under the Defect Liability Period until 2027-04-03.\n\nYou are requested to submit a written explanation and, where the work falls within the Defect Liability Period, to rectify the defect at your own cost, within 15 days of this notice.\n\nEvidence rows: WO25-01994, RD0240\n\nExecutive Engineer (Roads), Ward M/W",
+  "generated_by": "template",
+  "sent_by": "A. Patil",
+  "created_at": "2026-11-21T16:49:18+05:30",
+  "delivery": "recorded"
+ },
+ "AuthSession": {
+  "token": "cit_<shown once; send as Authorization: Bearer>",
+  "role": "citizen",
+  "ward_codes": [],
+  "name": "Priya",
+  "email": "priya@example.org",
+  "expires_at": null,
+  "citizen_id": "eff699a7-f531-4aec-aaa2-a773cacb4c5e",
+  "admin_id": null
  }
 }

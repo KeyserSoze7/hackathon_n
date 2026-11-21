@@ -4,30 +4,19 @@ import json
 import re
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import text
 
 from backend import claude_writer
+from backend import report_lifecycle as lc
 from backend import schemas as s
-from backend.database import get_engine, norm_ward, one, rows
+from backend.auth import optional_citizen
+from backend.database import get_engine, invalid, norm_ward, one, parse_ts, rows
 from backend.photos import public_url
 
 router = APIRouter(tags=["View 4: Citizen Layer"])
-TRACKER = ["reported", "matched_to_contract", "payment_held", "contractor_notified"]
-LABELS = {"reported": "Reported", "matched_to_contract": "Matched to contract",
-          "payment_held": "Payment auto-held (DLP)", "contractor_notified": "Contractor notified"}
 ID_RE = re.compile(r"\b(?:WO25-\d{5}|RD\d{4}|BMC25-\d{6}|ACC\d{4})\b")
 MID_LAT, MID_LON = "(r.start_lat + r.end_lat) / 2", "(r.start_lon + r.end_lon) / 2"
-
-
-def steps(r):
-    """Detailed tracker: before the report's status = done, its status = current, after = pending."""
-    cur, out = TRACKER.index(r["status"]), []
-    for i, step in enumerate(TRACKER):
-        st = "done" if i < cur else "current" if i == cur else "pending"
-        at = None if st == "pending" else r["created_at"] if step == "reported" else r["status_updated_at"]
-        out.append({"step": step, "label": LABELS[step], "status": st, "at": at})
-    return out
 
 
 def candidates(lat, lon):
@@ -210,15 +199,30 @@ SURFACE_WORK = ("Pothole", "Broken paver blocks")
 NEAREST_M = 500  # a location only matches a road whose midpoint is within this distance
 
 
-def invalid(field, msg):
-    """422 in FastAPI's validation-error shape, so clients parse every 422 the same way."""
-    return HTTPException(422, [{"loc": ["body", field], "msg": msg, "type": "value_error"}])
-
-
 def is_dlp_surface(r):
     """Road under DLP and a surface defect (pothole/broken paver, or an untyped 'still broken')."""
     surface = r["issue_type"] in SURFACE or (r["issue_type"] is None and r["kind"] == "still_broken")
     return bool(r["road_id"] and r["under_dlp"] and surface)
+
+
+def check_photo_ids(photo_ids):
+    """422 unless every id is unique and was uploaded via POST /api/uploads/photo."""
+    if len(set(photo_ids)) != len(photo_ids):
+        raise invalid("photo_ids", "photo_ids contains duplicates")
+    if photo_ids:
+        known = {p["photo_id"] for p in rows("SELECT photo_id FROM photos WHERE photo_id IN %(ids)s", ids=tuple(photo_ids))}
+        if missing := [p for p in photo_ids if p not in known]:
+            raise invalid("photo_ids", f"unknown photo_ids (upload them first via POST /api/uploads/photo): {', '.join(missing)}")
+
+
+def first_photo_url(row, request):
+    """photo_url for a row carrying storage/storage_path/photo_id of its first photo (or None)."""
+    return public_url(row["storage"], row["storage_path"], row["photo_id"], request) if row.get("photo_id") else None
+
+
+def hold_eligible(r):
+    """An officer may put this report in payment_held: DLP surface defect, and not a 'verified fixed' report."""
+    return r["kind"] != "verified_fixed" and is_dlp_surface(r)
 
 
 def find_road(req):
@@ -238,6 +242,37 @@ def find_road(req):
     return None, None
 
 
+ACTOR = {"citizen": "citizen", "admin": "ward_office", "system": "system"}
+
+
+def add_event(c, report_id, actor_type, event_type, from_status, to_status, note=None, photo_ids=(),
+              admin_id=None, meta=None):
+    """Append to the report's history inside the caller's transaction (c = connection from get_engine().begin())."""
+    c.execute(text("INSERT INTO citizen_report_events (report_id, actor_type, admin_id, event_type, from_status, "
+                   "to_status, note, photo_ids, meta) VALUES (:r, :a, CAST(:adm AS uuid), :e, :f, :t, :n, :p, "
+                   "CAST(:m AS jsonb))"),
+              {"r": report_id, "a": actor_type, "adm": admin_id, "e": event_type, "f": from_status, "t": to_status,
+               "n": note, "p": list(photo_ids), "m": json.dumps(meta or {}, default=str)})
+
+
+def report_events(report_ids):
+    """{report_id: [raw event rows, oldest first]} for the given reports (every id present, possibly [])."""
+    out = {i: [] for i in report_ids}
+    if report_ids:
+        for e in rows("SELECT report_id, at, actor_type, event_type, from_status, to_status, note, photo_ids "
+                      "FROM citizen_report_events WHERE report_id IN %(ids)s ORDER BY at, id", ids=tuple(report_ids)):
+            out[e["report_id"]].append(e)
+    return out
+
+
+def event_out(e):
+    """API shape of an event: who acted is citizen / ward_office / system, never an officer's identity."""
+    actor = ACTOR[e["actor_type"]]
+    return {"at": e["at"], "event_type": e["event_type"], "actor": actor,
+            "from_status": e["from_status"], "to_status": e["to_status"], "note": e["note"],
+            "photo_ids": list(e["photo_ids"] or []), "status": e["to_status"], "by_role": actor}
+
+
 def build_report(report_id, request):
     """The full CitizenReport, rebuilt from the DB (shared by POST and GET). Never includes contact_phone."""
     r = one("SELECT cr.*, cr.location_accuracy_m::float8 AS accuracy_m, ra.road_name, ra.ward_code, ra.under_dlp, "
@@ -252,6 +287,7 @@ def build_report(report_id, request):
             f"report {report_id}", i=report_id, sw=SURFACE_WORK)
     photos = rows("SELECT p.photo_id, p.storage, p.storage_path, p.width, p.height FROM citizen_report_photos crp "
                   "JOIN photos p USING (photo_id) WHERE crp.report_id = %(i)s ORDER BY crp.position", i=report_id)
+    evs = report_events([report_id])[report_id]
     road = responsible = None
     if r["road_id"]:
         road = {k: r[k] for k in ("road_id", "road_name", "ward_code", "under_dlp")}
@@ -273,23 +309,26 @@ def build_report(report_id, request):
             "responsible": responsible, "sla_hours": r["sla_hours"],
             "photos": [{"photo_id": p["photo_id"], "photo_url": public_url(p["storage"], p["storage_path"], p["photo_id"], request),
                         "width": p["width"], "height": p["height"]} for p in photos],
-            "tracker": steps(r), "flag_id": r["flag_id"], "landmark": r["landmark"], "location": loc,
+            "tracker": lc.tracker(r["status"], r["created_at"], evs, hold_eligible(r), r["status_updated_at"]),
+            "flag_id": r["flag_id"], "landmark": r["landmark"], "location": loc,
             "input_mode": r["input_mode"], "language": r["language"], "text": r["text"],
-            "matched_locality": r["matched_locality"], "created_at": r["created_at"]}
+            "matched_locality": r["matched_locality"], "created_at": r["created_at"],
+            "events": [event_out(e) for e in evs],
+            "sla_due_at": lc.sla_due_at(parse_ts(r["created_at"]), r["sla_hours"], parse_ts(r["repair_due_at"])),
+            "repair_due_at": r["repair_due_at"], "resolved_at": r["resolved_at"],
+            "rejection_reason": r["rejection_reason"], "payment_hold_eligible": hold_eligible(r)}
 
 
 @router.post("/api/citizen-reports", status_code=201, response_model=s.CitizenReport,
-             responses=s.NOT_FOUND, summary="Submit citizen report (server sets tracker status)")
-def add_citizen_report(req: s.CitizenReportReq, request: Request):
+             responses={**s.NOT_FOUND, 401: s.AUTH[401]}, summary="Submit citizen report (server sets tracker status)")
+def add_citizen_report(req: s.CitizenReportReq, request: Request,
+                       citizen: Optional[dict] = Depends(optional_citizen)):
     """View 4 report. The server resolves the road (road_id -> location within 500 m -> landmark/text), links the latest
-    matching work order, detects a duplicate (same road + issue in 7 days) and sets the tracker status; anon clients
-    cannot set it. contact_phone is stored privately and never returned."""
-    if len(set(req.photo_ids)) != len(req.photo_ids):
-        raise invalid("photo_ids", "photo_ids contains duplicates")
-    if req.photo_ids:
-        known = {p["photo_id"] for p in rows("SELECT photo_id FROM photos WHERE photo_id IN %(ids)s", ids=tuple(req.photo_ids))}
-        if missing := [p for p in req.photo_ids if p not in known]:
-            raise invalid("photo_ids", f"unknown photo_ids (upload them first via POST /api/uploads/photo): {', '.join(missing)}")
+    matching work order, detects a duplicate (same road + issue in 7 days) and sets the status: matched_to_contract when
+    a road matched, else reported. Officers move it on (payment hold, contractor notice, ...); clients cannot set it.
+    With `Authorization: Bearer <citizen token>` the report is saved to that citizen (GET /api/me/reports).
+    contact_phone is stored privately and never returned."""
+    check_photo_ids(req.photo_ids)
     if req.flag_id and not rows("SELECT 1 FROM flags WHERE flag_id = %(f)s", f=req.flag_id):
         raise invalid("flag_id", f"unknown flag_id {req.flag_id}")
     if req.work_order_id:
@@ -304,12 +343,11 @@ def add_citizen_report(req: s.CitizenReportReq, request: Request):
     kind = req.kind or ("still_broken" if linked else "new_issue")
     status, flag_id = "reported", req.flag_id
     if road_id:
-        status = "matched_to_contract"
+        status = "matched_to_contract"  # insert stops here; an officer decides on the payment hold
         under_dlp = one("SELECT under_dlp FROM roads WHERE road_id = %(r)s", "road", r=road_id)["under_dlp"]
         if kind != "verified_fixed" and is_dlp_surface({"road_id": road_id, "under_dlp": under_dlp,
                                                          "issue_type": req.issue_type, "kind": kind}):
-            status = "payment_held"  # DLP road: the original contractor owes the fix, BMC holds payment
-            if not flag_id:
+            if not flag_id:  # DLP surface defect: link the bill the hold would apply to
                 f = rows("SELECT flag_id FROM flags WHERE road_id = %(r)s AND detector = 'DLP_PAID_TWICE' "
                          "ORDER BY rupees_at_stake DESC LIMIT 1", r=road_id)
                 flag_id = f[0]["flag_id"] if f else None
@@ -323,14 +361,17 @@ def add_citizen_report(req: s.CitizenReportReq, request: Request):
         report_id = c.execute(text(
             "INSERT INTO citizen_reports (kind, issue_type, input_mode, text, language, matched_locality, road_id, "
             "work_order_id, linked_work_order_id, flag_id, status, duplicate_of, landmark, location_lat, location_lon, "
-            "location_accuracy_m, location_source) VALUES (:kind, :issue_type, :input_mode, :text, :language, "
+            "location_accuracy_m, location_source, citizen_id) VALUES (:kind, :issue_type, :input_mode, :text, :language, "
             ":matched_locality, :road_id, :work_order_id, :linked, :flag_id, :status, :dup, :landmark, :lat, :lon, "
-            ":acc, :src) RETURNING id"),
+            ":acc, :src, CAST(:cid AS uuid)) RETURNING id"),
             {"kind": kind, "issue_type": req.issue_type, "input_mode": req.input_mode, "text": req.text,
              "language": req.language, "matched_locality": req.matched_locality or locality, "road_id": road_id,
              "work_order_id": req.work_order_id, "linked": linked, "flag_id": flag_id, "status": status, "dup": dup,
              "landmark": req.landmark, "lat": loc and loc.lat, "lon": loc and loc.lon,
-             "acc": loc and loc.accuracy_m, "src": loc and loc.source}).scalar_one()
+             "acc": loc and loc.accuracy_m, "src": loc and loc.source,
+             "cid": citizen and citizen["citizen_id"]}).scalar_one()
+        add_event(c, report_id, "citizen", "created", None, status,
+                  meta={"road_matched": bool(road_id), "duplicate_of": dup})
         for pos, pid in enumerate(req.photo_ids, 1):
             c.execute(text("INSERT INTO citizen_report_photos (report_id, photo_id, position) VALUES (:r, :p, :n)"),
                       {"r": report_id, "p": pid, "n": pos})
@@ -342,4 +383,5 @@ def add_citizen_report(req: s.CitizenReportReq, request: Request):
 
 @router.get("/api/citizen-reports/{report_id}", response_model=s.CitizenReport, responses=s.NOT_FOUND, summary="Citizen report status + tracker")
 def citizen_report(report_id: int, request: Request):
+    """Public status page for a report: tracker, events[] (history), sla_due_at, rejection_reason. No contact data."""
     return build_report(report_id, request)
