@@ -6,6 +6,316 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v3/contractor-performance/monthly": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Monthly contractor scorecards: separate speed / SLA / durability / cost ranks",
+        "description": "One block per month; every contractor-month carries four independent ranks (null when its own sample\nis below the methodology minimum, with the reason in `rank_eligibility`), known/missing denominators,\ndescriptive context, and the work-order IDs used as evidence. No composite score.",
+        "operationId": "monthly_api_v3_contractor_performance_monthly_get",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "examples": [
+                "2025-06"
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "examples": [
+                "2025-09"
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "min_jobs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Hide rows with fewer completed jobs (does not re-rank)",
+              "default": 0,
+              "title": "Min Jobs"
+            },
+            "description": "Hide rows with fewer completed jobs (does not re-rank)"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "speed_rank",
+                "sla_rank",
+                "durability_rank",
+                "cost_rank",
+                "completed_jobs",
+                "contractor_id"
+              ],
+              "type": "string",
+              "description": "Null ranks sort last, then contractor_id",
+              "default": "speed_rank",
+              "title": "Sort By"
+            },
+            "description": "Null ranks sort last, then contractor_id"
+          },
+          {
+            "name": "methodology_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "v1",
+              "title": "Methodology Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v3/contractor-performance/contractors/{contractor_id}": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "One contractor's monthly series with ranks, context and evidence IDs",
+        "description": "404 for an unknown contractor; an empty `months` list if it has no completed jobs in range.",
+        "operationId": "contractor_api_v3_contractor_performance_contractors__contractor_id__get",
+        "parameters": [
+          {
+            "name": "contractor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "CT04"
+              ],
+              "title": "Contractor Id"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "methodology_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "v1",
+              "title": "Methodology Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorSeries"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v3/contractor-performance/methodology": {
+      "get": {
+        "tags": [
+          "View 3: Scorecard & Next Rupee"
+        ],
+        "summary": "Metric definitions, directions, tie rule, eligibility and limitations",
+        "operationId": "methodology_api_v3_contractor_performance_methodology_get",
+        "parameters": [
+          {
+            "name": "methodology_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "v1",
+              "title": "Methodology Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MethodologyDoc"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
     "/api/v3/contractors": {
       "get": {
         "tags": [
@@ -1262,6 +1572,113 @@
         ],
         "title": "ContractorContext"
       },
+      "ContractorMonth": {
+        "properties": {
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Name"
+          },
+          "month": {
+            "type": "string",
+            "title": "Month",
+            "description": "YYYY-MM (calendar month of completed_at)",
+            "examples": [
+              "2025-07"
+            ]
+          },
+          "methodology_version": {
+            "type": "string",
+            "title": "Methodology Version"
+          },
+          "computed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Computed At"
+          },
+          "completed_jobs": {
+            "type": "integer",
+            "title": "Completed Jobs"
+          },
+          "total_billed_inr": {
+            "type": "number",
+            "title": "Total Billed Inr"
+          },
+          "speed": {
+            "$ref": "#/components/schemas/SpeedMetric"
+          },
+          "sla": {
+            "$ref": "#/components/schemas/RateMetric"
+          },
+          "durability": {
+            "$ref": "#/components/schemas/RateMetric"
+          },
+          "cost_alignment": {
+            "$ref": "#/components/schemas/CostMetric"
+          },
+          "rank_eligibility": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Eligibility"
+            },
+            "type": "object",
+            "title": "Rank Eligibility"
+          },
+          "workload_mix": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Workload Mix"
+          },
+          "context": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Context",
+            "description": "Descriptive exposure context; never evidence of contractor fault"
+          },
+          "data_quality": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data Quality"
+          },
+          "evidence_work_order_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence Work Order Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contractor_id",
+          "contractor_name",
+          "month",
+          "methodology_version",
+          "computed_at",
+          "completed_jobs",
+          "total_billed_inr",
+          "speed",
+          "sla",
+          "durability",
+          "cost_alignment",
+          "rank_eligibility",
+          "workload_mix",
+          "context",
+          "data_quality",
+          "evidence_work_order_ids"
+        ],
+        "title": "ContractorMonth"
+      },
       "ContractorScore": {
         "properties": {
           "contractor_id": {
@@ -1430,6 +1847,167 @@
         ],
         "title": "ContractorScore"
       },
+      "ContractorSeries": {
+        "properties": {
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contractor Name"
+          },
+          "methodology_version": {
+            "type": "string",
+            "title": "Methodology Version"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunInfo"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/ContractorMonth"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contractor_id",
+          "contractor_name",
+          "methodology_version",
+          "run",
+          "months"
+        ],
+        "title": "ContractorSeries"
+      },
+      "CostMetric": {
+        "properties": {
+          "median_abs_pct_deviation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Abs Pct Deviation",
+            "description": "Median |cost - rate-card benchmark| / benchmark. 0.25 = 25%"
+          },
+          "sample_count": {
+            "type": "integer",
+            "title": "Sample Count"
+          },
+          "missing_count": {
+            "type": "integer",
+            "title": "Missing Count"
+          },
+          "over_tolerance_count": {
+            "type": "integer",
+            "title": "Over Tolerance Count"
+          },
+          "over_tolerance_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over Tolerance Share"
+          },
+          "under_tolerance_count": {
+            "type": "integer",
+            "title": "Under Tolerance Count",
+            "description": "Descriptive only; cheap jobs are not rewarded"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "cohort_size": {
+            "type": "integer",
+            "title": "Cohort Size"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sample_count",
+          "missing_count",
+          "over_tolerance_count",
+          "under_tolerance_count",
+          "cohort_size"
+        ],
+        "title": "CostMetric"
+      },
+      "DimensionDef": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "speed",
+              "sla",
+              "durability",
+              "cost_alignment"
+            ],
+            "title": "Key"
+          },
+          "rank_field": {
+            "type": "string",
+            "title": "Rank Field"
+          },
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "lower is better",
+              "higher is better"
+            ],
+            "title": "Direction"
+          },
+          "sample": {
+            "type": "string",
+            "title": "Sample"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "rank_field",
+          "metric",
+          "direction",
+          "sample",
+          "source"
+        ],
+        "title": "DimensionDef"
+      },
       "Driver": {
         "properties": {
           "feature": {
@@ -1458,6 +2036,42 @@
           "effect_logodds"
         ],
         "title": "Driver"
+      },
+      "Eligibility": {
+        "properties": {
+          "eligible": {
+            "type": "boolean",
+            "title": "Eligible"
+          },
+          "sample": {
+            "type": "integer",
+            "title": "Sample"
+          },
+          "min_sample": {
+            "type": "integer",
+            "title": "Min Sample"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Why rank is null, e.g. 'sample 3 < min 5'"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "eligible",
+          "sample",
+          "min_sample"
+        ],
+        "title": "Eligibility"
       },
       "Error": {
         "properties": {
@@ -1883,6 +2497,134 @@
         ],
         "title": "Lookup"
       },
+      "MethodologyDoc": {
+        "properties": {
+          "methodology_version": {
+            "type": "string",
+            "title": "Methodology Version"
+          },
+          "known_versions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Known Versions"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "grain": {
+            "type": "string",
+            "title": "Grain"
+          },
+          "month_rule": {
+            "type": "string",
+            "title": "Month Rule"
+          },
+          "dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/DimensionDef"
+            },
+            "type": "array",
+            "title": "Dimensions"
+          },
+          "ranking": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Ranking"
+          },
+          "context": {
+            "type": "string",
+            "title": "Context"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "methodology_version",
+          "known_versions",
+          "params",
+          "grain",
+          "month_rule",
+          "dimensions",
+          "ranking",
+          "context",
+          "limitations"
+        ],
+        "title": "MethodologyDoc"
+      },
+      "MonthBlock": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "title": "Month"
+          },
+          "contractors": {
+            "items": {
+              "$ref": "#/components/schemas/ContractorMonth"
+            },
+            "type": "array",
+            "title": "Contractors"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "month",
+          "contractors"
+        ],
+        "title": "MonthBlock"
+      },
+      "MonthlyResponse": {
+        "properties": {
+          "methodology_version": {
+            "type": "string",
+            "title": "Methodology Version"
+          },
+          "sort_by": {
+            "type": "string",
+            "enum": [
+              "speed_rank",
+              "sla_rank",
+              "durability_rank",
+              "cost_rank",
+              "completed_jobs",
+              "contractor_id"
+            ],
+            "title": "Sort By"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunInfo"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/MonthBlock"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "methodology_version",
+          "sort_by",
+          "run",
+          "months"
+        ],
+        "title": "MonthlyResponse"
+      },
       "NextRupeeItem": {
         "properties": {
           "item_id": {
@@ -2069,6 +2811,58 @@
           "explanation"
         ],
         "title": "NextRupeeItem"
+      },
+      "RateMetric": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "description": "sla: jobs with sla_met = true; durability: jobs reopened within 30 days"
+          },
+          "known": {
+            "type": "integer",
+            "title": "Known"
+          },
+          "missing": {
+            "type": "integer",
+            "title": "Missing"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "cohort_size": {
+            "type": "integer",
+            "title": "Cohort Size"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "count",
+          "known",
+          "missing",
+          "cohort_size"
+        ],
+        "title": "RateMetric"
       },
       "Reply": {
         "properties": {
@@ -2461,6 +3255,135 @@
           "engineer_remark"
         ],
         "title": "RoadWorkOrder"
+      },
+      "RunInfo": {
+        "properties": {
+          "methodology_version": {
+            "type": "string",
+            "title": "Methodology Version"
+          },
+          "computed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Computed At"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "source_counts": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Source Counts"
+          },
+          "data_quality": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data Quality"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "methodology_version",
+          "computed_at",
+          "params",
+          "source_counts",
+          "data_quality"
+        ],
+        "title": "RunInfo"
+      },
+      "SpeedMetric": {
+        "properties": {
+          "relative_index": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relative Index",
+            "description": "Ranked value: median of job hours / same-month same-repair-method city median. 1.0 = typical, lower = faster"
+          },
+          "median_complaint_to_completion_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Complaint To Completion Hours",
+            "description": "Raw median, earliest linked complaint -> completed_at"
+          },
+          "cohort_median_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cohort Median Hours",
+            "description": "Median of the matched cohort medians for this contractor's jobs (peer value)"
+          },
+          "sample_count": {
+            "type": "integer",
+            "title": "Sample Count",
+            "description": "Jobs in the normalized (ranked) sample"
+          },
+          "raw_sample_count": {
+            "type": "integer",
+            "title": "Raw Sample Count",
+            "description": "Jobs with a valid complaint -> completion time"
+          },
+          "missing_count": {
+            "type": "integer",
+            "title": "Missing Count"
+          },
+          "assigned_to_completed_median_hours_proxy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assigned To Completed Median Hours Proxy",
+            "description": "Proxy only (assigned_at -> completed_at); not ranked"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "cohort_size": {
+            "type": "integer",
+            "title": "Cohort Size",
+            "description": "Contractors eligible for this rank in this month"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sample_count",
+          "raw_sample_count",
+          "missing_count",
+          "cohort_size"
+        ],
+        "title": "SpeedMetric"
       },
       "TimelineEvent": {
         "properties": {

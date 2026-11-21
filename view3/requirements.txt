@@ -9,3 +9,5 @@ sqlalchemy>=2
 psycopg2-binary
 fastapi
 uvicorn
+pytest
+httpx

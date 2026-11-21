@@ -17,6 +17,7 @@ sys.path.insert(0, str(HERE.parent / "view3"))  # View 3 model code (allocator, 
 import allocator, view3_pipeline as vp
 from db import engine
 import models as m
+from features.contractor_performance import router as contractor_performance
 
 app = FastAPI(
     title="Follow the Rupee: Backend",
@@ -40,6 +41,8 @@ V1, V2, V3, V4 = ("View 1: City & Ward Overview", "View 2: Road Story",
                   "View 3: Scorecard & Next Rupee", "View 4: Citizen Layer")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 ENG = engine()
+contractor_performance.configure(ENG)  # monthly contractor scorecards (features/contractor_performance)
+app.include_router(contractor_performance.router)
 
 
 @lru_cache(maxsize=1)

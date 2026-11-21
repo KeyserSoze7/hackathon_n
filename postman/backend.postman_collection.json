@@ -628,6 +628,101 @@
               }
             }
           ]
+        },
+        {
+          "name": "Monthly contractor scorecards (separate ranks)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractor-performance/monthly?from=2025-06&to=2025-09&sort_by=speed_rank"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('months are YYYY-MM within range', () => b.months.forEach(m => { pm.expect(m.month).to.match(/^\\d{4}-\\d{2}$/); pm.expect(m.month >= '2025-06' && m.month <= '2025-09').to.be.true; }));",
+                  "pm.test('four separate ranks, no composite', () => b.months.forEach(m => m.contractors.forEach(c => { ['speed','sla','durability','cost_alignment'].forEach(k => pm.expect(c[k]).to.have.property('rank')); pm.expect(c).to.not.have.property('risk_adjusted_score'); pm.expect(c).to.not.have.property('overall_rank'); })));",
+                  "pm.test('denominators add up', () => b.months.forEach(m => m.contractors.forEach(c => { pm.expect(c.sla.known + c.sla.missing).to.eql(c.completed_jobs); pm.expect(c.evidence_work_order_ids.length).to.eql(c.completed_jobs); })));",
+                  "pm.test('sorted by speed_rank, nulls last', () => b.months.forEach(m => { const r = m.contractors.map(c => c.speed.rank); const nn = r.filter(x => x !== null); pm.expect(nn).to.eql([...nn].sort((a, b) => a - b)); pm.expect(r.slice(nn.length).every(x => x === null)).to.be.true; }));",
+                  "pm.test('null rank carries a reason', () => b.months.forEach(m => m.contractors.forEach(c => ['speed','sla','durability','cost_alignment'].forEach(k => { if (c[k].rank === null) pm.expect(c.rank_eligibility[k].reason).to.be.a('string'); }))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Monthly scorecards - bad month (422)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractor-performance/monthly?from=2025-13"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contractor monthly series",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractor-performance/contractors/CT04"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('one contractor, ascending months', () => { pm.expect(b.contractor_id).to.eql('CT04'); b.months.forEach(m => pm.expect(m.contractor_id).to.eql('CT04')); const ms = b.months.map(m => m.month); pm.expect(ms).to.eql([...ms].sort()); });",
+                  "pm.test('evidence IDs are work orders', () => b.months.forEach(m => m.evidence_work_order_ids.forEach(id => pm.expect(id).to.match(/^WO/))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contractor monthly series - unknown (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractor-performance/contractors/CT99"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contractor scorecard methodology",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v3/contractor-performance/methodology"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('four dimensions with directions', () => { const d = pm.response.json().dimensions; pm.expect(d.map(x => x.key)).to.eql(['speed','sla','durability','cost_alignment']); d.forEach(x => pm.expect(x.direction).to.be.oneOf(['lower is better','higher is better'])); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

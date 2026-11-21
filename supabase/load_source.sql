@@ -13,7 +13,8 @@ end $$;
 truncate wards, localities, locality_aliases, contractors, rate_card, roads, traffic, flood_hotspots,
   facilities, accidents, rainfall_daily, tides, complaints, work_orders, complaint_work_orders,
   social_posts, flags, flag_replies, citizen_reports, ward_audit,
-  v3_contractor_scorecard, v3_job_expected_risk, v3_next_rupee, v3_ward_allocation;
+  v3_contractor_scorecard, v3_job_expected_risk, v3_next_rupee, v3_ward_allocation,
+  contractor_monthly_scorecards, contractor_scorecard_runs;  -- rebuild: python -m features.contractor_performance.refresh
 
 \copy wards from 'data/wards.csv' csv header
 \copy localities from 'data/localities.csv' csv header
