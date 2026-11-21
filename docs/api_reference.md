@@ -82,6 +82,19 @@ is smaller than `dlp_road_spend_inr`).
 Note on item 11: the dataset says whether a road is under DLP but has no expiry. A 36-month DLP is assumed
 (every DLP road was resurfaced 5-33 months before Oct 2025); `dlp_expires_on` is an estimate.
 
+## Monthly contractor scorecards (View 3)
+
+Four separate monthly ranks per contractor (speed, SLA, durability, rate-card cost alignment), raw recorded outcomes,
+no composite score. Complements the season-level, context-adjusted `GET /api/v3/contractors`.
+
+| Endpoint | Returns |
+|---|---|
+| `GET /api/v3/contractor-performance/monthly?from=2025-06&to=2025-09&sort_by=speed_rank&min_jobs=0` | one block per month; each contractor-month has the four ranks (null with a reason when its sample is too small), denominators, context and evidence work-order IDs |
+| `GET /api/v3/contractor-performance/contractors/{contractor_id}?from=&to=` | one contractor's monthly series (404 if unknown) |
+| `GET /api/v3/contractor-performance/methodology` | metric definitions, ranking and tie rules, eligibility, limitations |
+
+Data is computed by `python -m backend.features.contractor_performance.refresh` (rerun after each data load).
+
 ## Everything else
 
 `GET /api/health`, `GET /api/wards` (`?ward=` / `X-Ward-Code` for one), `GET /api/wards/map` (GeoJSON),

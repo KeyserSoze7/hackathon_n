@@ -13,3 +13,5 @@ anthropic>=2.12
 python-multipart
 pillow
 pillow-heif
+pytest
+httpx

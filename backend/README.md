@@ -13,6 +13,7 @@ One FastAPI app serves all four views (frontend-facing endpoint guide: `docs/api
 | `routes/city_overview.py` | View 1: KPI strip, wards, ward map, flagged queue |
 | `routes/road_story.py` | View 2: road search, road receipt, timeline, flags, Right-of-Reply, draft notice / RTI |
 | `routes/scorecard_planner.py` | View 3: contractor scorecard, ward allocation, next rupee (ward or ALL), summary, budget slider + range |
+| `features/contractor_performance/` | View 3: monthly contractor scorecards (four separate ranks, no composite); see below |
 | `routes/citizen.py` | View 4: localities, lookup with candidates, livability, citizen query, citizen reports (report form) + tracker |
 | `routes/uploads.py` | View 4: photo upload (validated, EXIF read then stripped, HEIC to JPEG) and photo serving |
 | `openapi.json` | Exported spec for client generation |
@@ -58,6 +59,9 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | 3 | `GET /api/v3/next-rupee/{ward}` | `v3_next_rupee` (`ward` = code or `ALL`) |
 | 3 | `GET /api/v3/budget-range/{ward}` | slider min / max / default / step for a ward or `ALL` |
 | 3 | `GET /api/v3/summary` | `v3_model_meta` (model quality + budget curve for the demo chart) |
+| 3 | `GET /api/v3/contractor-performance/monthly?from=2025-06&to=2025-09&sort_by=speed_rank&min_jobs=0` | `contractor_monthly_scorecards`, `contractor_scorecard_runs` |
+| 3 | `GET /api/v3/contractor-performance/contractors/{contractor_id}?from=&to=` | same (one contractor's monthly series; 404 if unknown) |
+| 3 | `GET /api/v3/contractor-performance/methodology` | static: metric definitions, ranking rules, limitations |
 | 3 | `POST /api/v3/allocate` | live MILP re-solve for a ward or `ALL` (`scorecard_planner/budget_allocator.py`) |
 | 4 | `GET /api/localities?ward=` | `locality_list` (aliases as an array) |
 | 4 | `GET /api/lookup?q=&language=` | road / locality match + `candidates` (nearest 3 roads, each with its latest work order) |
@@ -66,11 +70,72 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | 4 | `POST /api/uploads/photo` | multipart `file` (JPEG/PNG/WebP/HEIC, max 8 MB; 413 / 415) → `{photo_id, photo_url, width, height, taken_at, exif_lat, exif_lon}` |
 | 4 | `GET /api/uploads/photo/{photo_id}` | the stored photo (local) or a redirect to its Supabase public URL |
 | 4 | `POST /api/citizen-reports` | report form: issue_type, photo_ids (≤3), location, landmark, flag_id, contact_phone (private) → road, duplicate_of, linked work order, responsible party, SLA, photos, tracker |
-| 4 | `GET /api/citizen-reports/{id}` | `citizen_reports` + `steps[]` ({step, label, status: done/current/pending, at}) |
+| 4 | `GET /api/citizen-reports/{id}` | same shape as the POST (incl. `tracker[]` {step, label, status, at}) |
 
 Ward codes are accepted as `K/W`, `K-W` or `k_w` everywhere (the frontend contract uses `K-W`; the database stores `K/W`).
 
 Claude endpoints need credentials: `ANTHROPIC_API_KEY` in the environment or repo-root `.env` (or an `ant auth login` profile). Without them they serve templates. `CLAUDE_TIMEOUT_S` (default 25; Claude drafts take ~12-14 s) sets the cut-over to the template.
+
+## Monthly contractor scorecards (`backend/features/contractor_performance/`)
+Separate, explainable **monthly** ranks for comparing contractors on future work: speed, SLA, durability and
+rate-card cost alignment. There is **no composite score**. This sits next to the season-level, context-adjusted
+`GET /api/v3/contractors` and does not change it.
+
+| File | Role |
+|---|---|
+| `router.py` | FastAPI routes (read-only), registered in `main.py` |
+| `schemas.py` | response models (in `/openapi.json`) |
+| `service.py` | refresh orchestration, read/shape, methodology text |
+| `repository.py` | Postgres reads/upsert, CSV source (debug), in-memory store (tests) |
+| `processor.py` | pure, deterministic aggregation and ranking (no I/O) |
+| `config.py` | versioned parameters (`v1`: tolerance 30%, min sample 5, min cohort 3) |
+| `exporter.py`, `refresh.py` | JSON snapshot (debugging only), refresh CLI |
+
+**Setup / refresh.** Apply `supabase/migrations/20261121000700_contractor_monthly_scorecards.sql` (safe to re-run;
+rollback is in its header), load the sources as usual, then recompute and upsert from the repo root:
+```bash
+python -m backend.features.contractor_performance.refresh                     # upsert methodology v1 (DATABASE_URL from .env)
+python -m backend.features.contractor_performance.refresh --csv-dir data --dry-run --export /tmp/cp.json   # no DB
+```
+The refresh is CLI-only (no write route on the public API). It is idempotent: one transaction upserts the run row,
+removes stale rows of that methodology version, and upserts `(contractor_id, month, methodology_version)` rows.
+GET requests only read stored rows. Re-run it after `load_source.sql` (which truncates these tables).
+The new tables have RLS on with **no anon policy**: the React app reads them through FastAPI only.
+
+**Grain and month.** One row per contractor x calendar month of `work_orders.completed_at` x methodology version.
+Jobs without `completed_at` get no month row; they are counted in `run.data_quality`.
+
+| Dimension (rank field) | Metric | Better | Sample |
+|---|---|---|---|
+| speed (`speed.rank`) | median of job hours / same-month same-`repair_method` city median, where hours = earliest linked `complaints.received_at` -> `completed_at` | lower | jobs with a linked complaint timestamp <= completion and a cohort of >= 3 jobs |
+| sla (`sla.rank`) | `sla_met` true / known | higher | non-null `sla_met` |
+| durability (`durability.rank`) | `reopened_within_30d` true / known | lower | non-null `reopened_within_30d` |
+| cost_alignment (`cost_alignment.rank`) | median abs(cost - benchmark) / benchmark; benchmark = `area_sqm x rate` (per sqm) or `rate` (per job) | lower | rate-card match, positive benchmark, area for per-sqm methods |
+
+- Raw median complaint-to-completion hours, the peer cohort median, a per-method breakdown and an
+  `assigned_at -> completed_at` **proxy** (never ranked) sit next to the speed index, so method mix is visible.
+- Cost: +/-30% around the benchmark is ordinary variation. `over_tolerance_count/share` is reported, and
+  `under_tolerance_count` is descriptive only, so cheap jobs are not rewarded.
+- Ranks are computed per dimension and per month among contractors whose sample for **that** dimension is >= 5.
+  Otherwise `rank` is null and `rank_eligibility[dim].reason` says why (e.g. `sample 3 < min 5`).
+- Ties: values are rounded to 6 decimals, then share the best rank (1, 2, 2, 4). Display order then goes by `contractor_id`.
+  `min_jobs` only hides rows; it never changes stored ranks. `cohort_size` = contractors eligible that month.
+- Null `sla_met` / `reopened_within_30d` count as `missing`, never as a success or failure.
+- `context` is **descriptive exposure, not adjustment and not evidence of fault**. It covers:
+  - regional rain (daily max across Santacruz/Colaba over the work window; not ward-specific)
+  - big-tide days (city-level)
+  - jobs in flood-hotspot wards (ward-level)
+  - job-weighted traffic
+  - distinct same-month accidents on serviced roads (not attributed to the contractor)
+  - jobs on ambulance-entry roads
+
+  Each block reports its coverage and is `null` if its source table is missing.
+- Data quality: a work order's ward is checked against `roads.ward_code`. Any mismatch is listed in `data_quality`
+  rather than resolved silently.
+- Evidence: `evidence_work_order_ids` lists every job in the contractor-month.
+- Changing any parameter means adding a new version in `config.py`, so old rankings stay reproducible.
+
+Tests (no database): `pytest backend/tests -q` (from the repo root).
 
 ## Changing an endpoint (e.g. View 2)
 - Each view's routes are in `routes/<view>.py` (View 2: `routes/road_story.py`). New endpoint for a view → add it to that file.
@@ -85,4 +150,4 @@ Claude endpoints need credentials: `ANTHROPIC_API_KEY` in the environment or rep
   (`%(name)s` params; never format user input into SQL) and `ENG.begin()` + `text()` for writes.
 - Numbers come from the database/pipeline; endpoints only select and shape. No arithmetic in prompts or UI.
 - Update `postman/backend.postman_collection.json` and run it against an API started with `STRICT_MODELS=1`:
-  `postman collection run postman/backend.postman_collection.json` (37 requests, 94 assertions)
+  `postman collection run postman/backend.postman_collection.json --working-dir .` (counts in the run summary)

@@ -34,8 +34,9 @@ The schema (tables, types, RLS) is owned by `supabase/migrations/`; this pipelin
      `POST /api/v3/allocate {"ward_code":"K/W","budget_inr":500000}` → exact re-solve, about 0.01 s
    - View 4: `GET /api/lookup?q=...` (road name, locality, alias or Devanagari), `POST /api/citizen-reports`,
      `GET /api/citizen-reports/{id}` (tracker status is set by the server)
-   - Tests: `postman collection run postman/backend.postman_collection.json` (23 requests, 59 assertions)
+   - Tests: `postman collection run postman/backend.postman_collection.json` (see `backend/README.md` for current counts)
 5. **Refresh** after any data change: `audit_engine/run_audit.py` + `supabase/load_audit_outputs.sql`, then this pipeline. Restart the API.
+   Monthly contractor scorecards (`/api/v3/contractor-performance/...`): after each load run `python -m backend.features.contractor_performance.refresh` from the repo root (see `backend/README.md`).
 
 ## Split of work
 | Layer | Where | What |

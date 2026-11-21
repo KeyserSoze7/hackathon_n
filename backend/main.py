@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from backend.features.contractor_performance import router as contractor_performance
 from backend.routes import citizen, city_overview, health, road_story, scorecard_planner, uploads
 
 app = FastAPI(
@@ -45,6 +46,7 @@ async def cap_upload_size(request: Request, call_next):
 
 for module in (health, city_overview, road_story, scorecard_planner, citizen, uploads):
     app.include_router(module.router)
+app.include_router(contractor_performance.router)  # monthly contractor scorecards (backend/features/contractor_performance)
 
 
 @app.on_event("startup")
