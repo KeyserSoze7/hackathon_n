@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MARG·LEDGER · Mumbai road repair audit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+          colors: {
+            concrete: '#F3F4F6',
+            surface: '#FFFFFF',
+            hairline: '#D8DCE2',
+            ink: '#111317',
+            muted: '#4B5563',
+            hwyellow: '#F5B700',
+            hwgreen: '#0F5C43',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { font-style: normal !important; box-sizing: border-box; }
+    body {
+      background-color: #F3F4F6; color: #111317;
+      font-family: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+      font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .tnum { font-variant-numeric: tabular-nums; }
+    .balance { text-wrap: balance; }
+
+    /* Black-and-yellow kerb, drawn as a flat tile pattern (no gradient). */
+    .highway-curb {
+      height: 6px; width: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='6'%3E%3Crect width='12' height='6' fill='%23111317'/%3E%3Crect x='12' width='12' height='6' fill='%23F5B700'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+    }
+
+    .skeleton { background-color: #E2E5EB; animation: skelPulse 1.15s ease-in-out infinite; }
+    @keyframes skelPulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+
+    .scanner-line {
+      position: absolute; left: 6%; right: 6%; height: 3px; background-color: #F5B700;
+      animation: scanSweep 0.95s ease-in-out infinite;
+    }
+    @keyframes scanSweep { 0% { top: 8%; } 50% { top: 86%; } 100% { top: 8%; } }
+
+    .eq-bar { transform-origin: bottom; animation: eqBounce 0.65s ease-in-out infinite; }
+    @keyframes eqBounce { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+
+    .pop-confirm { animation: popConfirm 0.2s ease-out both; }
+    @keyframes popConfirm { from { opacity: 0.6; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
+
+    .highway-centerline { border-left: 3px dashed #9CA3AF; }
+
+    input[type="range"].daylight-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; background: #E2E5EB; border-radius: 999px; outline: none; }
+    input[type="range"].daylight-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 999px; background: #F5B700; border: 3px solid #111317; cursor: pointer; }
+    input[type="range"].daylight-slider::-moz-range-thumb { width: 30px; height: 30px; border-radius: 999px; background: #F5B700; border: 3px solid #111317; cursor: pointer; }
+
+    :focus-visible { outline: 2px solid #111317; outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { .skeleton, .scanner-line, .eq-bar, .pop-confirm { animation: none; } }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-concrete text-ink">
+
+  <!-- ================================================================== -->
+  <!-- HEADER: brand row + ward switch + language, then the screen nav      -->
+  <!-- ================================================================== -->
+  <header class="sticky top-0 z-40 bg-surface">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3 min-w-0 max-w-full">
+        <a href="#start" class="flex items-center gap-2.5 shrink-0" aria-label="MARG·LEDGER home">
+          <span class="w-8 h-8 rounded-[8px] bg-hwyellow border border-ink text-ink flex items-center justify-center font-bold text-sm tracking-tight">M₹</span>
+          <span class="text-base font-bold tracking-tight">MARG·LEDGER</span>
+        </a>
+        <button id="ward-pill" onclick="openWardModal()" aria-haspopup="dialog" class="min-w-0 max-w-full min-h-[40px] px-3.5 py-1.5 rounded-[8px] bg-hwgreen text-surface flex items-center gap-2 hover:opacity-95 transition-opacity">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+          <span id="header-ward-pill" class="font-mono text-xs font-semibold tracking-wide truncate max-w-[200px] sm:max-w-none"></span>
+          <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+        </button>
+      </div>
+
+      <div role="group" aria-label="Language" class="flex items-center bg-concrete border border-hairline rounded-[14px] p-[4px]">
+        <button onclick="setLanguage('en')" id="lang-en" aria-pressed="true" class="min-h-[38px] px-3 rounded-[10px] text-sm font-semibold bg-hwyellow text-ink">EN</button>
+        <button onclick="setLanguage('hi')" id="lang-hi" aria-pressed="false" class="min-h-[38px] px-3 rounded-[10px] text-sm font-medium text-muted hover:text-ink">हिन्दी</button>
+        <button onclick="setLanguage('mr')" id="lang-mr" aria-pressed="false" class="min-h-[38px] px-3 rounded-[10px] text-sm font-medium text-muted hover:text-ink">मराठी</button>
+      </div>
+    </div>
+
+    <nav aria-label="Screens" class="border-t border-hairline bg-surface">
+      <ul class="max-w-6xl mx-auto px-2 sm:px-4 py-2 grid grid-cols-5 sm:flex gap-1">
+        <li><a href="#start" data-nav="start" class="nav-link"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg><span class="hidden sm:inline" data-i18n="navStart">Find a road</span><span class="sm:hidden">Find</span></a></li>
+        <li><a href="#receipt" data-nav="receipt" class="nav-link"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z" /><path d="M9 7h6M9 11h6M9 15h4" /></svg><span class="hidden sm:inline" data-i18n="navReceipt">Road receipt</span><span class="sm:hidden">Receipt</span></a></li>
+        <li><a href="#city" data-nav="city" class="nav-link"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg><span class="hidden sm:inline" data-i18n="navCity">City audit</span><span class="sm:hidden">City</span></a></li>
+        <li><a href="#contractors" data-nav="contractors" class="nav-link"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1" /><path d="M16 4a4 4 0 0 1 0 8M22 21v-1a6 6 0 0 0-4-5.6" /></svg><span class="hidden sm:inline" data-i18n="navContractors">Contractors</span><span class="sm:hidden">Firms</span></a></li>
+        <li><a href="#nextrupee" data-nav="nextrupee" class="nav-link"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2" /><path d="M3 10h18M16 15h2" /></svg><span class="hidden sm:inline" data-i18n="navNextRupee">Next rupee</span><span class="sm:hidden">Next ₹</span></a></li>
+      </ul>
+    </nav>
+    <div class="highway-curb" aria-hidden="true"></div>
+  </header>
+
+  <style>
+    .nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 52px; padding: 6px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; color: #4B5563; text-align: center; transition: background-color .15s, color .15s; }
+    .nav-link:hover { color: #111317; background-color: #F3F4F6; }
+    .nav-link.is-active { background-color: #F5B700; color: #111317; font-weight: 600; }
+    .nav-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    @media (min-width: 640px) { .nav-link { flex-direction: row; gap: 8px; min-height: 46px; padding: 0 16px; font-size: 14px; } }
+  </style>
+
+  <main id="app" class="flex-1 w-full min-w-0 max-w-6xl mx-auto px-4 py-7 sm:py-9">
+
+    <!-- Boot state: shown until the sample data has loaded -->
+    <div id="boot" class="space-y-5" role="status" aria-label="Loading data">
+      <div class="skeleton h-10 w-2/3 rounded"></div>
+      <div class="skeleton h-5 w-1/2 rounded"></div>
+      <div class="skeleton h-64 w-full rounded-[20px]"></div>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 1: FIND A ROAD                                             -->
+    <!-- ================================================================ -->
+    <section id="screen-start" class="hidden space-y-8">
+      <div class="max-w-3xl space-y-2">
+        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight leading-tight balance">Find any Mumbai road and see what it cost, whether it is under warranty, and how it has held up</h1>
+        <p class="text-base text-muted">Type a road name or area. Every answer links back to the work orders, complaints and flags behind it.</p>
+      </div>
+
+      <div class="bg-surface border border-hairline rounded-[20px] p-[12px] sm:p-5 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 class="text-lg font-bold">Find a road</h2>
+          <div role="tablist" aria-label="How to find a road" class="grid grid-cols-3 bg-concrete border border-hairline rounded-[12px] p-[4px] gap-1">
+            <button role="tab" id="ftab-signboard" aria-selected="true" onclick="setFinderTab('signboard')" class="min-h-[42px] px-3 rounded-[8px] text-xs sm:text-sm font-semibold bg-hwyellow text-ink">Photo of signboard</button>
+            <button role="tab" id="ftab-qr" aria-selected="false" onclick="setFinderTab('qr')" class="min-h-[42px] px-3 rounded-[8px] text-xs sm:text-sm font-medium text-muted hover:text-ink">Scan QR code</button>
+            <button role="tab" id="ftab-search" aria-selected="false" onclick="setFinderTab('search')" class="min-h-[42px] px-3 rounded-[8px] text-xs sm:text-sm font-medium text-muted hover:text-ink">Type road or area</button>
+          </div>
+        </div>
+        <p class="text-xs text-muted">Demo build: the photo and QR options walk through the flow with one sample road. Reading signboards and QR codes is not connected yet.</p>
+
+        <!-- Signboard -->
+        <div id="finder-panel-signboard" class="space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            <div class="lg:col-span-7 relative rounded-[8px] bg-concrete border-2 border-dashed border-hairline p-6 flex flex-col items-center justify-center min-h-[230px] overflow-hidden">
+              <div id="signboard-scanner-line" class="hidden scanner-line"></div>
+              <div class="w-full max-w-sm rounded-[8px] bg-surface border-2 border-ink overflow-hidden">
+                <div class="bg-hwgreen text-surface px-4 py-2 flex items-center justify-between">
+                  <span class="font-mono text-xs font-semibold tracking-wider">WARD L</span>
+                  <span class="font-mono text-xs font-semibold">RD0220</span>
+                </div>
+                <div class="px-4 py-4 text-center">
+                  <p class="text-xl font-bold tracking-tight">KURLA ANDHERI ROAD</p>
+                </div>
+                <div class="highway-curb"></div>
+              </div>
+              <p class="text-xs text-muted mt-4 text-center">Sample board for the demo. Real boards are not read yet.</p>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+              <div id="signboard-idle" class="rounded-[8px] bg-concrete border border-hairline p-5 space-y-3 flex-1 flex flex-col justify-center">
+                <h3 class="text-base font-bold">No QR code needed</h3>
+                <p class="text-sm text-muted">Photograph the road name on a signboard. It is matched against <span class="font-mono text-xs text-ink">roads.csv</span> and <span class="font-mono text-xs text-ink">localities.csv</span>.</p>
+              </div>
+              <div id="signboard-skeleton" class="hidden rounded-[8px] bg-concrete border border-hairline p-5 space-y-3 flex-1" role="status" aria-label="Matching road">
+                <p class="text-sm font-semibold">Matching the board to the road list…</p>
+                <div class="h-4 w-1/3 rounded skeleton"></div>
+                <div class="h-6 w-3/4 rounded skeleton"></div>
+                <div class="h-10 w-full rounded skeleton"></div>
+              </div>
+              <div id="signboard-matched" class="hidden rounded-[8px] bg-surface border-2 border-ink p-5 space-y-3 pop-confirm">
+                <p class="text-xs font-semibold text-hwgreen">Demo match</p>
+                <h3 id="sb-name" class="text-lg font-bold"></h3>
+                <p id="sb-meta" class="font-mono text-xs text-muted"></p>
+                <button onclick="openRoad('RD0220')" class="w-full min-h-[48px] px-4 rounded-[8px] bg-hwyellow text-ink text-sm font-bold hover:brightness-95">Open road receipt</button>
+              </div>
+              <button onclick="snapSignboard()" id="snap-signboard-btn" class="w-full min-h-[54px] px-5 rounded-[8px] bg-hwyellow text-ink text-base font-bold hover:brightness-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+                <span>Photograph road signboard</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR -->
+        <div id="finder-panel-qr" class="hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+            <div class="lg:col-span-6 relative rounded-[8px] bg-concrete border border-hairline p-6 min-h-[220px] flex flex-col items-center justify-center overflow-hidden">
+              <div id="qr-scanner-line" class="hidden scanner-line"></div>
+              <div class="w-40 h-40 rounded-[8px] bg-surface border-2 border-ink flex items-center justify-center">
+                <svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3z" /><path d="M20 14v3h-3" /><path d="M14 20h6" /></svg>
+              </div>
+              <p id="qr-status-text" class="font-mono text-xs text-muted mt-3">Ready</p>
+            </div>
+            <div class="lg:col-span-6 space-y-4">
+              <h3 class="text-lg font-bold">Scan a road's QR code</h3>
+              <p class="text-sm text-muted">A QR code on each signboard would carry the <span class="font-mono text-xs text-ink">road_id</span> and open its receipt directly. This option is a concept in the demo; no such codes exist in the data.</p>
+              <button onclick="runQrScan()" class="w-full sm:w-auto min-h-[52px] px-6 rounded-[8px] bg-hwyellow text-ink text-base font-bold hover:brightness-95">Simulate a scan of RD0220</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div id="finder-panel-search" class="hidden space-y-4">
+          <label class="block">
+            <span class="sr-only">Road name, area or road ID</span>
+            <input id="road-live-search" type="search" oninput="renderSearch()" placeholder="Road name, ward or ID, for example Kurla, L, or RD0220" class="w-full min-h-[52px] px-4 rounded-[8px] bg-concrete border border-hairline text-base placeholder:text-muted focus:outline-none focus:border-ink" />
+          </label>
+          <p id="road-search-count" class="font-mono text-xs text-muted"></p>
+          <div id="road-directory-list" class="divide-y divide-hairline border border-hairline rounded-[8px] bg-surface overflow-hidden"></div>
+        </div>
+      </div>
+
+      <div class="highway-curb rounded-full overflow-hidden" aria-hidden="true"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <!-- Your area -->
+        <div class="bg-surface border border-hairline rounded-[20px] p-[12px] sm:p-5 flex flex-col justify-between gap-5">
+          <div class="space-y-4">
+            <div class="flex items-baseline justify-between gap-2">
+              <h2 class="text-lg font-bold">Your area</h2>
+              <span id="area-ward-code" class="font-mono text-xs font-semibold text-hwgreen"></span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="rounded-[8px] bg-concrete border border-hairline p-4 space-y-1">
+                <p class="text-xs text-muted">Spent this monsoon</p>
+                <p id="area-budget-spent" class="text-2xl font-bold tnum"></p>
+                <p id="area-budget-total" class="text-xs text-muted tnum"></p>
+              </div>
+              <div class="rounded-[8px] bg-concrete border border-ink p-4 space-y-1">
+                <p class="text-xs text-muted">Billed under warranty</p>
+                <p id="area-recoverable" class="text-2xl font-bold tnum"></p>
+                <p id="area-recoverable-share" class="text-xs text-muted tnum"></p>
+              </div>
+              <div class="rounded-[8px] bg-concrete border border-hairline p-4 space-y-1">
+                <p class="text-xs text-muted">Complaints per 100,000 people</p>
+                <p id="area-complaints" class="text-2xl font-bold tnum"></p>
+                <p id="area-flood" class="text-xs text-muted tnum"></p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <button onclick="toggleAudio('area')" class="w-full min-h-[52px] px-4 rounded-[8px] bg-concrete border border-ink hover:bg-hwyellow/20 text-sm font-semibold flex items-center justify-between gap-3 transition-colors">
+              <span class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /></svg>
+                <span id="audio-label-area">Listen to a 10-second summary</span>
+              </span>
+              <span class="flex items-center gap-2 shrink-0">
+                <span id="audio-eq-area" class="hidden flex items-end gap-0.5 h-4">
+                  <span class="w-1 h-full bg-ink rounded-full eq-bar" style="animation-delay:0s"></span>
+                  <span class="w-1 h-full bg-ink rounded-full eq-bar" style="animation-delay:0.15s"></span>
+                  <span class="w-1 h-full bg-ink rounded-full eq-bar" style="animation-delay:0.3s"></span>
+                </span>
+                <span id="audio-time-area" class="font-mono text-xs text-muted tnum">0:10</span>
+              </span>
+            </button>
+            <div class="w-full h-1.5 bg-concrete rounded-full overflow-hidden"><div id="audio-bar-area" class="h-full bg-hwyellow w-0 transition-all duration-100"></div></div>
+          </div>
+        </div>
+
+        <!-- Moving here -->
+        <div class="bg-surface border border-hairline rounded-[20px] p-[12px] sm:p-5 flex flex-col justify-between gap-5">
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h2 class="text-lg font-bold">Moving here? Check within 1.5 km</h2>
+            </div>
+            <div id="mi-pills" class="flex flex-wrap gap-2" role="group" aria-label="Choose a locality"></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-[8px] bg-concrete border border-hairline p-3.5 space-y-0.5">
+                <p class="text-xs text-muted">Flood hotspots</p>
+                <p id="mi-floods" class="text-2xl font-bold tnum"></p>
+              </div>
+              <div class="rounded-[8px] bg-concrete border border-hairline p-3.5 space-y-0.5">
+                <p class="text-xs text-muted">Repairs failed within 30 days</p>
+                <p id="mi-failure" class="text-2xl font-bold tnum"></p>
+              </div>
+              <div class="rounded-[8px] bg-concrete border border-hairline p-3.5 space-y-0.5">
+                <p class="text-xs text-muted">Hospital access roads</p>
+                <p id="mi-ambulance" class="text-2xl font-bold tnum"></p>
+              </div>
+              <div class="rounded-[8px] bg-concrete border border-hairline p-3.5 space-y-0.5">
+                <p class="text-xs text-muted">Ward spend on warranty roads</p>
+                <p id="mi-ward-share" class="text-2xl font-bold tnum"></p>
+              </div>
+            </div>
+          </div>
+          <p id="mi-note" class="text-xs text-muted"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 2: ROAD RECEIPT                                            -->
+    <!-- ================================================================ -->
+    <section id="screen-receipt" class="hidden max-w-3xl mx-auto space-y-6">
+      <div class="bg-surface border border-hairline rounded-[16px] overflow-hidden flex">
+        <div class="w-2.5 bg-hwyellow shrink-0" aria-hidden="true"></div>
+        <div class="p-5 flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1 min-w-0">
+            <p id="rc-sign-mono" class="font-mono text-xs font-semibold text-hwgreen"></p>
+            <h1 id="rc-road-name" class="text-2xl sm:text-3xl font-bold tracking-tight balance"></h1>
+            <p id="rc-verdict" class="text-sm text-muted"></p>
+          </div>
+          <button onclick="location.hash='start'" class="min-h-[42px] px-4 rounded-[8px] bg-concrete border border-hairline hover:border-ink text-sm font-semibold shrink-0">Find another road</button>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-hairline rounded-[20px] p-[12px] sm:p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-concrete border border-hairline rounded-[8px] p-5">
+          <div class="md:col-span-4 space-y-1">
+            <p class="text-xs font-medium text-muted">Billed to BMC this monsoon</p>
+            <p id="rc-billed" class="text-[40px] sm:text-[44px] font-bold tracking-tight tnum leading-none"></p>
+            <p id="rc-wo-sub" class="font-mono text-xs text-muted"></p>
+          </div>
+          <div class="md:col-span-4 md:border-l md:border-hairline md:pl-5 pt-4 md:pt-0 border-t md:border-t-0 border-hairline space-y-1">
+            <p class="text-xs font-medium text-muted">Billed while under warranty</p>
+            <p id="rc-owed" class="text-[40px] sm:text-[44px] font-bold tracking-tight text-hwgreen tnum leading-none"></p>
+            <p class="text-xs font-medium">Original contractor's cost under warranty</p>
+          </div>
+          <div class="md:col-span-4 pt-3 md:pt-0 space-y-1.5">
+            <button onclick="toggleAudio('receipt')" class="w-full min-h-[48px] px-3.5 rounded-[8px] bg-surface border border-ink hover:bg-hwyellow/20 text-xs font-semibold flex items-center justify-between gap-2 transition-colors">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /></svg>
+                <span id="audio-label-receipt">Listen (10 seconds)</span>
+              </span>
+              <span id="audio-time-receipt" class="font-mono text-xs text-muted tnum">0:10</span>
+            </button>
+            <div class="w-full h-1.5 bg-surface rounded-full overflow-hidden"><div id="audio-bar-receipt" class="h-full bg-hwyellow w-0 transition-all duration-100"></div></div>
+          </div>
+        </div>
+
+        <p id="rc-warranty-note" class="text-sm text-muted"></p>
+
+        <div class="space-y-4">
+          <h2 class="text-base font-bold">Connected proof trail</h2>
+          <div class="ml-3 pl-7 highway-centerline space-y-6 py-1">
+            <div class="relative space-y-1">
+              <span class="absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-surface border-2 border-ink" aria-hidden="true"></span>
+              <p id="rc-s1-meta" class="font-mono text-xs text-muted tnum"></p>
+              <h3 id="rc-s1-title" class="text-base font-bold"></h3>
+              <p id="rc-s1-desc" class="text-sm text-muted"></p>
+            </div>
+            <div class="relative space-y-1">
+              <span class="absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-ink" aria-hidden="true"></span>
+              <p id="rc-s2-meta" class="font-mono text-xs text-muted tnum"></p>
+              <h3 id="rc-s2-title" class="text-base font-bold"></h3>
+              <p id="rc-s2-desc" class="text-sm text-muted"></p>
+            </div>
+            <div class="relative">
+              <span class="absolute -left-[37px] top-3 w-4 h-4 rounded-[3px] bg-hwyellow border border-ink" aria-hidden="true"></span>
+              <div class="rounded-[8px] border-2 border-ink p-4 space-y-1">
+                <p id="rc-s3-meta" class="font-mono text-xs font-bold tnum"></p>
+                <h3 id="rc-s3-title" class="text-base font-bold"></h3>
+                <p id="rc-s3-desc" class="text-sm"></p>
+              </div>
+            </div>
+            <div class="relative space-y-3">
+              <span class="absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-hwyellow border-2 border-ink" aria-hidden="true"></span>
+              <div class="space-y-1">
+                <p id="rc-s4-status" class="font-mono text-xs font-semibold"></p>
+                <h3 class="text-base font-bold">Audit flags</h3>
+                <p class="text-sm text-muted">Each flag is a rule the data triggered, not a finding of wrongdoing. The contractor or ward engineer can reply on the record.</p>
+              </div>
+              <button onclick="toggleEvidenceDrawer()" aria-expanded="false" id="ev-toggle" class="w-full min-h-[46px] px-4 rounded-[8px] bg-concrete border border-hairline hover:border-ink text-sm font-semibold flex items-center justify-between">
+                <span id="ev-toggle-label">Show evidence rows</span>
+                <svg id="ev-chevron" class="w-4 h-4 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+              </button>
+              <div id="evidence-drawer" class="hidden space-y-4 pt-1">
+                <ul id="rc-raw-rows" class="divide-y divide-hairline rounded-[8px] bg-concrete border border-hairline"></ul>
+                <div class="space-y-2">
+                  <label for="reply-input" class="block text-sm font-semibold">Right of reply (ward engineer or contractor)</label>
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="reply-input" type="text" placeholder="For example, utility trench permit or site note" class="flex-1 min-h-[46px] px-3.5 rounded-[8px] bg-surface border border-hairline text-sm placeholder:text-muted focus:outline-none focus:border-ink" />
+                    <button onclick="logOfficialReply()" class="min-h-[46px] px-4 rounded-[8px] bg-ink text-surface text-sm font-semibold hover:opacity-90 shrink-0">Log reply</button>
+                  </div>
+                  <p class="text-xs text-muted">Replies are held in this browser only. They are not saved to any record yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="openNoticeModal()" class="w-full min-h-[54px] px-5 rounded-[8px] bg-hwyellow text-ink text-base font-bold hover:brightness-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>
+          <span>Draft defect notice (EN / मराठी)</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 3: CITY AUDIT                                              -->
+    <!-- ================================================================ -->
+    <section id="screen-city" class="hidden space-y-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <h1 id="city-headline" class="text-2xl sm:text-3xl font-bold tracking-tight balance"></h1>
+        <p id="city-counts" class="font-mono text-xs text-muted tnum"></p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-surface border border-hairline rounded-[16px] p-5 space-y-1">
+          <p class="text-xs font-medium text-muted">Monsoon spend against budget</p>
+          <p id="city-spend" class="text-3xl font-bold tracking-tight tnum"></p>
+          <p id="city-budget" class="text-xs text-muted tnum"></p>
+        </div>
+        <div class="bg-surface border-2 border-ink rounded-[16px] p-5 space-y-1">
+          <p class="text-xs font-medium">Billed on roads under warranty</p>
+          <p id="city-recoverable" class="text-3xl font-bold tracking-tight text-hwgreen tnum"></p>
+          <p id="city-recoverable-note" class="text-xs text-muted"></p>
+        </div>
+        <div class="bg-surface border border-hairline rounded-[16px] p-5 space-y-1">
+          <p class="text-xs font-medium text-muted">Repairs that failed within 30 days</p>
+          <p id="city-reopened" class="text-3xl font-bold tracking-tight tnum"></p>
+          <p id="city-reopened-share" class="text-xs text-muted tnum"></p>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-hairline rounded-[20px] p-5 sm:p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold">Ward map: share of spend on warranty roads</h2>
+            <p class="text-sm text-muted">Select a ward to filter the table below. Dashed wards are flood-prone with few complaints per resident.</p>
+          </div>
+          <button onclick="setCityWard('ALL')" id="city-all-btn" class="min-h-[42px] px-4 rounded-[8px] text-sm font-bold">All wards</button>
+        </div>
+        <div id="city-ward-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>
+        <div class="flex flex-wrap items-center gap-4 text-xs text-muted">
+          <span class="flex items-center gap-2"><i class="inline-block w-4 h-3 rounded-sm bg-hwyellow/40 border border-hairline"></i> 25% or more</span>
+          <span class="flex items-center gap-2"><i class="inline-block w-4 h-3 rounded-sm bg-concrete border border-hairline"></i> 15 to 25%</span>
+          <span class="flex items-center gap-2"><i class="inline-block w-4 h-3 rounded-sm bg-surface border border-hairline"></i> Under 15%</span>
+          <span class="flex items-center gap-2"><i class="inline-block w-4 h-3 rounded-sm border border-dashed border-ink"></i> Flood-prone, few complaints</span>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-hairline rounded-[20px] p-5 sm:p-6 space-y-4">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="city-table-title" class="text-lg font-bold">Roads with the largest warranty bills</h2>
+          <span id="city-table-count" class="font-mono text-xs text-muted tnum"></span>
+        </div>
+        <div class="overflow-x-auto relative">
+          <table class="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr class="border-b border-hairline text-xs text-muted">
+                <th scope="col" class="pb-3 pr-4 font-medium">Road and stretch</th>
+                <th scope="col" class="pb-3 px-3 font-medium">Ward</th>
+                <th scope="col" class="pb-3 px-3 font-medium">Flag</th>
+                <th scope="col" class="pb-3 px-3 text-right font-medium">Billed under warranty</th>
+                <th scope="col" class="pb-3 pl-3 text-right font-medium"><span class="sr-only">Action</span></th>
+              </tr>
+            </thead>
+            <tbody id="city-flagged-body" class="divide-y divide-hairline text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 4: CONTRACTORS                                             -->
+    <!-- ================================================================ -->
+    <section id="screen-contractors" class="hidden space-y-6">
+      <div class="max-w-3xl space-y-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight balance">Each contractor's record, shown beside the rain and flooding they worked in</h1>
+        <p class="text-base text-muted">Raw failure rates punish contractors who work in flood-prone wards. Each rate here sits beside what is expected for that contractor's own mix of repairs and wards.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-8 bg-surface border border-hairline rounded-[20px] p-5 sm:p-6 space-y-5">
+          <div class="overflow-x-auto relative">
+            <table class="w-full text-left border-collapse min-w-[680px]">
+              <thead>
+                <tr class="border-b border-hairline text-xs text-muted">
+                  <th scope="col" class="pb-3 pr-3 font-medium">Contractor</th>
+                  <th scope="col" class="pb-3 px-2 text-right font-medium">Failed within 30 days</th>
+                  <th scope="col" class="pb-3 px-2 text-right font-medium">Met SLA</th>
+                  <th scope="col" class="pb-3 pl-4 border-l border-hairline font-medium">Where they worked</th>
+                </tr>
+              </thead>
+              <tbody id="contractor-body" class="divide-y divide-hairline text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="lg:col-span-4 bg-surface border border-hairline rounded-[20px] p-5 sm:p-6 space-y-4">
+          <h2 class="text-lg font-bold">How to read this</h2>
+          <ul class="space-y-3 text-sm text-muted">
+            <li><span class="font-semibold text-ink">Expected rate</span> is the citywide failure rate for the same repair methods, in wards with the same flood-proneness, as this contractor's jobs.</li>
+            <li><span class="font-semibold text-ink">Range</span> is the 95% uncertainty band. Fewer jobs means a wider range, so a small contractor is not judged on a few jobs.</li>
+            <li><span class="font-semibold text-ink">Flood-prone</span> means a ward low-lying index of 0.6 or more.</li>
+            <li><span class="font-semibold text-ink">Warranty bills</span> are today's status from the dataset, so treat them as an upper bound.</li>
+            <li>There are no grades. The figures are for review and do not establish fault.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SCREEN 5: NEXT RUPEE                                              -->
+    <!-- ================================================================ -->
+    <section id="screen-nextrupee" class="hidden space-y-8">
+      <div class="max-w-3xl space-y-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight balance">Where the next rupee does the most good</h1>
+        <p class="text-base text-muted">Roads are ranked by risk: traffic, accidents from road defects, flood spots, hospital access and repairs that keep failing. Roads under warranty cost BMC nothing, so budget goes to the rest.</p>
+      </div>
+
+      <div class="bg-surface border border-hairline rounded-[20px] p-6 sm:p-7 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3">
+          <div>
+            <p class="text-sm text-muted">Budget to spend</p>
+            <p id="nr-budget-display" class="text-4xl sm:text-5xl font-bold tracking-tight tnum mt-1"></p>
+          </div>
+          <div class="sm:text-right">
+            <p class="text-sm text-muted">Roads funded</p>
+            <p id="nr-funded-label" class="text-xl font-bold text-hwgreen tnum mt-1"></p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <input id="nr-slider" type="range" min="1" max="15" step="0.5" value="7.5" oninput="renderNextRupee()" class="daylight-slider" aria-label="Budget to spend, in crores" />
+          <div class="flex justify-between font-mono text-xs text-muted tnum"><span>₹1 Cr</span><span>₹8 Cr</span><span>₹15 Cr</span></div>
+        </div>
+        <p id="nr-pool-note" class="text-xs text-muted"></p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-5 bg-surface border-2 border-hwyellow rounded-[20px] p-5 sm:p-6 space-y-5">
+          <div class="space-y-1">
+            <p id="nr-free-total" class="text-sm font-bold text-hwgreen tnum"></p>
+            <h2 class="text-lg font-bold balance">Costs BMC ₹0: the contractor owes these repairs</h2>
+          </div>
+          <ol id="nr-bucket-a" class="space-y-3"></ol>
+        </div>
+
+        <div class="lg:col-span-7 bg-surface border border-hairline rounded-[20px] p-5 sm:p-6 space-y-5">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-lg font-bold">Ranked roads to fund next</h2>
+            <span id="nr-used-display" class="font-mono text-xs font-semibold tnum"></span>
+          </div>
+          <ol id="nr-bucket-b" class="space-y-3"></ol>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================================================================== -->
+  <!-- MODAL: switch ward                                                  -->
+  <!-- ================================================================== -->
+  <div id="ward-modal" role="dialog" aria-modal="true" aria-labelledby="ward-modal-title" class="hidden fixed inset-0 z-50 bg-ink/35 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-surface border-2 border-ink rounded-[20px] p-[12px] space-y-3">
+      <div class="px-3 pt-2 flex items-center justify-between">
+        <h3 id="ward-modal-title" class="text-base font-bold">Switch ward</h3>
+        <button onclick="closeWardModal()" aria-label="Close" class="w-9 h-9 rounded-[8px] bg-concrete border border-hairline font-semibold hover:border-ink">✕</button>
+      </div>
+      <div id="ward-list" class="space-y-2 p-1 max-h-[60vh] overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- MODAL: defect notice                                                -->
+  <!-- ================================================================== -->
+  <div id="notice-modal" role="dialog" aria-modal="true" aria-labelledby="notice-title" class="hidden fixed inset-0 z-50 bg-ink/35 flex items-end sm:items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-surface border-2 border-ink rounded-[20px] overflow-hidden flex flex-col max-h-[88vh]">
+      <div class="px-5 py-4 border-b border-hairline flex items-center justify-between gap-3">
+        <div>
+          <p class="font-mono text-xs font-semibold text-hwgreen">DRAFT TEMPLATE · NOT YET WRITTEN BY CLAUDE</p>
+          <h3 id="notice-title" class="text-lg font-bold">Defect notice</h3>
+        </div>
+        <button onclick="closeNoticeModal()" aria-label="Close notice" class="w-9 h-9 rounded-[8px] bg-concrete border border-hairline font-semibold hover:border-ink">✕</button>
+      </div>
+      <div class="px-5 pt-4 flex items-center gap-2">
+        <button onclick="setNoticeLang('en')" id="nt-en" aria-pressed="true" class="min-h-[38px] px-3.5 rounded-[8px] text-sm font-semibold bg-hwyellow text-ink">English</button>
+        <button onclick="setNoticeLang('mr')" id="nt-mr" aria-pressed="false" class="min-h-[38px] px-3.5 rounded-[8px] text-sm font-medium bg-concrete border border-hairline text-muted hover:text-ink">मराठी</button>
+      </div>
+      <div id="notice-skeleton" class="p-5 space-y-3" role="status" aria-label="Drafting notice">
+        <div class="h-4 w-1/2 rounded skeleton"></div>
+        <div class="h-3.5 w-full rounded skeleton"></div>
+        <div class="h-3.5 w-5/6 rounded skeleton"></div>
+        <div class="h-3.5 w-full rounded skeleton"></div>
+        <div class="h-16 w-full rounded-[8px] skeleton"></div>
+      </div>
+      <div id="notice-body" class="hidden p-5 overflow-y-auto space-y-4 text-sm leading-relaxed">
+        <div id="notice-text-en" class="space-y-3"></div>
+        <div id="notice-text-mr" class="hidden space-y-3"></div>
+        <p id="nt-citations" class="rounded-[8px] bg-concrete border border-hairline p-3 font-mono text-xs text-muted"></p>
+      </div>
+      <div class="p-[12px] bg-concrete border-t border-hairline flex items-center gap-2.5">
+        <button onclick="copyNotice()" class="flex-1 min-h-[48px] px-4 rounded-[8px] bg-hwyellow text-ink text-sm font-bold hover:brightness-95">Copy notice</button>
+        <button onclick="closeNoticeModal()" class="min-h-[48px] px-4 rounded-[8px] bg-surface border border-hairline text-sm font-medium hover:border-ink">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-ink text-surface text-sm font-semibold px-5 py-3 rounded-[10px]"></div>
+
+  <script>
+  // =========================================================================
+  // 1. DATA. Every number on screen is read from these JSON files, which are
+  //    generated from data/*.csv by frontend/scripts/make_sample.py.
+  // =========================================================================
+  const FILES = {
+    summary: 'data/summary.json', roadlist: 'data/roadlist.json', roads: 'data/roads.json',
+    contractors: 'data/contractors.json', planner: 'data/planner.json', livability: 'data/livability.json',
+    localities: 'data/localities.json'
+  };
+  const D = {};
+  const DEMO_ROAD = 'RD0220';   // Kurla Andheri Road, segment 1, ward L: 35 jobs on one warranty segment
+  const PLANNER_POOL = 30;      // the planner ranks the top 30 roads by risk
+  const MOVE_IN = ['Andheri West', 'Kurla East', 'Dadar West', 'Bhandup West'];
+  const REASON_TEXT = {
+    FLOOD_SPOT: 'Flood spot nearby', AMBULANCE_ROUTE: 'Hospital access road', HIGH_TRAFFIC: 'Heavy traffic',
+    ACCIDENT_PRONE: 'Accidents from road defects', REPEAT_FAILURE: 'Repairs keep failing', UNDER_REPORTED_WARD: 'Ward under-reports'
+  };
+  const DETECTOR_TEXT = { DLP_PAID_TWICE: 'Billed under warranty', RATE_INFLATION: 'Billed above rate card' };
+
+  const S = { roadId: DEMO_ROAD, ward: 'K/W', loc: 'Andheri West', tab: 'signboard', noticeLang: 'en', evOpen: false, cityWard: 'ALL', budgetCr: 7.5 };
+
+  // =========================================================================
+  // 2. FORMATTING
+  // =========================================================================
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const num = n => Number(n).toLocaleString('en-IN');
+  const pct = (x, d = 0) => `${(x * 100).toFixed(d)}%`;
+  function inr(n) {
+    const a = Math.abs(n);
+    if (a >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`;
+    if (a >= 1e5) return `₹${(n / 1e5).toFixed(1)}L`;
+    return `₹${Math.round(n).toLocaleString('en-IN')}`;
+  }
+  function dateStr(s) {
+    const d = new Date(String(s).replace(' ', 'T'));
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  const shortWard = w => (w.ward_name || '').split(',')[0];
+  const $ = id => document.getElementById(id);
+  const setText = (id, t) => { const el = $(id); if (el) el.textContent = t; };
+  const idChip = t => `<span class="font-mono text-xs bg-surface border border-hairline rounded-[6px] px-1.5 py-0.5 whitespace-nowrap">${esc(t)}</span>`;
+  const wardBy = code => D.summary.wards.find(w => w.ward_code === code);
+  const roadBy = id => D.roadlist.find(r => r.road_id === id);
+
+  // =========================================================================
+  // 3. ROUTING AND NAV (real links; the active tab is set from the hash)
+  // =========================================================================
+  const SCREENS = ['start', 'receipt', 'city', 'contractors', 'nextrupee'];
+  const RENDER = { start: renderStart, receipt: renderReceipt, city: renderCity, contractors: renderContractors, nextrupee: renderNextRupee };
+
+  function route() {
+    if (!D.summary) return;
+    let id = location.hash.slice(1);
+    if (!SCREENS.includes(id)) id = 'start';
+    SCREENS.forEach(s => $('screen-' + s).classList.toggle('hidden', s !== id));
+    document.querySelectorAll('[data-nav]').forEach(a => {
+      const on = a.dataset.nav === id;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    RENDER[id]();
+    stopAudio();
+    window.scrollTo({ top: 0 });
+  }
+  function openRoad(id) { S.roadId = id; location.hash = 'receipt'; route(); }
+  window.addEventListener('hashchange', route);
+
+  function setLanguage(lang) {
+    ['en', 'hi', 'mr'].forEach(l => {
+      const b = $('lang-' + l);
+      const on = l === lang;
+      b.setAttribute('aria-pressed', on);
+      b.className = on ? 'min-h-[38px] px-3 rounded-[10px] text-sm font-semibold bg-hwyellow text-ink' : 'min-h-[38px] px-3 rounded-[10px] text-sm font-medium text-muted hover:text-ink';
+    });
+    // Only the navigation labels are translated so far; the rest is English until the Hindi and Marathi copy is ready.
+    const NAV_T = { en: ['Find a road', 'Road receipt', 'City audit', 'Contractors', 'Next rupee'], hi: ['सड़क खोजें', 'सड़क रसीद', 'शहर ऑडिट', 'ठेकेदार', 'अगला रुपया'], mr: ['रस्ता शोधा', 'रस्ता पावती', 'शहर ऑडिट', 'कंत्राटदार', 'पुढचा रुपया'] };
+    ['navStart', 'navReceipt', 'navCity', 'navContractors', 'navNextRupee'].forEach((k, i) => {
+      const el = document.querySelector(`[data-i18n="${k}"]`); if (el) el.textContent = NAV_T[lang][i];
+    });
+  }
+
+  // =========================================================================
+  // 4. WARD SWITCHER
+  // =========================================================================
+  function openWardModal() {
+    const list = $('ward-list');
+    list.innerHTML = D.summary.wards.map(w => {
+      const on = w.ward_code === S.ward;
+      return `<button onclick="selectWard('${esc(w.ward_code)}')" aria-pressed="${on}" class="w-full min-h-[48px] px-4 rounded-[8px] ${on ? 'bg-hwyellow border-ink' : 'bg-concrete border-hairline hover:border-ink'} border text-left flex items-center justify-between gap-3">
+        <span class="font-semibold">${esc(shortWard(w))}</span><span class="font-mono text-xs font-semibold text-hwgreen">WARD ${esc(w.ward_code)}</span></button>`;
+    }).join('');
+    $('ward-modal').classList.remove('hidden');
+    $('ward-modal').querySelector('button[aria-label="Close"]').focus();
+  }
+  function closeWardModal() { $('ward-modal').classList.add('hidden'); }
+  function selectWard(code) {
+    S.ward = code; S.cityWard = code;
+    closeWardModal();
+    renderHeaderWard();
+    renderArea();
+    renderCityWardGrid();
+    renderCityTable();
+    toast(`Ward ${code} selected`);
+  }
+  function renderHeaderWard() {
+    const w = wardBy(S.ward);
+    setText('header-ward-pill', `WARD ${S.ward}` + (window.matchMedia('(min-width: 640px)').matches ? ` · ${shortWard(w).toUpperCase()}` : ''));
+  }
+
+  // =========================================================================
+  // 5. SCREEN 1: FIND A ROAD
+  // =========================================================================
+  function renderStart() {
+    renderHeaderWard();
+    renderSearch();
+    renderArea();
+    renderMoveIn();
+    setFinderTab(S.tab);
+    const d = roadBy(DEMO_ROAD);
+    setText('sb-name', d.road_name);
+    setText('sb-meta', `${d.road_id} · WARD ${d.ward_code} · ${d.under_dlp ? 'UNDER WARRANTY' : 'OUT OF WARRANTY'}`);
+  }
+
+  function setFinderTab(t) {
+    S.tab = t;
+    ['signboard', 'qr', 'search'].forEach(k => {
+      $('finder-panel-' + k).classList.toggle('hidden', k !== t);
+      const b = $('ftab-' + k);
+      const on = k === t;
+      b.setAttribute('aria-selected', on);
+      b.className = on ? 'min-h-[42px] px-3 rounded-[8px] text-xs sm:text-sm font-semibold bg-hwyellow text-ink' : 'min-h-[42px] px-3 rounded-[8px] text-xs sm:text-sm font-medium text-muted hover:text-ink';
+    });
+  }
+
+  function snapSignboard() {
+    $('signboard-idle').classList.add('hidden');
+    $('signboard-matched').classList.add('hidden');
+    $('signboard-scanner-line').classList.remove('hidden');
+    $('signboard-skeleton').classList.remove('hidden');
+    setTimeout(() => {
+      $('signboard-scanner-line').classList.add('hidden');
+      $('signboard-skeleton').classList.add('hidden');
+      $('signboard-matched').classList.remove('hidden');
+      toast('Demo: matched to RD0220');
+    }, 750);
+  }
+
+  function runQrScan() {
+    $('qr-scanner-line').classList.remove('hidden');
+    $('qr-status-text').textContent = 'Scanning… (demo)';
+    setTimeout(() => {
+      $('qr-scanner-line').classList.add('hidden');
+      $('qr-status-text').textContent = `Demo verified: ${DEMO_ROAD}`;
+      openRoad(DEMO_ROAD);
+    }, 750);
+  }
+
+  function renderSearch() {
+    const q = ($('road-live-search').value || '').trim().toLowerCase();
+    const all = D.roadlist.filter(r => !q || r.road_id.toLowerCase().includes(q) || r.road_name.toLowerCase().includes(q) || r.ward_code.toLowerCase().includes(q));
+    const shown = all.slice(0, 8);
+    setText('road-search-count', all.length === 0 ? 'No road matches' : `${num(all.length)} roads match · showing ${shown.length}`);
+    $('road-directory-list').innerHTML = shown.map(r => `
+      <button onclick="openRoad('${esc(r.road_id)}')" class="w-full text-left px-4 py-3.5 hover:bg-concrete flex flex-wrap items-center justify-between gap-2">
+        <span><span class="block text-sm font-bold">${esc(r.road_name)}, segment ${r.segment_no}</span>
+          <span class="font-mono text-xs text-muted">${esc(r.road_id)} · WARD ${esc(r.ward_code)}</span></span>
+        <span class="font-mono text-xs font-semibold ${r.under_dlp ? 'text-hwgreen' : 'text-muted'}">${r.under_dlp ? 'UNDER WARRANTY' : 'OUT OF WARRANTY'}</span>
+      </button>`).join('') || '<p class="p-4 text-sm text-muted">Try a road name, a ward code such as K/W, or a road ID.</p>';
+  }
+
+  function renderArea() {
+    const w = wardBy(S.ward);
+    setText('area-ward-code', `WARD ${S.ward} · ${shortWard(w).toUpperCase()}`);
+    setText('area-budget-spent', inr(w.spend_inr));
+    setText('area-budget-total', `of ${inr(w.budget_inr)} budget`);
+    setText('area-recoverable', inr(w.recoverable_dlp_inr));
+    setText('area-recoverable-share', `${pct(w.dlp_share)} of this ward's spend`);
+    setText('area-complaints', num(w.complaints_per_100k));
+    setText('area-flood', w.under_reported ? 'Flood-prone, few complaints' : `Flood-prone index ${w.low_lying_index.toFixed(2)}`);
+  }
+
+  function renderMoveIn() {
+    $('mi-pills').innerHTML = MOVE_IN.map(name => {
+      const on = name === S.loc;
+      return `<button onclick="selectLoc('${esc(name)}')" aria-pressed="${on}" class="min-h-[38px] px-3 rounded-[8px] text-xs ${on ? 'font-semibold bg-hwyellow border border-ink' : 'font-medium bg-concrete border border-hairline hover:border-ink'}">${esc(name)}</button>`;
+    }).join('');
+    const l = D.livability.find(x => x.locality === S.loc);
+    setText('mi-floods', `${l.flood_spots_1500m} ${l.flood_spots_1500m === 1 ? 'spot' : 'spots'}`);
+    setText('mi-failure', l.failure_rate_30d_1500m === null ? 'No repairs' : pct(l.failure_rate_30d_1500m));
+    setText('mi-ambulance', `${l.hospital_access_roads_1500m}`);
+    setText('mi-ward-share', pct(l.ward_warranty_share));
+    setText('mi-note', l.jobs_1500m
+      ? `${num(l.roads_1500m)} road segments within 1.5 km. ${num(Math.round(l.failure_rate_30d_1500m * l.jobs_1500m))} of ${num(l.jobs_1500m)} repairs there failed within 30 days. Figures are from the sample data and are not a forecast.`
+      : `No repairs were logged on road segments within 1.5 km of ${S.loc}.`);
+  }
+  function selectLoc(name) { S.loc = name; renderMoveIn(); }
+
+  // Audio is a text-to-speech stand-in with a progress bar. It reads the same numbers on screen.
+  let audioTimer = null, audioSlot = null;
+  function stopAudio() {
+    if (audioTimer) clearInterval(audioTimer);
+    audioTimer = null; audioSlot = null;
+    if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
+    ['area', 'receipt'].forEach(s => {
+      $('audio-bar-' + s).style.width = '0%';
+      $('audio-time-' + s).textContent = '0:10';
+      const eq = $('audio-eq-' + s); if (eq) eq.classList.add('hidden');
+    });
+    $('audio-label-area').textContent = 'Listen to a 10-second summary';
+    $('audio-label-receipt').textContent = 'Listen (10 seconds)';
+  }
+  function toggleAudio(slot) {
+    if (audioSlot === slot) { stopAudio(); return; }
+    stopAudio();
+    audioSlot = slot;
+    const text = slot === 'area'
+      ? (() => { const w = wardBy(S.ward); return `Ward ${S.ward}, ${shortWard(w)}. Spent ${inr(w.spend_inr)} of ${inr(w.budget_inr)}. Billed under warranty ${inr(w.recoverable_dlp_inr)}.`; })()
+      : (() => { const r = D.roads[S.roadId]; return `${r.road_name}, segment ${r.segment_no}. Billed ${inr(r.total_billed_inr)}. Billed while under warranty ${inr(r.recoverable_inr)}.`; })();
+    if ('speechSynthesis' in window) {
+      try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-IN'; speechSynthesis.speak(u); } catch (e) {}
+    }
+    $('audio-label-' + slot).textContent = 'Playing…';
+    const eq = $('audio-eq-' + slot); if (eq) eq.classList.remove('hidden');
+    let p = 0;
+    audioTimer = setInterval(() => {
+      p++;
+      $('audio-bar-' + slot).style.width = p + '%';
+      const rem = Math.max(0, Math.ceil((100 - p) / 10));
+      $('audio-time-' + slot).textContent = `0:${String(rem).padStart(2, '0')}`;
+      if (p >= 100) stopAudio();
+    }, 100);
+  }
+
+  // =========================================================================
+  // 6. SCREEN 2: ROAD RECEIPT
+  // =========================================================================
+  function renderReceipt() {
+    const r = D.roads[S.roadId];
+    const dlpFlags = r.flags.filter(f => f.detector === 'DLP_PAID_TWICE');
+    const failed = r.work_orders.filter(w => w.reopened);
+    const rd = roadBy(S.roadId);
+
+    setText('rc-sign-mono', `${r.road_id} · WARD ${r.ward_code} · ${r.surface.toUpperCase()}`);
+    setText('rc-road-name', `${r.road_name}, segment ${r.segment_no}`);
+    setText('rc-verdict', r.under_dlp
+      ? `Resurfaced ${dateStr(r.last_resurfaced)} and still marked under warranty in the dataset.`
+      : `Resurfaced ${dateStr(r.last_resurfaced)}. Marked out of warranty in the dataset, so repairs here are BMC's cost.`);
+    setText('rc-billed', inr(r.total_billed_inr));
+    setText('rc-owed', inr(r.recoverable_inr));
+    setText('rc-wo-sub', `${r.work_orders.length} repair jobs · ${r.length_m} m`);
+    setText('rc-warranty-note', `Warranty status is today's flag in the dataset. The dataset has no warranty end date, so the billed-under-warranty figure is an upper bound.`);
+
+    // Step 1: first linked complaint
+    const c = r.complaints[0];
+    setText('rc-s1-meta', c ? `${c.complaint_id} · ${dateStr(c.received_at)} · ${c.channel}` : 'No complaint linked');
+    setText('rc-s1-title', c ? `Complaint: ${c.category}` : 'No complaint linked to this road');
+    setText('rc-s1-desc', c ? `Status: ${c.status}. ${r.complaints.length} complaints are linked to this road's repairs.` : 'Repairs on this road were logged without a linked complaint.');
+
+    // Step 2: the first repair that the audit flagged, else the first repair
+    const flagged = dlpFlags[0] ? r.work_orders.find(w => w.work_order_id === dlpFlags[0].work_order_id) : null;
+    const wo = flagged || r.work_orders[0];
+    setText('rc-s2-meta', `${wo.work_order_id} · ${inr(wo.cost_inr)} · ${wo.contractor_name}`);
+    setText('rc-s2-title', `Repair billed: ${wo.repair_method}`);
+    setText('rc-s2-desc', dlpFlags[0] ? dlpFlags[0].rule_text : `Assigned ${dateStr(wo.assigned_at)}, completed ${dateStr(wo.completed_at)}. Met SLA: ${wo.sla_met ? 'yes' : 'no'}.`);
+
+    // Step 3: failures within 30 days
+    const f = failed[0];
+    setText('rc-s3-meta', f ? `${f.work_order_id} · completed ${dateStr(f.completed_at)}` : `${r.work_orders.length} repairs · none failed`);
+    setText('rc-s3-title', failed.length ? `${num(failed.length)} of ${num(r.work_orders.length)} repairs failed within 30 days` : 'No repair failed within 30 days');
+    $('rc-s3-title').className = 'text-base font-bold';
+    setText('rc-s3-desc', failed.length ? `The first failure was ${f.work_order_id}, by ${f.contractor_name}.` : 'No failure is recorded for this road.');
+
+    // Step 4: audit flags
+    const flagCount = r.flags.length;
+    setText('rc-s4-status', flagCount ? `AUDIT FLAGS: ${num(flagCount)} · NEEDS EXPLANATION` : 'AUDIT FLAGS: NONE');
+    setText('ev-toggle-label', flagCount ? `Show evidence rows (${num(flagCount)})` : 'No evidence rows');
+    $('ev-toggle').disabled = flagCount === 0;
+    $('rc-raw-rows').innerHTML = r.flags.slice(0, 40).map(fl => `
+      <li class="p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-2 text-sm">
+        <div class="space-y-1 min-w-0">
+          <p class="font-semibold">${esc(DETECTOR_TEXT[fl.detector] || fl.detector)} · tier ${fl.tier}</p>
+          <p class="text-muted">${esc(fl.rule_text)}</p>
+          <p class="flex flex-wrap gap-1.5 pt-1">${fl.evidence.map(idChip).join('')}</p>
+        </div>
+        <p class="font-semibold tnum shrink-0">${inr(fl.rupees_at_stake)}</p>
+      </li>`).join('') + (flagCount > 40 ? `<li class="p-4 text-sm text-muted">and ${num(flagCount - 40)} more</li>` : '');
+    if (!flagCount) S.evOpen = false;
+    applyEvidence();
+  }
+
+  function applyEvidence() {
+    $('evidence-drawer').classList.toggle('hidden', !S.evOpen);
+    $('ev-toggle').setAttribute('aria-expanded', S.evOpen);
+    $('ev-chevron').style.transform = S.evOpen ? 'rotate(180deg)' : '';
+    const n = D.roads[S.roadId].flags.length;
+    setText('ev-toggle-label', S.evOpen ? 'Hide evidence rows' : (n ? `Show evidence rows (${num(n)})` : 'No evidence rows'));
+  }
+  function toggleEvidenceDrawer() { S.evOpen = !S.evOpen; applyEvidence(); }
+  function logOfficialReply() {
+    const i = $('reply-input');
+    if (!i.value.trim()) { toast('Enter a note before logging'); return; }
+    i.value = '';
+    toast('Reply noted in this session');
+  }
+
+  // Notice: a template filled from the flagged rows. Claude drafting is not wired yet.
+  function noticeData() {
+    const r = D.roads[S.roadId];
+    const dlp = r.flags.filter(f => f.detector === 'DLP_PAID_TWICE');
+    const ids = dlp.slice(0, 5).map(f => f.work_order_id);
+    return { r, n: dlp.length, amt: dlp.reduce((a, f) => a + f.rupees_at_stake, 0), ids, ward: r.ward_code };
+  }
+  function openNoticeModal() {
+    const { r, n, amt, ids } = noticeData();
+    const m = $('notice-modal');
+    m.classList.remove('hidden');
+    $('notice-skeleton').classList.remove('hidden');
+    $('notice-body').classList.add('hidden');
+    $('notice-title').textContent = `Defect notice: ${r.road_name}, segment ${r.segment_no}`;
+    const idText = ids.join(', ') + (n > ids.length ? ` and ${n - ids.length} more` : '');
+    $('notice-text-en').innerHTML = `
+      <p class="font-semibold">To the Executive Engineer, Ward ${esc(r.ward_code)}</p>
+      <p>Road ${esc(r.road_id)} (${esc(r.road_name)}, segment ${r.segment_no}) was resurfaced on ${dateStr(r.last_resurfaced)}. The dataset marks it as still under its Defect Liability Period.</p>
+      <p>${n} repair bills totalling ${inr(amt)} were paid for this road after resurfacing, including ${esc(idText)}.</p>
+      <p>We ask that the original contractor be asked to rectify these defects at no cost to BMC, and that payments on this segment be reviewed before further disbursement.</p>
+      <p class="text-xs text-muted">Draft template built from the flagged rows. Claude drafting is not connected yet, and the wording needs an officer's review before use.</p>`;
+    $('notice-text-mr').innerHTML = `
+      <p class="font-semibold">प्रति: कार्यकारी अभियंता, प्रभाग ${esc(r.ward_code)}</p>
+      <p>रस्ता ${esc(r.road_id)} (${esc(r.road_name)}, भाग ${r.segment_no}) चे पुनर्पृष्ठीकरण ${dateStr(r.last_resurfaced)} रोजी झाले. डेटानुसार हा रस्ता अद्याप दोष दायित्व कालावधीत (DLP) आहे.</p>
+      <p>या रस्त्यासाठी पुनर्पृष्ठीकरणानंतर ${n} कामांची देयके, एकूण ${inr(amt)}, अदा झाल्याची नोंद आहे, ज्यात ${esc(idText)} यांचा समावेश आहे.</p>
+      <p>कंत्राटदाराकडून विनाशुल्क दुरुस्तीची मागणी करावी, आणि या भागावरील पुढील देयकांचा आढावा घ्यावा, ही विनंती आहे.</p>
+      <p class="text-xs text-muted">हा मसुदा साच्यातून तयार केला आहे. वापरण्यापूर्वी अधिकाऱ्याने व मराठी भाषातज्ज्ञाने तपासावा.</p>`;
+    $('nt-citations').textContent = `CITED ROWS: ${ids.join(' · ')}${n > ids.length ? ' …' : ''} · ${r.road_id}`;
+    setNoticeLang(S.noticeLang);
+    setTimeout(() => {
+      $('notice-skeleton').classList.add('hidden');
+      $('notice-body').classList.remove('hidden');
+    }, 700);
+  }
+  function closeNoticeModal() { $('notice-modal').classList.add('hidden'); }
+  function setNoticeLang(l) {
+    S.noticeLang = l;
+    $('notice-text-en').classList.toggle('hidden', l !== 'en');
+    $('notice-text-mr').classList.toggle('hidden', l !== 'mr');
+    ['en', 'mr'].forEach(k => {
+      const b = $('nt-' + k), on = k === l;
+      b.setAttribute('aria-pressed', on);
+      b.className = on ? 'min-h-[38px] px-3.5 rounded-[8px] text-sm font-semibold bg-hwyellow text-ink' : 'min-h-[38px] px-3.5 rounded-[8px] text-sm font-medium bg-concrete border border-hairline text-muted hover:text-ink';
+    });
+  }
+  function copyNotice() {
+    const el = S.noticeLang === 'en' ? $('notice-text-en') : $('notice-text-mr');
+    const text = el.innerText + '\n\n' + $('nt-citations').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('Notice copied'), () => toast('Copy not available here'));
+    else toast('Copy not available here');
+  }
+
+  // =========================================================================
+  // 7. SCREEN 3: CITY AUDIT
+  // =========================================================================
+  function renderCity() {
+    const c = D.summary.city;
+    const complaintsWithWard = D.summary.wards.reduce((a, w) => a + w.complaints, 0);
+    setText('city-headline', `${inr(c.spend_inr)} of monsoon repairs went out across ${D.summary.wards.length} wards. ${inr(c.recoverable_dlp_inr)} of it was billed on roads under warranty.`);
+    setText('city-counts', `${num(c.jobs)} WORK ORDERS · ${num(complaintsWithWard)} COMPLAINTS WITH A WARD`);
+    setText('city-spend', inr(c.spend_inr));
+    setText('city-budget', `${pct(c.spend_inr / c.budget_inr, 1)} of the ${inr(c.budget_inr)} ward budget`);
+    setText('city-recoverable', inr(c.recoverable_dlp_inr));
+    setText('city-recoverable-note', `${num(c.dlp_jobs)} of ${num(c.jobs)} jobs. Upper bound: today's warranty flag, not the status on each bill date.`);
+    setText('city-reopened', num(c.reopened_jobs));
+    setText('city-reopened-share', `${pct(c.reopened_jobs / c.jobs)} of ${num(c.jobs)} jobs`);
+    renderCityWardGrid();
+    renderCityTable();
+  }
+
+  function renderCityWardGrid() {
+    $('city-ward-grid').innerHTML = D.summary.wards.map(w => {
+      const on = S.cityWard === w.ward_code;
+      const tone = on ? 'bg-hwyellow border-ink' : w.dlp_share >= 0.25 ? 'bg-hwyellow/40 border-hairline' : w.dlp_share >= 0.15 ? 'bg-concrete border-hairline' : 'bg-surface border-hairline';
+      const dash = w.under_reported && !on ? 'border-dashed border-ink' : '';
+      return `<button onclick="setCityWard('${esc(w.ward_code)}')" aria-pressed="${on}" class="min-h-[74px] p-2.5 rounded-[10px] border ${tone} ${dash} text-left flex flex-col justify-between hover:border-ink">
+        <span class="flex items-baseline justify-between gap-1"><span class="font-mono text-xs font-bold">${esc(w.ward_code)}</span><span class="text-base font-bold tnum">${pct(w.dlp_share)}</span></span>
+        <span class="text-[11px] text-muted truncate">${esc(shortWard(w))}</span></button>`;
+    }).join('');
+    const all = $('city-all-btn');
+    all.setAttribute('aria-pressed', S.cityWard === 'ALL');
+    all.className = S.cityWard === 'ALL' ? 'min-h-[42px] px-4 rounded-[8px] bg-hwyellow text-ink text-sm font-bold' : 'min-h-[42px] px-4 rounded-[8px] bg-concrete border border-hairline text-ink text-sm font-medium hover:border-ink';
+  }
+  function setCityWard(code) { S.cityWard = code; renderCityWardGrid(); renderCityTable(); }
+
+  function renderCityTable() {
+    const rows = D.roadlist.filter(r => r.recoverable > 0 && (S.cityWard === 'ALL' || r.ward_code === S.cityWard))
+      .sort((a, b) => b.recoverable - a.recoverable).slice(0, 5);
+    setText('city-table-title', S.cityWard === 'ALL' ? 'Roads with the largest warranty bills' : `Roads with the largest warranty bills in ward ${S.cityWard}`);
+    setText('city-table-count', `${rows.length} ${rows.length === 1 ? 'ROW' : 'ROWS'}`);
+    $('city-flagged-body').innerHTML = rows.length ? rows.map(r => `
+      <tr class="hover:bg-concrete">
+        <td class="py-4 pr-4"><p class="font-bold">${esc(r.road_name)}, segment ${r.segment_no}</p><p class="font-mono text-xs text-muted">${esc(r.road_id)}</p></td>
+        <td class="py-4 px-3 font-mono text-xs">${esc(r.ward_code)}</td>
+        <td class="py-4 px-3">${DETECTOR_TEXT.DLP_PAID_TWICE}</td>
+        <td class="py-4 px-3 text-right font-bold tnum">${inr(r.recoverable)}</td>
+        <td class="py-4 pl-3 text-right"><button onclick="openRoad('${esc(r.road_id)}')" class="min-h-[40px] px-3.5 rounded-[8px] bg-hwyellow text-ink text-xs font-bold hover:brightness-95">Open receipt</button></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="py-6 text-center text-muted">No warranty bills in this ward.</td></tr>';
+  }
+
+  // =========================================================================
+  // 8. SCREEN 4: CONTRACTORS
+  // =========================================================================
+  function renderContractors() {
+    const rows = [...D.contractors].sort((a, b) => b.total_billed_inr - a.total_billed_inr);
+    const verdict = { higher: 'Above expected', lower: 'Below expected', inline: 'In line with expected' };
+    $('contractor-body').innerHTML = rows.map(c => `
+      <tr>
+        <td class="py-4 pr-3"><p class="font-bold">${esc(c.contractor_name)}</p><p class="font-mono text-xs text-muted">${esc(c.contractor_id)} · ${num(c.jobs)} jobs · ${inr(c.total_billed_inr)}</p></td>
+        <td class="py-4 px-2 text-right"><p class="font-bold tnum">${pct(c.reopen_rate, 1)}</p>
+          <p class="text-xs text-muted tnum">Expected ${pct(c.expected_reopen_rate, 1)} · range ${pct(c.reopen_ci[0])}–${pct(c.reopen_ci[1])}</p>
+          <p class="text-xs font-semibold">${verdict[c.reopen_vs_expected]}</p></td>
+        <td class="py-4 px-2 text-right"><p class="font-bold tnum">${pct(c.sla_rate, 1)}</p>
+          <p class="text-xs text-muted tnum">range ${pct(c.sla_ci[0])}–${pct(c.sla_ci[1])}</p>
+          <p class="text-xs text-muted tnum">Median bill ${c.median_cost_ratio.toFixed(2)}× rate card</p></td>
+        <td class="py-4 pl-4 border-l border-hairline text-xs space-y-0.5 tnum">
+          <p>${pct(c.context.flood_ward_share)} of jobs in flood-prone wards</p>
+          <p>${pct(c.context.heavy_rain_share)} in heavy-rain windows (≥ 64.5 mm day)</p>
+          <p>${num(c.context.avg_peak_vehicles)} avg peak-hour vehicles</p>
+          <p>${inr(c.recoverable_inr)} billed under warranty</p></td>
+      </tr>`).join('');
+  }
+
+  // =========================================================================
+  // 9. SCREEN 5: NEXT RUPEE
+  // =========================================================================
+  function renderNextRupee() {
+    const budgetCr = parseFloat($('nr-slider').value);
+    const budget = budgetCr * 1e7;
+    S.budgetCr = budgetCr;
+    setText('nr-budget-display', `₹${budgetCr.toFixed(1)} Cr`);
+
+    const pool = D.planner.roads.slice(0, PLANNER_POOL);
+    const free = pool.filter(r => r.under_dlp);
+    const cands = pool.filter(r => !r.under_dlp);
+    const freed = free.reduce((a, r) => a + r.estimated_repair_cost_inr, 0);
+    setText('nr-free-total', `${inr(freed)} freed across ${free.length} high-risk roads under warranty`);
+    setText('nr-pool-note', `Ranking covers the top ${PLANNER_POOL} roads by risk score. Costs are the median of past work-order costs on each road, not a quote.`);
+
+    $('nr-bucket-a').innerHTML = free.length ? free.map(r => `
+      <li class="rounded-[8px] bg-concrete border border-hairline p-4 flex items-start justify-between gap-3">
+        <div class="space-y-1 min-w-0">
+          <p class="font-mono text-xs text-muted">${esc(r.road_id)} · WARD ${esc(r.ward_code)}</p>
+          <p class="text-sm font-bold">${esc(r.road_name)}, segment ${r.segment_no}</p>
+          <p class="font-mono text-[11px] text-muted">${r.reason_codes.map(c => esc(c)).join(' · ') || 'No risk reason'}</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-base font-bold text-hwgreen tnum">₹0</p>
+          <p class="text-xs text-muted tnum line-through">${inr(r.estimated_repair_cost_inr)}</p>
+        </div>
+      </li>`).join('') : '<li class="text-sm text-muted">No warranty roads in the top-ranked pool.</li>';
+
+    let used = 0, funded = 0;
+    const rows = cands.map((r, i) => {
+      const fits = used + r.estimated_repair_cost_inr <= budget;
+      if (fits) { used += r.estimated_repair_cost_inr; funded++; }
+      return `
+      <li class="rounded-[8px] ${fits ? 'bg-concrete border border-ink' : 'bg-surface border border-hairline opacity-50'} p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="space-y-1 min-w-0">
+          <p class="font-mono text-xs text-muted">${esc(r.road_id)} · WARD ${esc(r.ward_code)} · RISK ${r.score}</p>
+          <p class="text-sm font-bold">${i + 1}. ${esc(r.road_name)}, segment ${r.segment_no}</p>
+          <p class="font-mono text-[11px] text-muted">${r.reason_codes.map(c => esc(c)).join(' · ') || 'No risk reason'}</p>
+        </div>
+        <div class="sm:text-right shrink-0 flex sm:flex-col items-baseline justify-between gap-1">
+          <p class="text-base font-bold tnum">${inr(r.estimated_repair_cost_inr)}</p>
+          <p class="font-mono text-xs font-bold ${fits ? 'text-hwgreen' : 'text-muted'}">${fits ? 'FUNDED' : 'NEXT CYCLE'}</p>
+        </div>
+      </li>`;
+    });
+    $('nr-bucket-b').innerHTML = rows.join('');
+    setText('nr-funded-label', `${funded} of ${cands.length} roads in the pool`);
+    setText('nr-used-display', `USED ${inr(used)} OF ${inr(budget)}`);
+  }
+
+  // =========================================================================
+  // 10. TOAST, BOOT
+  // =========================================================================
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 2500);
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeWardModal(); closeNoticeModal(); }
+  });
+
+  Promise.all(Object.entries(FILES).map(([k, u]) =>
+    fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); }).then(v => { D[k] = v; })
+  )).then(() => {
+    // Index roads by id for the receipt
+    $('boot').classList.add('hidden');
+    renderHeaderWard();
+    route();
+  }).catch(err => {
+    $('boot').innerHTML = `<p class="text-sm">Could not load the sample data (${esc(err.message)}). Run frontend/scripts/make_sample.py and serve the frontend folder.</p>`;
+  });
+  </script>
+</body>
+</html>
