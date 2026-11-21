@@ -4,3 +4,7 @@ __pycache__/
 uploads/
 # Demo video + scene clips: too large for git, shared outside the repo (see docs/demo_video_script.md)
 assets/video/
+
+# local secrets (never commit)
+.env.local
+.env.*.local

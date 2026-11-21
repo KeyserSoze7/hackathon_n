@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { FileText, ShieldCheck, ShieldOff, CircleAlert } from 'lucide-react'
-import { api } from '../data/api'
+import { api, notYet } from '../data/api'
 import { useAsync } from '../lib/useAsync'
 import { inr, num, date, DETECTOR, cleanName } from '../lib/format'
 import { ErrorBox, Id, Modal, Pending, Primary, Skel } from '../components/ui'
@@ -14,6 +14,7 @@ export default function RoadReceipt({ roadId, onFind }: { roadId: string; onFind
   const [reporting, setReporting] = useState(() => new URLSearchParams(location.hash.split('?')[1]).get('report') === '1')
   const [showAll, setShowAll] = useState(false)
 
+  if (error && notYet(error)) return <div className="mx-auto max-w-3xl space-y-4"><Pending label="This road's receipt is not part of the demo data" /><button onClick={onFind} className="min-h-[44px] rounded-[8px] border border-hairline bg-surface px-4 text-sm font-semibold hover:border-ink">Find another road</button></div>
   if (error) return <ErrorBox error={error} onRetry={reload} />
   if (loading || !data) return <Loading />
   const [road, timeline] = data
@@ -249,7 +250,7 @@ function NoticeDraft({ roadId }: { roadId: string }) {
       <div role="group" aria-label="Notice language" className="inline-grid grid-cols-2 gap-1 rounded-[12px] border border-hairline bg-concrete p-[4px]">
         {(['en', 'mr'] as const).map((l) => <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l} className={`min-h-[40px] rounded-[8px] px-4 text-sm ${lang === l ? 'bg-hwyellow font-semibold' : 'font-medium text-muted'}`}>{l === 'en' ? 'English' : 'मराठी'}</button>)}
       </div>
-      {error ? <ErrorBox error={error} onRetry={reload} /> : loading || !data ? (
+      {error && notYet(error) ? <Pending label="A notice for this road is not part of the demo data. Try Kurla Andheri Road" /> : error ? <ErrorBox error={error} onRetry={reload} /> : loading || !data ? (
         <div className="space-y-3" role="status" aria-label="Drafting notice"><p className="text-sm text-muted">Claude is drafting from the flagged rows…</p><Skel className="h-5 w-2/3" /><Skel className="h-4 w-full" /><Skel className="h-4 w-full" /><Skel className="h-4 w-5/6" /><Skel className="h-24 w-full" /></div>
       ) : (
         <div className="rise space-y-3">

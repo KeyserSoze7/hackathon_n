@@ -5,7 +5,10 @@ import type {
   Locality, Livability, RoadListItem,
 } from './types'
 
-export const API_BASE: string = (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://10.10.38.50:8000'
+import { DEMO, DemoMiss, demoGet, demoSend } from './demo'
+
+// In demo mode there is no backend, so no address is shipped in the bundle.
+export const API_BASE: string = (import.meta.env.VITE_API_BASE as string | undefined) ?? (DEMO ? '' : 'http://10.10.38.50:8000')
 
 export class ApiError extends Error {
   constructor(public status: number, public path: string) { super(`${status} ${path}`) }
@@ -35,12 +38,18 @@ export const myReports = {
   add: (id: number) => { const s = new Set(myReports.ids()); s.add(id); localStorage.setItem(MY_KEY, JSON.stringify([...s])) },
 }
 
+// Demo mode: serve saved snapshots instead of calling the backend (see data/demo.ts).
+async function viaDemo<T>(run: () => Promise<unknown>, path: string): Promise<T> {
+  try { return (await run()) as T } catch (e) { if (e instanceof DemoMiss) throw new ApiError(e.status, path); throw e }
+}
 async function get<T>(path: string, who: 'citizen' | 'admin' | 'none' = 'none'): Promise<T> {
+  if (DEMO) return viaDemo<T>(() => demoGet(path), path)
   const r = await fetch(API_BASE + path, { headers: auth(who) })
   if (!r.ok) throw new ApiError(r.status, path)
   return r.json()
 }
 async function send<T>(method: 'POST' | 'PATCH', path: string, body: unknown, who: 'citizen' | 'admin' | 'none' = 'none'): Promise<T> {
+  if (DEMO) return viaDemo<T>(() => demoSend(method, path, (body ?? {}) as Record<string, unknown>), path)
   const r = await fetch(API_BASE + path, { method, headers: { 'content-type': 'application/json', ...auth(who) }, body: JSON.stringify(body) })
   if (!r.ok) throw new ApiError(r.status, path)
   return r.json()

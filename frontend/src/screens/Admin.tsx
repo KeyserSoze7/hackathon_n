@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { LogOut, Search } from 'lucide-react'
 import { adminSession, api, notYet } from '../data/api'
+import { DEMO } from '../data/demo'
 import { useAsync } from '../lib/useAsync'
 import { cleanName, date, DETECTOR, inr, num, shortWard } from '../lib/format'
 import type { AdminSession, CitizenReport, QueueItem, Ward } from '../data/types'
@@ -52,6 +53,7 @@ function Gate({ wards, onLogin, onPreview }: { wards: Ward[] | null; onLogin: (s
       <div className="grid gap-4 md:grid-cols-2">
         <form onSubmit={doLogin} className="space-y-4 rounded-[20px] border border-hairline bg-surface p-5">
           <h2 className="text-lg font-bold">Sign in</h2>
+          {DEMO && <p className="rounded-[12px] border border-hairline bg-hwyellow/25 p-3 text-sm">Demo: sign in as <span className="font-semibold">officer@demo.in</span> with any password.</p>}
           <label className="block text-sm font-medium">Official email<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={input} /></label>
           <label className="block text-sm font-medium">Password<input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={input} /></label>
           <Primary type="submit" disabled={login === 'busy'} className="w-full">{login === 'busy' ? 'Signing in…' : 'Sign in'}</Primary>

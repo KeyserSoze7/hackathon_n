@@ -5,6 +5,7 @@ import { useAsync } from './lib/useAsync'
 import { shortWard } from './lib/format'
 import Logo from './components/Logo'
 import Splash from './components/Splash'
+import { DEMO } from './data/demo'
 import { Modal, ErrorBox } from './components/ui'
 import Start from './screens/Start'
 import RoadReceipt from './screens/RoadReceipt'
@@ -52,6 +53,7 @@ export default function App() {
   return (
     <div className="min-h-full">
       <Splash ready={!!wards || !!error} />
+      {DEMO && <p className="bg-ink px-4 py-2 text-center text-xs text-white">Demo version. Every figure is a saved snapshot of the live system; reports and replies you send stay in this browser only.</p>}
       <header className="sticky top-0 z-40 bg-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-4 sm:py-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">

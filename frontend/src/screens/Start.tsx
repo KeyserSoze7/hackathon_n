@@ -6,6 +6,7 @@ import { inr, num, pct, date, shortWard } from '../lib/format'
 import { ErrorBox, Id, Pending, Primary, Skel } from '../components/ui'
 import { useAsync } from '../lib/useAsync'
 import ReportFlow from '../components/ReportFlow'
+import { DEMO, demoSamples } from '../data/demo'
 
 type Tab = 'signboard' | 'qr' | 'search'
 type Found = { state: 'idle' } | { state: 'loading' } | { state: 'none'; text: string } | { state: 'ok'; data: Lookup; text: string; answer?: string }
@@ -93,6 +94,7 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
               </label>
               <Primary type="submit" disabled={!text.trim() || found.state === 'loading'}>Ask</Primary>
             </form>
+            {DEMO && <DemoQuestions onPick={(t) => { setText(t); find(t, true) }} />}
             <Result found={found} onOpenRoad={onOpenRoad} onReport={setReporting} />
             <BrowseRoads ward={ward} onOpenRoad={onOpenRoad} />
           </div>
@@ -372,6 +374,20 @@ function BrowseRoads({ ward, onOpenRoad }: { ward: string; onOpenRoad: (id: stri
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+/** Demo only: the questions that have saved Claude answers, one tap each. */
+function DemoQuestions({ onPick }: { onPick: (t: string) => void }) {
+  const { data } = useAsync(demoSamples, [])
+  if (!data?.queries.length) return null
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold text-muted">Demo: tap a question to see the saved answer written by Claude</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {data.queries.map((q: string) => <button key={q} onClick={() => onPick(q)} className="min-h-[48px] rounded-[12px] border border-hairline bg-surface px-3 py-2 text-left text-sm hover:border-ink">{q}</button>)}
+      </div>
     </div>
   )
 }

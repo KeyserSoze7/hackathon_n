@@ -3,11 +3,12 @@
 Usage: python frontend/scripts/qa_flows.py            (creates ONE test report titled "FRONTEND TEST")
 Screenshots: assets/qa/*.png. Exit code 1 if any check fails.
 """
-import base64, json, pathlib, subprocess, sys, tempfile, threading, time, urllib.request
+import base64, json, os, pathlib, subprocess, sys, tempfile, threading, time, urllib.request
 import websocket
 
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-APP = 'http://localhost:5173/'
+APP = os.environ.get('QA_APP', 'http://localhost:5173/')  # QA_DEMO=1 adds the demo-only checks (set QA_APP to the demo server)
+DEMO = os.environ.get('QA_DEMO') == '1'
 OUT = pathlib.Path(__file__).resolve().parents[2] / 'assets' / 'qa'; OUT.mkdir(parents=True, exist_ok=True)
 results, errors = [], []
 
@@ -100,6 +101,17 @@ try:
             time.sleep(3); s2 = js("document.body.innerText.match(/Funded by this budget\\s+([^\\n]+)/)?.[1]")
             check('budget slider re-solves on the server', s1 and s2 and s1 != s2)
             click('हिं'); check('language toggle changes the nav', wait("document.querySelector('header nav').innerText.includes('सड़क')")); click('EN')
+    if DEMO:
+        # Demo loop: a visitor's report is moved forward by the ward office and the citizen sees it. Everything stays in the browser.
+        send('Emulation.setDeviceMetricsOverride', width=390, height=844, deviceScaleFactor=1, mobile=True)
+        check('demo banner shown', js("document.body.innerText.includes('Demo version')"))
+        go('admin'); type_into('input[type=email]', 'officer@demo.in'); type_into('input[type=password]', 'anything'); click('Sign in')
+        check('demo officer signs in', wait("document.body.innerText.includes('Signed in as')"))
+        rid2 = js("JSON.parse(localStorage.getItem('marg-my-reports')||'[]').slice(-1)[0]")
+        type_into('input[inputmode=numeric]', str(rid2)); click('Open'); check('officer opens the visitor report', wait(f"!!{D}"))
+        click('Mark: Contractor notified', D); check('officer marks the contractor notified', wait("document.body.innerText.includes('Saved. The citizen sees this')")); shot('demo-admin-moved')
+        go('me'); click('Report %s' % rid2); check('citizen sees the officer step on the tracker', wait("[...document.querySelectorAll('[role=dialog] span')].some(e=>e.textContent==='Contractor notified')")); shot('demo-citizen-sees')
+        go('receipt?road=RD0001'); check('road outside the demo set shows a friendly note', wait("document.body.innerText.includes('Connected proof trail') || document.body.innerText.includes('not part of the demo data')"))
     check('no console errors', not errors)
     for e in errors[:8]: print('  console:', e)
 finally:
