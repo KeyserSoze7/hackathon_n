@@ -1,6 +1,7 @@
 // Live backend client. No sample fallbacks: anything the API does not serve yet is shown as "Data coming in".
 import type {
   City, Ward, QueueItem, RoadDetail, TimelineEvent, Lookup, Contractor, AllocWard, NextItem, Allocation, CitizenReportReq,
+  Locality, Livability, RoadListItem,
 } from './types'
 
 export const API_BASE: string = (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://10.10.38.50:8000'
@@ -28,6 +29,10 @@ export const api = {
   road: (id: string) => get<RoadDetail>(`/api/roads/${q(id)}`),
   timeline: (id: string) => get<TimelineEvent[]>(`/api/roads/${q(id)}/timeline`),
   lookup: (text: string) => get<Lookup>(`/api/lookup?q=${q(text)}`),
+  localities: () => get<Locality[]>('/api/localities'),
+  roads: (opts: { q?: string; ward?: string; limit?: number; offset?: number }) =>
+    get<RoadListItem[]>(`/api/roads?limit=${opts.limit ?? 20}&offset=${opts.offset ?? 0}${opts.q ? `&q=${q(opts.q)}` : ''}${opts.ward ? `&ward=${q(opts.ward)}` : ''}`),
+  livability: (locality: string) => get<Livability>(`/api/livability?locality=${q(locality)}`),
   contractors: () => get<Contractor[]>('/api/v3/contractors'),
   allocWards: () => get<AllocWard[]>('/api/v3/wards'),
   nextRupee: (ward: string) => get<NextItem[]>(`/api/v3/next-rupee/${q(ward)}`),

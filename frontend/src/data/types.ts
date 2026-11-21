@@ -73,3 +73,13 @@ export interface CitizenReportReq {
   text?: string | null; language?: 'en' | 'hi' | 'mr' | null; photo_url?: string | null
   road_id?: string | null; work_order_id?: string | null; matched_locality?: string | null
 }
+export interface Locality { locality: string; ward_code: string; lat: number; lon: number; aliases: string[] }
+export interface Livability {
+  locality: string; ward_code: string; lat: number; lon: number; radius_m: number
+  flood_hotspots_1500m: number; failure_rate_30d_1500m: number | null; jobs_1500m: number
+  hospital_access_roads_1500m: number; ward_dlp_leakage_rate: number | null; nearby_road_ids: string[]
+}
+export interface RoadListItem {
+  road_id: string; road_name: string; segment_no: number | null; ward_code: string; under_dlp: boolean
+  total_billed_inr: number; rupees_at_stake: number; flagged_bills_count: number
+}

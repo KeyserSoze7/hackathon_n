@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Check, QrCode, Search, Volume2 } from 'lucide-react'
-import { api } from '../data/api'
-import type { Lookup, Ward } from '../data/types'
+import { Camera, Check, ChevronDown, MapPin, QrCode, Search, Volume2 } from 'lucide-react'
+import { api, ApiError } from '../data/api'
+import type { Livability, Lookup, RoadListItem, Ward } from '../data/types'
 import { inr, num, pct, date, shortWard } from '../lib/format'
-import { Id, Pending, Primary, Skel } from '../components/ui'
+import { ErrorBox, Id, Pending, Primary, Skel } from '../components/ui'
+import { useAsync } from '../lib/useAsync'
 
 type Tab = 'signboard' | 'qr' | 'search'
 type Found = { state: 'idle' } | { state: 'loading' } | { state: 'none'; text: string } | { state: 'ok'; data: Lookup; text: string }
@@ -84,7 +85,7 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
               <Primary type="submit" disabled={!text.trim() || found.state === 'loading'}>Find road</Primary>
             </form>
             <Result found={found} onOpenRoad={onOpenRoad} />
-            <Pending label="Browse all roads" />
+            <BrowseRoads ward={ward} onOpenRoad={onOpenRoad} />
           </div>
         )}
       </div>
@@ -93,10 +94,7 @@ export default function Start({ wards, ward, onOpenRoad }: { wards: Ward[] | nul
 
       <div className="grid items-stretch gap-6 lg:grid-cols-2">
         <YourArea ward={ward} w={w} loading={!wards} />
-        <div className="space-y-4 rounded-[20px] border border-hairline bg-surface p-3 sm:p-5">
-          <h2 className="text-lg font-bold">Moving here? Check within 1.5 km</h2>
-          <Pending label="Flood hotspots, repair failures and hospital access near a locality" />
-        </div>
+        <MovingHere ward={ward} onOpenRoad={onOpenRoad} />
       </div>
     </div>
   )
@@ -205,6 +203,173 @@ function YourArea({ ward, w, loading }: { ward: string; w?: Ward; loading: boole
         </button>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-concrete"><div className="h-full bg-hwyellow transition-all duration-100" style={{ width: `${progress}%` }} /></div>
       </div>
+    </div>
+  )
+}
+
+type Check = { state: 'idle' } | { state: 'loading' } | { state: 'none'; name: string } | { state: 'error'; error: Error; name: string } | { state: 'ok'; data: Livability }
+
+/** "Moving here?": flood hotspots, repair failures and hospital access within 1.5 km of a locality. */
+function MovingHere({ ward, onOpenRoad }: { ward: string; onOpenRoad: (id: string) => void }) {
+  const localities = useAsync(() => api.localities(), [])
+  const [name, setName] = useState('')
+  const [check, setCheck] = useState<Check>({ state: 'idle' })
+
+  const run = async (n: string) => {
+    setCheck({ state: 'loading' })
+    try { setCheck({ state: 'ok', data: await api.livability(n) }) }
+    catch (e) {
+      if (e instanceof ApiError && e.status === 404) setCheck({ state: 'none', name: n })
+      else setCheck({ state: 'error', error: e instanceof Error ? e : new Error(String(e)), name: n })
+    }
+  }
+
+  // Start with the first locality in the selected ward, so the panel shows real numbers straight away.
+  useEffect(() => {
+    const first = localities.data?.find((l) => l.ward_code === ward)?.locality
+    if (first) { setName(first); run(first) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localities.data, ward])
+
+  return (
+    <div className="space-y-4 rounded-[20px] border border-hairline bg-surface p-3 sm:p-5">
+      <h2 className="text-lg font-bold">Moving here? Check within 1.5 km</h2>
+      <form onSubmit={(e) => { e.preventDefault(); if (name.trim()) run(name.trim()) }} className="flex flex-col gap-2 sm:flex-row">
+        <label className="relative flex-1">
+          <span className="sr-only">Locality</span>
+          <MapPin size={18} strokeWidth={1.5} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <input value={name} onChange={(e) => setName(e.target.value)} list="localities" placeholder="Locality, e.g. Hindmata or हिंदमाता"
+            className="min-h-[48px] w-full rounded-[8px] border border-hairline bg-concrete pl-10 pr-3 placeholder:text-muted focus:border-ink focus:outline-none" />
+          <datalist id="localities">{localities.data?.map((l) => <option key={l.locality} value={l.locality}>{l.ward_code}</option>)}</datalist>
+        </label>
+        <button type="submit" disabled={!name.trim() || check.state === 'loading'}
+          className="min-h-[48px] rounded-[8px] border border-ink bg-concrete px-5 text-sm font-semibold hover:bg-hwyellow/20 disabled:opacity-50">Check</button>
+      </form>
+
+      {localities.error && <ErrorBox error={localities.error} onRetry={localities.reload} />}
+      {check.state === 'loading' && <div className="grid gap-3 sm:grid-cols-2">{[0, 1, 2, 3].map((i) => <Skel key={i} className="h-24" />)}</div>}
+      {check.state === 'none' && <p className="rounded-[8px] border border-hairline bg-concrete p-4 text-sm">No locality called “{check.name}”. Pick one from the list.</p>}
+      {check.state === 'error' && <ErrorBox error={check.error} onRetry={() => run(check.name)} />}
+      {check.state === 'ok' && <LivabilityResult d={check.data} onOpenRoad={onOpenRoad} />}
+    </div>
+  )
+}
+
+function LivabilityResult({ d, onOpenRoad }: { d: Livability; onOpenRoad: (id: string) => void }) {
+  const tiles: [string, string, string][] = [
+    ['Flood hotspots', num(d.flood_hotspots_1500m), 'chronic waterlogging spots nearby'],
+    ['Repairs that failed', d.failure_rate_30d_1500m === null ? 'None logged' : pct(d.failure_rate_30d_1500m), `reopened within 30 days, of ${num(d.jobs_1500m)} jobs`],
+    ['Hospital access roads', num(d.hospital_access_roads_1500m), 'ambulance entry roads nearby'],
+    ['Billed under warranty', d.ward_dlp_leakage_rate === null ? 'n/a' : pct(d.ward_dlp_leakage_rate, 1), `of ward ${d.ward_code} spend`],
+  ]
+  return (
+    <div className="rise space-y-3">
+      <p className="text-sm text-muted">Within {(d.radius_m / 1000).toFixed(1)} km of <span className="font-semibold text-ink">{d.locality}</span> (ward {d.ward_code})</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {tiles.map(([label, value, note]) => (
+          <div key={label} className="space-y-1 rounded-[8px] border border-hairline bg-concrete p-4">
+            <p className="text-xs text-muted">{label}</p>
+            <p className="text-2xl font-bold">{value}</p>
+            <p className="text-xs text-muted">{note}</p>
+          </div>
+        ))}
+      </div>
+      {d.nearby_road_ids.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted">Nearest roads ({num(d.nearby_road_ids.length)}), open a receipt:</p>
+          <div className="flex flex-wrap gap-2">
+            {d.nearby_road_ids.slice(0, 8).map((id) => (
+              <button key={id} onClick={() => onOpenRoad(id)} className="rounded-[6px] hover:opacity-80" aria-label={`Open road ${id}`}><Id>{id}</Id></button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const PAGE = 20
+
+/** Browse every road segment: filter by name or ID, optionally only the selected ward, 20 at a time. */
+function BrowseRoads({ ward, onOpenRoad }: { ward: string; onOpenRoad: (id: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [filter, setFilter] = useState('')
+  const [query, setQuery] = useState('')
+  const [onlyWard, setOnlyWard] = useState(true)
+  const [rows, setRows] = useState<RoadListItem[]>([])
+  const [more, setMore] = useState(false)
+  const [state, setState] = useState<{ loading: boolean; error: Error | null }>({ loading: false, error: null })
+
+  useEffect(() => { const t = window.setTimeout(() => setQuery(filter.trim()), 300); return () => window.clearTimeout(t) }, [filter])
+
+  const load = async (offset: number) => {
+    setState({ loading: true, error: null })
+    try {
+      const page = await api.roads({ q: query || undefined, ward: onlyWard ? ward : undefined, limit: PAGE, offset })
+      setRows((r) => (offset === 0 ? page : [...r, ...page]))
+      setMore(page.length === PAGE)
+      setState({ loading: false, error: null })
+    } catch (e) { setState({ loading: false, error: e instanceof Error ? e : new Error(String(e)) }) }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (open) load(0) }, [open, query, onlyWard, ward])
+
+  return (
+    <div className="rounded-[8px] border border-hairline bg-concrete">
+      <button onClick={() => setOpen((o) => !o)} aria-expanded={open}
+        className="flex min-h-[48px] w-full items-center justify-between gap-3 px-4 text-sm font-semibold hover:bg-hwyellow/20">
+        Browse all roads <ChevronDown size={18} strokeWidth={1.5} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="space-y-3 border-t border-hairline bg-surface p-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="relative flex-1">
+              <span className="sr-only">Filter roads by name or ID</span>
+              <Search size={16} strokeWidth={1.5} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+              <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter by road name or ID, e.g. SV Road or RD0048"
+                className="min-h-[44px] w-full rounded-[8px] border border-hairline bg-concrete pl-9 pr-3 text-sm placeholder:text-muted focus:border-ink focus:outline-none" />
+            </label>
+            <label className="flex min-h-[44px] items-center gap-2 text-sm">
+              <input type="checkbox" checked={onlyWard} onChange={(e) => setOnlyWard(e.target.checked)} className="h-4 w-4 accent-ink" />
+              Only ward {ward}
+            </label>
+          </div>
+
+          {state.error && <ErrorBox error={state.error} onRetry={() => load(0)} />}
+          {state.loading && rows.length === 0 && <div className="space-y-2">{[0, 1, 2, 3].map((i) => <Skel key={i} className="h-14" />)}</div>}
+          {!state.loading && !state.error && rows.length === 0 && (
+            <p className="p-2 text-sm text-muted">No roads match{query ? ` “${query}”` : ''}{onlyWard ? ` in ward ${ward}` : ''}.</p>
+          )}
+
+          {rows.length > 0 && (
+            <ul className="divide-y divide-hairline rounded-[8px] border border-hairline">
+              {rows.map((r) => (
+                <li key={r.road_id}>
+                  <button onClick={() => onOpenRoad(r.road_id)} className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 px-3 py-3 text-left hover:bg-hwyellow/10">
+                    <span className="min-w-0">
+                      <span className="block font-semibold">{r.road_name}{r.segment_no ? <span className="font-normal text-muted"> · segment {r.segment_no}</span> : null}</span>
+                      <span className="flex flex-wrap items-center gap-2 text-xs text-muted">
+                        <Id>{r.road_id}</Id> ward {r.ward_code}
+                        {r.under_dlp && <span className="rounded-[6px] bg-hwgreen px-1.5 py-0.5 font-semibold text-white">Under warranty</span>}
+                      </span>
+                    </span>
+                    <span className="text-right text-xs text-muted">
+                      <span className="block text-sm font-semibold text-ink">{inr(r.total_billed_inr)} billed</span>
+                      {r.flagged_bills_count > 0 ? `${inr(r.rupees_at_stake)} at stake · ${num(r.flagged_bills_count)} flagged` : 'No flagged bills'}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {more && (
+            <button onClick={() => load(rows.length)} disabled={state.loading}
+              className="min-h-[44px] w-full rounded-[8px] border border-ink bg-concrete text-sm font-semibold hover:bg-hwyellow/20 disabled:opacity-50">
+              {state.loading ? 'Loading…' : 'Show more roads'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
