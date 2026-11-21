@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from backend.features.contractor_performance import router as contractor_performance
-from backend.routes import admin, citizen, citizen_accounts, city_overview, health, road_story, scorecard_planner, uploads
+from backend.routes import accounts, admin, citizen, citizen_accounts, city_overview, health, road_story, scorecard_planner, uploads
 
 app = FastAPI(
     title="Follow the Rupee: Backend",
@@ -29,12 +29,15 @@ app = FastAPI(
         {"name": "View 3: Scorecard & Next Rupee", "description": "Context-adjusted contractor scorecard, budget allocation, live slider."},
         {"name": "View 4: Citizen Layer", "description": "Landmark lookup, citizen accounts (anonymous bearer token), "
                                                        "citizen reports with accountability tracker."},
+        {"name": "Accounts", "description": "One email + password sign-in for citizens and officers "
+                                            "(POST /api/auth/signup, POST /api/auth/login); the role decides ward-office access."},
         {"name": "Admin", "description": "Ward-officer / admin dashboard: access requests, login, report queue and "
                                          "triage, contractor notices, flags awaiting reply. Bearer token from "
                                          "POST /api/admin/login."},
     ],
 )
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+                   expose_headers=["X-Total-Count", "X-Page", "X-Page-Size"])  # admin list paging
 MAX_UPLOAD_BODY = 9 * 1024 * 1024  # 8 MB photo + multipart overhead
 
 
@@ -49,7 +52,7 @@ async def cap_upload_size(request: Request, call_next):
             return JSONResponse({"detail": "file too large (max 8 MB)"}, status_code=413)
     return await call_next(request)
 
-for module in (health, city_overview, road_story, scorecard_planner, citizen, citizen_accounts, uploads, admin):
+for module in (health, city_overview, road_story, scorecard_planner, citizen, citizen_accounts, uploads, accounts, admin):
     app.include_router(module.router)
 app.include_router(contractor_performance.router)  # monthly contractor scorecards (backend/features/contractor_performance)
 

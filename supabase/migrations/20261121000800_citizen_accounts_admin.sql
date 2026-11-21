@@ -8,18 +8,32 @@
 --   alter table citizen_reports drop column if exists citizen_id, drop column if exists rejection_reason,
 --     drop column if exists repair_due_at, drop column if exists resolved_at;
 --   drop table if exists contractor_notices, citizen_report_events, admin_sessions, admin_access_requests,
---     admin_users, citizens;
+--     admin_users, citizen_sessions, citizens;
 --   (then re-add citizen_reports_status_check with the 4 original statuses and the flag_replies "anon insert" policy)
 
--- ── Citizens: anonymous accounts. The API returns the bearer token once; only its sha256 is stored. ────
+-- ── Citizens: anonymous (POST /api/citizens) or email + password (POST /api/auth/signup). ────────────────
+-- The API returns bearer tokens once; only their sha256 is stored.
 create table if not exists citizens (
   citizen_id   uuid primary key default gen_random_uuid(),
   display_name text not null check (char_length(display_name) between 1 and 60),
-  token_hash   text not null unique,                                   -- sha256 hex of the bearer token
+  token_hash   text not null unique,                                   -- sha256 hex of the first bearer token
   phone        text check (phone ~ '^\+?[0-9 -]{6,20}$'),              -- optional, for SMS later; never returned
   joined_at    timestamptz not null default now(),
   last_seen_at timestamptz
 );
+alter table citizens
+  add column if not exists email         text unique check (email = lower(email) and email ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  add column if not exists password_hash text;                         -- scrypt (backend/auth.py), signup accounts only
+alter table citizens drop constraint if exists citizens_email_password_check;
+alter table citizens add constraint citizens_email_password_check check ((email is null) = (password_hash is null));
+
+-- Extra tokens from POST /api/auth/login (one per device; citizen tokens do not expire).
+create table if not exists citizen_sessions (
+  token_hash text primary key,
+  citizen_id uuid not null references citizens on delete cascade,
+  created_at timestamptz not null default now()
+);
+create index if not exists citizen_sessions_citizen_idx on citizen_sessions (citizen_id);
 
 -- ── Admin / ward-officer accounts. Created by the CLI (first admin) or by approving an access request. ──
 create table if not exists admin_users (
@@ -116,7 +130,7 @@ drop policy if exists "anon insert" on flag_replies;
 do $$
 declare t text;
 begin
-  foreach t in array array['citizens', 'admin_users', 'admin_sessions', 'admin_access_requests',
+  foreach t in array array['citizens', 'citizen_sessions', 'admin_users', 'admin_sessions', 'admin_access_requests',
                            'citizen_report_events', 'contractor_notices'] loop
     execute format('alter table %I enable row level security', t);
     execute format('revoke all on %I from anon, authenticated', t);

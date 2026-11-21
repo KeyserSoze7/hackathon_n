@@ -17,6 +17,7 @@ One FastAPI app serves all four views (frontend-facing endpoint guide: `docs/api
 | `routes/citizen.py` | View 4: localities, lookup with candidates, livability, citizen query, citizen reports (report form) + tracker |
 | `routes/uploads.py` | View 4: photo upload (validated, EXIF read then stripped, HEIC to JPEG) and photo serving |
 | `routes/citizen_accounts.py` | View 4: anonymous citizen accounts (bearer token), `GET /api/me` + stats, my reports, confirm / reopen a fix |
+| `routes/accounts.py` | One sign-in: `POST /api/auth/signup` (citizen email + password), `POST /api/auth/login` (officer, admin or citizen → token + role) |
 | `routes/admin.py` | Admin dashboard: access requests, login, summary, report queue + triage (PATCH), contractor notices, flags awaiting reply |
 | `auth.py` | Bearer tokens (citizen `cit_…`, officer `adm_…`; only sha256 stored), scrypt passwords, `require_citizen` / `require_admin()` / ward-scope dependencies |
 | `report_lifecycle.py` | Report statuses, allowed transitions, citizen confirmation, `sla_due_at`, tracker steps (pure, unit-tested) |
@@ -62,6 +63,7 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | — | `GET /api/health` | row counts |
 | 1 | `GET /api/city` | `city_kpis` (incl. `rupees_at_stake_total`, `wards_over_budget`, `under_reported_wards`, `work_orders_count`, `complaints_count`, `reopened_within_30d_count`, `sla_met_rate`, `dlp_road_spend_inr`, `recoverable_dlp_rule`) |
 | 1 | `GET /api/wards` (all, list) · `GET /api/wards?ward=K/W` or header `X-Ward-Code: K/W` (one, object; query wins; case-insensitive; 404 if unknown) | `ward_overview` |
+| 1 | `GET /api/wards/{ward}/money-trail` | `wards` budget + `work_orders` by contractor / repair method, 30-day failures (one row per job) |
 | 1 | `GET /api/wards/map` | GeoJSON: `data/wards.geojson` polygons + `ward_overview` in properties (colour by `dlp_leakage_rate`) |
 | 1 | `GET /api/flagged-queue?ward=K/W&tier=1&detector=REPEAT_BILL_NO_COMPLAINT&limit=20&offset=0` | `flagged_queue` |
 | 2 | `GET /api/roads?q=&ward=&limit=&offset=` | `road_audit` (road search / picker) |
@@ -92,9 +94,10 @@ uvicorn backend.main:app --port 8000 --reload          # add --host 0.0.0.0 to s
 | 4 | `GET /api/me` · `GET /api/me/reports?status=` | citizen token: profile + stats (rupees from `flagged_queue`, each bill once) · own reports with history |
 | 4 | `POST /api/citizen-reports/{id}/confirm` | citizen token (owner): `{fixed}` resolved → confirmed_fixed, or → reopened |
 | A | `POST /api/admin/access-requests` · `GET /api/admin/access-requests?status=` · `POST …/{id}/approve` · `POST …/{id}/reject` | `admin_access_requests`, `admin_users` (approve/list: admin role) |
+| A | `POST /api/auth/signup` · `POST /api/auth/login` | unified sign-in → `{token, role, ward_codes, name, email, …}` (`citizens` + `citizen_sessions`, or `admin_users` + `admin_sessions`) |
 | A | `POST /api/admin/login` · `POST /api/admin/logout` · `GET /api/admin/me` | `admin_users`, `admin_sessions` |
 | A | `GET /api/admin/summary?ward=` | report counts by status, new today, overdue SLA, median hours to resolve, rupees held, flags awaiting reply |
-| A | `GET /api/admin/reports?ward=&status=&kind=&issue_type=&q=&sort=&page=` · `GET /api/admin/reports/{id}` | report queue (paged cards) · full triage detail |
+| A | `GET /api/admin/reports?ward=&status=&kind=&issue_type=&q=&sort=&page=` · `GET /api/admin/reports/{id}` | report queue (array; `X-Total-Count` / `X-Page` / `X-Page-Size` headers) · full triage detail |
 | A | `PATCH /api/admin/reports/{id}` | status transition (`report_lifecycle.py`), note, duplicate_of, rejection_reason, repair_due_at → `citizen_report_events` |
 | A | `POST /api/admin/reports/{id}/notify-contractor` | records a `contractor_notices` row (drafted via draft-notice when no message); nothing is sent |
 | A | `GET /api/admin/flags?ward=&awaiting_reply=` | flags in scope with reply counts |
@@ -183,5 +186,5 @@ Tests (no database): `pytest backend/tests -q` (from the repo root).
   `postman collection run postman/backend.postman_collection.json --working-dir .` (counts in the run summary).
   The Admin folder logs in with the `adminEmail` / `adminPassword` collection variables, so create that admin with
   `admin_cli` first (default variables: `ops@example.org` / `change-me-please`; change both for a shared database).
-  Last full run: 108 requests, 266 assertions, 0 failures.
+  Last full run: 122 requests, 290 assertions, 0 failures.
 - Unit tests (no database): `pytest backend/tests -q`.

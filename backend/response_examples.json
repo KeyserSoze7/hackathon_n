@@ -276,5 +276,15 @@
   "sent_by": "A. Patil",
   "created_at": "2026-11-21T16:49:18+05:30",
   "delivery": "recorded"
+ },
+ "AuthSession": {
+  "token": "cit_<shown once; send as Authorization: Bearer>",
+  "role": "citizen",
+  "ward_codes": [],
+  "name": "Priya",
+  "email": "priya@example.org",
+  "expires_at": null,
+  "citizen_id": "eff699a7-f531-4aec-aaa2-a773cacb4c5e",
+  "admin_id": null
  }
 }

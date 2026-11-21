@@ -436,6 +436,8 @@ class ReportEvent(Out):
     to_status: Optional[ReportStatus]
     note: Optional[str]
     photo_ids: list[str]
+    status: Optional[ReportStatus]  # = to_status (frontend Tracker reads `status`)
+    by_role: Literal["citizen", "ward_office", "system"]  # = actor
 
 
 IssueType = Literal["pothole", "waterlogging", "open_manhole", "broken_paver", "cave_in", "choked_drain", "other"]
@@ -759,13 +761,6 @@ class ReportCard(Out):
     citizen: str  # pseudonym (display name) or "Anonymous"; never a phone number
 
 
-class ReportPage(Out):
-    items: list[ReportCard]
-    page: int
-    page_size: int
-    total: int
-
-
 class AdminFlag(Out):
     flag_id: str
     tier: int
@@ -781,13 +776,6 @@ class AdminFlag(Out):
     rule_text: str
     replies_count: int
     last_reply_at: Optional[ISTDateTime]
-
-
-class FlagPage(Out):
-    items: list[AdminFlag]
-    page: int
-    page_size: int
-    total: int
 
 
 class AdminWorkOrder(Out):
@@ -864,3 +852,55 @@ class NotifyReq(BaseModel):
     message: Optional[str] = Field(None, min_length=1, max_length=20000,
                                    description="Omit to draft one from the report's flag (Claude, template fallback)")
     language: Language = "en"
+
+
+# ── Unified sign-in (frontend: one email/password account; role decides ward-office access) ─────────────────
+class SignupReq(BaseModel):
+    model_config = {"json_schema_extra": {"examples": [{"name": "Priya", "email": "priya@example.org", "password": "<min 8 chars>"}]}}
+    name: str = Field(min_length=1, max_length=60)
+    email: str = Field(pattern=EMAIL_RE, max_length=254)
+    password: str = Field(min_length=8, max_length=200)
+
+
+class AuthSession(Out):
+    model_config = _example("AuthSession")
+    token: str  # citizen: cit_... (no expiry) · officer/admin: adm_... (expires_at)
+    role: Literal["citizen", "ward_officer", "admin"]
+    ward_codes: list[str]  # officer: their wards; citizen / admin: []
+    name: str
+    email: str
+    expires_at: Optional[ISTDateTime]  # officer/admin sessions only
+    citizen_id: Optional[str]
+    admin_id: Optional[str]
+
+
+# ── View 1: ward money trail ────────────────────────────────────────────────
+class MoneyTrailContractor(Out):
+    contractor_id: str
+    contractor_name: str
+    jobs: int
+    spend_inr: int
+    failed_30d: int  # jobs reopened within 30 days
+    failed_spend_inr: int  # billed on those jobs
+
+
+class MoneyTrailMethod(Out):
+    repair_method: str
+    jobs: int
+    spend_inr: int
+    failed_30d: int
+
+
+class FailedWithin30d(Out):
+    jobs: int
+    spend_inr: int
+
+
+class MoneyTrail(Out):
+    ward_code: str
+    budget_inr: int
+    spend_inr: int
+    by_contractor: list[MoneyTrailContractor]  # highest spend first
+    by_repair_method: list[MoneyTrailMethod]  # highest spend first
+    failed_within_30d: FailedWithin30d
+    summary: str  # one sentence built from the numbers above (no model text)

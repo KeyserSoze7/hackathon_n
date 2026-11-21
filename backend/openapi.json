@@ -291,6 +291,59 @@
         }
       }
     },
+    "/api/wards/{ward_code}/money-trail": {
+      "get": {
+        "tags": [
+          "View 1: City & Ward Overview"
+        ],
+        "summary": "Ward money trail: budget vs spend, by contractor and repair method, failed repairs",
+        "description": "Where a ward's monsoon repair money went: budget vs billed spend, spend and 30-day failures by contractor\n(canonical names) and by repair method, and the spend on jobs that failed within 30 days. Every job counts once\n(work_orders grain; no joins that multiply rows). `summary` is one sentence built from these numbers.",
+        "operationId": "money_trail_api_wards__ward_code__money_trail_get",
+        "parameters": [
+          {
+            "name": "ward_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ward Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoneyTrail"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/roads": {
       "get": {
         "tags": [
@@ -1776,6 +1829,110 @@
         }
       }
     },
+    "/api/auth/signup": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Create a citizen account (email + password) -> citizen token",
+        "description": "409 if the email already has a citizen or officer account. Officers do not sign up here: they ask via\nPOST /api/admin/access-requests.",
+        "operationId": "signup_api_auth_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSession"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicts with the current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "summary": "Sign in (officer, admin or citizen) -> token + role",
+        "description": "Officer/admin accounts are checked first, then citizen accounts. Wrong email or password -> 401.",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid or expired bearer token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/access-requests": {
       "post": {
         "tags": [
@@ -2293,8 +2450,8 @@
         "tags": [
           "Admin"
         ],
-        "summary": "Report queue (paged cards)",
-        "description": "Cards: id, created_at, age_hours, sla_due_at, status, issue_type, road, flag, first photo, citizen pseudonym.\nNever a phone number.",
+        "summary": "Report queue (paged cards; totals in X-Total-Count / X-Page / X-Page-Size)",
+        "description": "Array of cards: id, created_at, age_hours, sla_due_at, status, issue_type, road, flag, first photo, citizen\npseudonym (never a phone number). Paging: ?page=&page_size=; the total is in the X-Total-Count header.",
         "operationId": "list_reports_api_admin_reports_get",
         "security": [
           {
@@ -2457,7 +2614,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReportPage"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportCard"
+                  },
+                  "title": "Response List Reports Api Admin Reports Get"
+                }
+              }
+            },
+            "headers": {
+              "X-Total-Count": {
+                "description": "Rows matching the filters (all pages)",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-Page": {
+                "description": "This page (1-based)",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-Page-Size": {
+                "description": "Rows per page",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }
@@ -2762,7 +2943,7 @@
         "tags": [
           "Admin"
         ],
-        "summary": "Flags in your wards (awaiting reply)",
+        "summary": "Flags in your wards (awaiting reply; totals in X-Total-Count)",
         "description": "Ranked by rupees at stake. Reply with POST /api/flags/{flag_id}/replies (officer token).",
         "operationId": "list_flags_api_admin_flags_get",
         "security": [
@@ -2835,7 +3016,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FlagPage"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFlag"
+                  },
+                  "title": "Response List Flags Api Admin Flags Get"
+                }
+              }
+            },
+            "headers": {
+              "X-Total-Count": {
+                "description": "Rows matching the filters (all pages)",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-Page": {
+                "description": "This page (1-based)",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "X-Page-Size": {
+                "description": "Rows per page",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }
@@ -4334,6 +4539,95 @@
             "harm_avoided": 132.2,
             "spend_inr": 499138,
             "ward_code": "K/W"
+          }
+        ]
+      },
+      "AuthSession": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "citizen",
+              "ward_officer",
+              "admin"
+            ],
+            "title": "Role"
+          },
+          "ward_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ward Codes"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-06-22T02:59:00+05:30"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "citizen_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Citizen Id"
+          },
+          "admin_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Admin Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "role",
+          "ward_codes",
+          "name",
+          "email",
+          "expires_at",
+          "citizen_id",
+          "admin_id"
+        ],
+        "title": "AuthSession",
+        "examples": [
+          {
+            "citizen_id": "eff699a7-f531-4aec-aaa2-a773cacb4c5e",
+            "email": "priya@example.org",
+            "name": "Priya",
+            "role": "citizen",
+            "token": "cit_<shown once; send as Authorization: Bearer>",
+            "ward_codes": []
           }
         ]
       },
@@ -6342,36 +6636,23 @@
         ],
         "title": "Error"
       },
-      "FlagPage": {
+      "FailedWithin30d": {
         "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/AdminFlag"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "page": {
+          "jobs": {
             "type": "integer",
-            "title": "Page"
+            "title": "Jobs"
           },
-          "page_size": {
+          "spend_inr": {
             "type": "integer",
-            "title": "Page Size"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
+            "title": "Spend Inr"
           }
         },
         "type": "object",
         "required": [
-          "items",
-          "page",
-          "page_size",
-          "total"
+          "jobs",
+          "spend_inr"
         ],
-        "title": "FlagPage"
+        "title": "FailedWithin30d"
       },
       "FlagWithReplies": {
         "properties": {
@@ -7118,6 +7399,120 @@
           "limitations"
         ],
         "title": "MethodologyDoc"
+      },
+      "MoneyTrail": {
+        "properties": {
+          "ward_code": {
+            "type": "string",
+            "title": "Ward Code"
+          },
+          "budget_inr": {
+            "type": "integer",
+            "title": "Budget Inr"
+          },
+          "spend_inr": {
+            "type": "integer",
+            "title": "Spend Inr"
+          },
+          "by_contractor": {
+            "items": {
+              "$ref": "#/components/schemas/MoneyTrailContractor"
+            },
+            "type": "array",
+            "title": "By Contractor"
+          },
+          "by_repair_method": {
+            "items": {
+              "$ref": "#/components/schemas/MoneyTrailMethod"
+            },
+            "type": "array",
+            "title": "By Repair Method"
+          },
+          "failed_within_30d": {
+            "$ref": "#/components/schemas/FailedWithin30d"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ward_code",
+          "budget_inr",
+          "spend_inr",
+          "by_contractor",
+          "by_repair_method",
+          "failed_within_30d",
+          "summary"
+        ],
+        "title": "MoneyTrail"
+      },
+      "MoneyTrailContractor": {
+        "properties": {
+          "contractor_id": {
+            "type": "string",
+            "title": "Contractor Id"
+          },
+          "contractor_name": {
+            "type": "string",
+            "title": "Contractor Name"
+          },
+          "jobs": {
+            "type": "integer",
+            "title": "Jobs"
+          },
+          "spend_inr": {
+            "type": "integer",
+            "title": "Spend Inr"
+          },
+          "failed_30d": {
+            "type": "integer",
+            "title": "Failed 30D"
+          },
+          "failed_spend_inr": {
+            "type": "integer",
+            "title": "Failed Spend Inr"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contractor_id",
+          "contractor_name",
+          "jobs",
+          "spend_inr",
+          "failed_30d",
+          "failed_spend_inr"
+        ],
+        "title": "MoneyTrailContractor"
+      },
+      "MoneyTrailMethod": {
+        "properties": {
+          "repair_method": {
+            "type": "string",
+            "title": "Repair Method"
+          },
+          "jobs": {
+            "type": "integer",
+            "title": "Jobs"
+          },
+          "spend_inr": {
+            "type": "integer",
+            "title": "Spend Inr"
+          },
+          "failed_30d": {
+            "type": "integer",
+            "title": "Failed 30D"
+          }
+        },
+        "type": "object",
+        "required": [
+          "repair_method",
+          "jobs",
+          "spend_inr",
+          "failed_30d"
+        ],
+        "title": "MoneyTrailMethod"
       },
       "MonthBlock": {
         "properties": {
@@ -7999,6 +8394,37 @@
             },
             "type": "array",
             "title": "Photo Ids"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reported",
+                  "matched_to_contract",
+                  "payment_held",
+                  "contractor_notified",
+                  "resolved",
+                  "confirmed_fixed",
+                  "reopened",
+                  "rejected",
+                  "duplicate"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "by_role": {
+            "type": "string",
+            "enum": [
+              "citizen",
+              "ward_office",
+              "system"
+            ],
+            "title": "By Role"
           }
         },
         "type": "object",
@@ -8009,7 +8435,9 @@
           "from_status",
           "to_status",
           "note",
-          "photo_ids"
+          "photo_ids",
+          "status",
+          "by_role"
         ],
         "title": "ReportEvent"
       },
@@ -8076,37 +8504,6 @@
           "lon"
         ],
         "title": "ReportLocation"
-      },
-      "ReportPage": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ReportCard"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "page_size": {
-            "type": "integer",
-            "title": "Page Size"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "page",
-          "page_size",
-          "total"
-        ],
-        "title": "ReportPage"
       },
       "ReportPatchReq": {
         "properties": {
@@ -8936,6 +9333,42 @@
         ],
         "title": "RunInfo"
       },
+      "SignupReq": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 8,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "title": "SignupReq",
+        "examples": [
+          {
+            "email": "priya@example.org",
+            "name": "Priya",
+            "password": "<min 8 chars>"
+          }
+        ]
+      },
       "SpeedMetric": {
         "properties": {
           "relative_index": {
@@ -9452,6 +9885,10 @@
     {
       "name": "View 4: Citizen Layer",
       "description": "Landmark lookup, citizen accounts (anonymous bearer token), citizen reports with accountability tracker."
+    },
+    {
+      "name": "Accounts",
+      "description": "One email + password sign-in for citizens and officers (POST /api/auth/signup, POST /api/auth/login); the role decides ward-office access."
     },
     {
       "name": "Admin",

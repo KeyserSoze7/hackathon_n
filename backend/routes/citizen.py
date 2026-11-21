@@ -267,9 +267,10 @@ def report_events(report_ids):
 
 def event_out(e):
     """API shape of an event: who acted is citizen / ward_office / system, never an officer's identity."""
-    return {"at": e["at"], "event_type": e["event_type"], "actor": ACTOR[e["actor_type"]],
+    actor = ACTOR[e["actor_type"]]
+    return {"at": e["at"], "event_type": e["event_type"], "actor": actor,
             "from_status": e["from_status"], "to_status": e["to_status"], "note": e["note"],
-            "photo_ids": list(e["photo_ids"] or [])}
+            "photo_ids": list(e["photo_ids"] or []), "status": e["to_status"], "by_role": actor}
 
 
 def build_report(report_id, request):

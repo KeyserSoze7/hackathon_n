@@ -1,6 +1,9 @@
 # Change log: citizen accounts + admin / ward-officer dashboard APIs
 
-**Branch:** `feat/citizen-admin-api` (from `main` @ `0aea2c1`)
+**Branches:**
+- `feat/citizen-admin-api`: the feature, based on `main` @ `0aea2c1`.
+- `merge/citizen-admin-api`: the feature merged into the latest `main` (`6dacbc5`), plus the frontend-compatibility
+  layer described below. This is the branch to review and merge.
 **Scope:** backend only (FastAPI + Supabase). No UI. This is the backend for the frontend's citizen "my reports" flow
 and the officer dashboard.
 **Frontend guide:** [docs/api_reference.md](../../docs/api_reference.md), in the sections *Citizen accounts*, *Report
@@ -26,12 +29,28 @@ lifecycle* and *Admin & ward-officer dashboard*. The exact shapes are in Swagger
 - The earlier "still pending" items (`/api/roads?q=`, `/api/localities`, `/api/livability`, `draft-notice`,
   `citizen-query`, `uploads/photo`) **already existed on main**. Nothing was rebuilt.
 
+## Frontend compatibility (`merge/citizen-admin-api`)
+The frontend on `pratham` (`f572cf9`) already has a client for these APIs. Where its calls differed from the first
+version of the backend, the backend now matches the frontend:
+
+| Frontend expects | Backend now |
+|---|---|
+| One email + password sign-in: `POST /api/auth/signup`, `POST /api/auth/login` → `{token, role: citizen\|ward_officer\|admin, ward_codes, name, email}` | **Added** in `routes/accounts.py`. Login checks officer/admin accounts first, then citizen accounts. `citizens` gains `email` and `password_hash`, and `citizen_sessions` holds one token per device. `POST /api/citizens` (anonymous) and `POST /api/admin/login` still work |
+| The same session token sent on every call | An officer token on a citizen call (e.g. filing a report) is treated as **anonymous**, not 401 |
+| `GET /api/admin/reports` returns an array | **Array.** Paging is in the `X-Total-Count`, `X-Page` and `X-Page-Size` headers, exposed through CORS. `GET /api/admin/flags` follows the same pattern |
+| `events[].status` and `events[].by_role` | **Added** alongside `to_status` and `actor` |
+| `GET /api/wards/{ward}/money-trail` | **Built** in `routes/city_overview.py`: budget vs spend, by contractor and by repair method, and 30-day failures. One row per job, and a summary sentence computed from the numbers |
+
+Merging: `merge/citizen-admin-api` merges into `main` with no conflicts. A trial merge of `pratham` shows 3 frontend
+conflicts (`api.ts`, `types.ts`, `Start.tsx`). Those conflicts exist **between `pratham` and `main` with or without this
+branch**; this work touches no frontend file.
+
 ## ⚠ Behaviour changes for the frontend
 | Before | Now | What to do |
 |---|---|---|
 | A new DLP pothole report was auto-set to `payment_held` | A new report stops at `matched_to_contract`. `payment_hold_eligible: true` tells officers they may set the hold | Show `payment_hold_eligible` as "eligible for payment hold" instead of assuming it is held |
 | The tracker had 4 steps and `done\|current\|pending` | It has 6 steps (adds `resolved` and `confirmed_fixed`), plus the step statuses `skipped` and `stopped` | Render the 2 extra steps, and grey out `skipped`/`stopped` |
-| `POST /api/flags/{id}/replies` was anonymous | It needs an officer or admin token for the flag's ward: **401** without a token, **403** outside the officer's wards | Put the reply box on RoadReceipt behind officer login |
+| `POST /api/flags/{id}/replies` was anonymous | It needs an officer or admin token for the flag's ward: **401** without a token, **403** outside the officer's wards | `pratham`'s client already sends the officer token. The older RoadReceipt on `main` shows an error until `pratham` is merged |
 | The report `status` enum had 4 values | It has 9 (see the lifecycle) | Update `TrackerStatus` in `frontend/src/data/types.ts` |
 
 ## Files
@@ -43,6 +62,7 @@ lifecycle* and *Admin & ward-officer dashboard*. The exact shapes are in Swagger
 | [backend/report_lifecycle.py](../../backend/report_lifecycle.py) | Statuses, the transition table, citizen confirmation, `sla_due_at` and tracker steps. Pure functions |
 | [backend/routes/citizen_accounts.py](../../backend/routes/citizen_accounts.py) | `POST /api/citizens`, `GET /api/me`, `GET /api/me/reports`, `POST /api/citizen-reports/{id}/confirm` |
 | [backend/routes/admin.py](../../backend/routes/admin.py) | All `/api/admin/*` routes |
+| [backend/routes/accounts.py](../../backend/routes/accounts.py) | `POST /api/auth/signup`, `POST /api/auth/login` (unified sign-in) |
 | [backend/admin_cli.py](../../backend/admin_cli.py) | `python -m backend.admin_cli create-admin`: bootstraps the first admin |
 | [backend/tests/test_citizen_admin.py](../../backend/tests/test_citizen_admin.py) | 28 unit tests for auth primitives, transitions, confirmation, SLA and tracker |
 
@@ -57,7 +77,8 @@ lifecycle* and *Admin & ward-officer dashboard*. The exact shapes are in Swagger
 | `backend/response_examples.json` | Real captured examples for the new POST responses. `CitizenReport` was refreshed; tokens and passwords are redacted |
 | `backend/openapi.json` | Regenerated: 15 new paths, 27 new schemas. Existing paths are unchanged, apart from the 3 above |
 | `supabase/load_source_data.sql` | Truncate list now includes `citizen_report_events` and `contractor_notices`. Accounts survive a reload |
-| `postman/backend.postman_collection.json` | View 4 gains 9 citizen requests and there is a new Admin folder with 35 requests. Existing reply and DLP-report tests are updated to the new behaviour, and the endpoint count is now 44 |
+| `backend/routes/city_overview.py` | `GET /api/wards/{ward}/money-trail` |
+| `postman/backend.postman_collection.json` | Adds 9 citizen requests to View 4, 3 money-trail requests to View 1, a new Admin folder (35 requests) and a new Accounts folder (11 requests). Existing reply and DLP-report tests are updated to the new behaviour, and the endpoint count is now 47 |
 | `docs/api_reference.md`, `backend/README.md`, `.env.example` | Docs, setup steps and `ADMIN_SESSION_HOURS` |
 
 ## Database and RLS
@@ -77,13 +98,14 @@ python -m backend.admin_cli create-admin --email <ops email> --name "Ops Admin" 
 ```
 
 ## Verification done
-- `pytest backend/tests -q`: 46 passed (28 new and 18 existing).
+- `pytest backend/tests -q`: 46 passed (28 new and 18 existing), on both branches.
 - On a throwaway Postgres in `/tmp` (deleted afterwards), with stand-in `anon`/`authenticated` roles:
   - All migrations `0000`–`0800` applied in order, and `0800` re-ran cleanly.
   - `load_source_data.sql` and `load_audit_outputs.sql` loaded, followed by the View 3 pipeline and the scorecard refresh.
   - The anon role is denied `SELECT` on all 6 private tables.
   - The anon insert policy on `flag_replies` is gone; `citizen_reports` keeps its policies.
-- **Postman (newman) against `uvicorn backend.main:app` with `STRICT_MODELS=1`: 108 requests, 266 assertions, 0 failures.**
+- **Postman (newman) against `uvicorn backend.main:app` with `STRICT_MODELS=1`, on `merge/citizen-admin-api`: 122 requests, 290 assertions, 0 failures.**
+- The updated `0800` also re-applies cleanly over a database that already ran the first version of `0800`.
 - A separate end-to-end script passed 92/92 checks. It covered:
   - citizen stats, including a bill counted only once
   - ward scoping, with 403s

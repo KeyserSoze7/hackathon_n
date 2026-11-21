@@ -34,6 +34,16 @@ SLA_DUE = "COALESCE(cr.repair_due_at, cr.created_at + make_interval(hours => i.s
 IN_SCOPE = f"(%(all)s OR {WARD} IN %(wards)s)"
 
 
+PAGING_HEADERS = {"X-Total-Count": {"description": "Rows matching the filters (all pages)", "schema": {"type": "integer"}},
+                  "X-Page": {"description": "This page (1-based)", "schema": {"type": "integer"}},
+                  "X-Page-Size": {"description": "Rows per page", "schema": {"type": "integer"}}}
+PAGED = {200: {"headers": PAGING_HEADERS}}
+
+
+def set_paging(response, total, page, page_size):
+    response.headers.update({"X-Total-Count": str(total), "X-Page": str(page), "X-Page-Size": str(page_size)})
+
+
 def scope_params(wards):
     """SQL params for IN_SCOPE: wards None = every ward."""
     return {"all": wards is None, "wards": tuple(wards) if wards else ("",)}
@@ -57,7 +67,7 @@ def request_access(req: s.AccessRequestReq):
     if not rows("SELECT 1 FROM wards WHERE ward_code = %(w)s", w=ward):
         raise invalid("ward_code", f"unknown ward {req.ward_code}")
     if rows("SELECT 1 FROM admin_users WHERE email = %(e)s", e=email):
-        raise HTTPException(409, "this email already has an account; sign in via POST /api/admin/login")
+        raise HTTPException(409, "this email already has an officer account; sign in via POST /api/auth/login")
     try:
         with get_engine().begin() as c:
             rid = c.execute(text("INSERT INTO admin_access_requests (name, email, designation, ward_code, reason) "
@@ -136,15 +146,21 @@ def login(req: s.LoginReq):
     ok = auth.verify_password(req.password, u[0]["password_hash"] if u else _DUMMY_HASH)
     if not (u and ok):
         raise auth.unauthorized("invalid email or password")
+    token, exp = start_admin_session(u[0]["admin_id"])
+    role = u[0]["role"]
+    return {"token": token, "role": role, "ward_codes": [] if role == "admin" else u[0]["ward_codes"], "expires_at": exp}
+
+
+def start_admin_session(admin_id):
+    """New session token (shown once) + its expiry; clears this account's expired sessions."""
     token = auth.new_token(auth.ADMIN_PREFIX)
     with get_engine().begin() as c:
         c.execute(text("DELETE FROM admin_sessions WHERE admin_id = CAST(:a AS uuid) AND expires_at <= now()"),
-                  {"a": u[0]["admin_id"]})
+                  {"a": admin_id})
         exp = c.execute(text("INSERT INTO admin_sessions (token_hash, admin_id, expires_at) "
                              "VALUES (:h, CAST(:a AS uuid), now() + make_interval(hours => :hrs)) RETURNING expires_at"),
-                        {"h": auth.token_hash(token), "a": u[0]["admin_id"], "hrs": auth.session_hours()}).scalar_one()
-    role = u[0]["role"]
-    return {"token": token, "role": role, "ward_codes": [] if role == "admin" else u[0]["ward_codes"], "expires_at": exp}
+                        {"h": auth.token_hash(token), "a": admin_id, "hrs": auth.session_hours()}).scalar_one()
+    return token, exp
 
 
 @router.post("/api/admin/logout", status_code=204, responses={401: s.AUTH[401]}, summary="End this session")
@@ -193,16 +209,17 @@ SORTS = {"newest": "cr.created_at DESC, cr.id DESC", "oldest": "cr.created_at, c
          "sla_due": f"{SLA_DUE} NULLS LAST, cr.id"}
 
 
-@router.get("/api/admin/reports", response_model=s.ReportPage, responses=s.AUTH, summary="Report queue (paged cards)")
-def list_reports(request: Request,
+@router.get("/api/admin/reports", response_model=list[s.ReportCard], responses={**s.AUTH, **PAGED},
+            summary="Report queue (paged cards; totals in X-Total-Count / X-Page / X-Page-Size)")
+def list_reports(request: Request, response: Response,
                  ward: Optional[str] = Query(None, description="Ward code; default: all your wards"),
                  status: Optional[s.ReportStatus] = None, kind: Optional[s.ReportKind] = None,
                  issue_type: Optional[s.IssueType] = None,
                  q: Optional[str] = Query(None, max_length=200, description="Report id, road name, landmark or text"),
                  sort: s.AdminSort = "newest", page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100),
                  admin: dict = Depends(ANY_ADMIN)):
-    """Cards: id, created_at, age_hours, sla_due_at, status, issue_type, road, flag, first photo, citizen pseudonym.
-    Never a phone number."""
+    """Array of cards: id, created_at, age_hours, sla_due_at, status, issue_type, road, flag, first photo, citizen
+    pseudonym (never a phone number). Paging: ?page=&page_size=; the total is in the X-Total-Count header."""
     p = scope_params(auth.ward_scope(admin, ward)) | {
         "st": status, "k": kind, "it": issue_type, "q": f"%{q.strip()}%" if q and q.strip() else None,
         "lim": page_size, "off": (page - 1) * page_size}
@@ -223,7 +240,8 @@ def list_reports(request: Request,
               "road": {k: r[k] for k in ("road_id", "road_name", "ward_code", "under_dlp")} if r["road_id"] else None,
               "flag": {"flag_id": r["flag_id"], "rupees_at_stake": r["rupees_at_stake"]} if r["flag_id"] else None,
               "photo_url": first_photo_url(r, request), "citizen": r["citizen"]} for r in rs]
-    return {"items": items, "page": page, "page_size": page_size, "total": total}
+    set_paging(response, total, page, page_size)
+    return items
 
 
 FLAG_SELECT = ("SELECT f.flag_id, f.tier, f.detector, f.status_label, f.ward_code, f.road_id, r.road_name, f.work_order_id, "
@@ -421,8 +439,9 @@ def notify_contractor(report_id: int, req: s.NotifyReq, admin: dict = Depends(AN
     return next(n for n in notices_for(report_id) if n["id"] == nid)
 
 
-@router.get("/api/admin/flags", response_model=s.FlagPage, responses=s.AUTH, summary="Flags in your wards (awaiting reply)")
-def list_flags(ward: Optional[str] = Query(None), awaiting_reply: Optional[bool] = Query(
+@router.get("/api/admin/flags", response_model=list[s.AdminFlag], responses={**s.AUTH, **PAGED},
+            summary="Flags in your wards (awaiting reply; totals in X-Total-Count)")
+def list_flags(response: Response, ward: Optional[str] = Query(None), awaiting_reply: Optional[bool] = Query(
                    None, description="true: only flags with no Right-of-Reply yet; false: only replied flags"),
                page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100),
                admin: dict = Depends(ANY_ADMIN)):
@@ -433,4 +452,5 @@ def list_flags(ward: Optional[str] = Query(None), awaiting_reply: Optional[bool]
     total = one("SELECT count(*) AS n FROM flags f LEFT JOIN (SELECT flag_id, count(*) AS n FROM flag_replies "
                 "GROUP BY flag_id) rep ON rep.flag_id = f.flag_id " + where, "flags", **p)["n"]
     items = rows(FLAG_SELECT + where + "ORDER BY f.rupees_at_stake DESC, f.flag_id LIMIT %(lim)s OFFSET %(off)s", **p)
-    return {"items": items, "page": page, "page_size": page_size, "total": total}
+    set_paging(response, total, page, page_size)
+    return items

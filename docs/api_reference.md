@@ -13,8 +13,12 @@ the POSTs carry real example responses). This page is the quick map. Backend cod
   uploads also `413` (too large) and `415` (not a supported image).
 - **Auth**: no login wall for citizens. Public reads stay anonymous. Signed-in calls send
   `Authorization: Bearer <token>`:
-  - citizen token (`cit_…`) from `POST /api/citizens`: keep it on the device, it is shown once and never expires;
-  - officer/admin token (`adm_…`) from `POST /api/admin/login`: expires after `ADMIN_SESSION_HOURS` (default 12).
+  - **one sign-in for everyone**: `POST /api/auth/login {email, password}` → `{token, role: citizen|ward_officer|admin,
+    ward_codes, name, email, expires_at, citizen_id, admin_id}`; citizens create an account with
+    `POST /api/auth/signup {name, email, password}` (see *Accounts* below);
+  - or, with no account at all, an anonymous citizen token from `POST /api/citizens`;
+  - citizen tokens (`cit_…`) never expire; officer/admin tokens (`adm_…`) expire after `ADMIN_SESSION_HOURS` (12).
+  An officer token sent on a citizen call (e.g. filing a report) is treated as anonymous, not rejected.
   `401` = missing/invalid/expired token, `403` = signed in but wrong role or ward, `409` = conflicts with the
   report's current state. All are `{detail: "..."}`.
 - **Labels**: flags read *Needs Explanation* or *Recoverable under DLP*. Never "fraud".
@@ -60,7 +64,8 @@ photo_ids[]}], sla_due_at, repair_due_at, resolved_at, rejection_reason, payment
   The DLP flag is still auto-linked (`flag_id`). Full lifecycle: see *Report lifecycle* below.
 - `tracker` has 6 steps: reported, matched_to_contract, payment_held, contractor_notified, resolved, confirmed_fixed.
   `skipped` = payment hold not applicable; `stopped` = report was rejected or marked duplicate.
-- `events[]` is the history (oldest first). `actor` is `citizen`, `ward_office` or `system`, never an officer's name.
+- `events[]` is the history (oldest first). `actor` (also as `by_role`) is `citizen`, `ward_office` or `system`,
+  never an officer's name. `status` repeats `to_status`.
 - `sla_due_at` = the officer's `repair_due_at` if set, else `created_at + sla_hours` (null without an issue type).
 - `responsible.party`: `contractor_under_dlp` (DLP surface defect, contractor fixes at no cost to BMC) or `bmc_ward`.
 - `duplicate_of`: earlier report for the same road + issue in the last 7 days.
@@ -90,6 +95,7 @@ is smaller than `dlp_road_spend_inr`).
 | 9 | `GET /api/lookup?q=&language=` | match + `matched_locality` + `candidates[]`: nearest 3 roads with `road_distance_m` and `latest_work_order{work_order_id, contractor_id, contractor_name, cost_inr, completed_at, sla_met, reopened_within_30d}` |
 | 10 | `POST /api/citizen-query` `{text, language, mode: street_check|move_in}` | `{matched_locality, matched_road_id, plain_language_reply, warranty_status, generated_by, lookup, livability}`; no match is still 200 |
 | 11 | `GET /api/roads/{road_id}` | road header incl. `segment_no`, `length_m`, `dlp_months`, `dlp_expires_on`, `dlp_rule`; each work order has `under_dlp_at_billing` |
+| 13 | `GET /api/wards/{ward}/money-trail` | `{ward_code, budget_inr, spend_inr, by_contractor[{contractor_id, contractor_name, jobs, spend_inr, failed_30d, failed_spend_inr}], by_repair_method[{repair_method, jobs, spend_inr, failed_30d}], failed_within_30d{jobs, spend_inr}, summary}`; 404 unknown ward |
 | 12 | `GET /api/v3/next-rupee/{ward or ALL}`, `POST /api/v3/allocate {ward_code: ward or ALL, budget_inr}`, `GET /api/v3/budget-range/{ward or ALL}` | city-wide planner; slider `{min_inr, max_inr, default_inr, step_inr}` |
 
 Note on item 11: the dataset says whether a road is under DLP but has no expiry. A 36-month DLP is assumed
@@ -107,6 +113,16 @@ no composite score. Complements the season-level, context-adjusted `GET /api/v3/
 | `GET /api/v3/contractor-performance/methodology` | metric definitions, ranking and tie rules, eligibility, limitations |
 
 Data is computed by `python -m backend.features.contractor_performance.refresh` (rerun after each data load).
+
+## Accounts (one sign-in)
+
+| Endpoint | Returns |
+|---|---|
+| `POST /api/auth/signup` `{name, email, password (min 8)}` | 201 `AuthSession` with `role: "citizen"` and a citizen token. 409 if the email has any account. Officers don't sign up here: they use access requests (below) |
+| `POST /api/auth/login` `{email, password}` | `AuthSession`. Officer/admin accounts are checked first, then citizen accounts. Wrong credentials 401. A citizen login issues a new device token; older tokens keep working |
+
+`AuthSession` = `{token, role, ward_codes[], name, email, expires_at (officers only), citizen_id, admin_id}`.
+`POST /api/admin/login` (officers only) and `POST /api/citizens` (anonymous) still work.
 
 ## Citizen accounts (View 4)
 
@@ -169,11 +185,11 @@ to admins only. The first admin is created on the server with `python -m backend
 | 10 | `POST /api/admin/login` `{email, password}` | none | `{token, role: ward_officer\|admin, ward_codes[], expires_at}` (admin: `ward_codes` = `[]` = every ward). Wrong credentials 401 |
 | 10 | `GET /api/admin/me` · `POST /api/admin/logout` (204) | officer | `{admin_id, email, name, designation, role, ward_codes, session_expires_at}` |
 | 11 | `GET /api/admin/summary?ward=` | officer | `{ward_codes, reports_by_status{<all 9 statuses>}, new_today, overdue_sla, median_hours_to_resolve, rupees_held_inr, flags_awaiting_reply}` |
-| 12 | `GET /api/admin/reports?ward=&status=&kind=&issue_type=&q=&sort=newest\|oldest\|sla_due&page=&page_size=` | officer | `{items[{id, created_at, age_hours, sla_due_at, status, kind, issue_type, road, flag, photo_url, citizen}], page, page_size, total}`. `citizen` is the pseudonym (or "Anonymous"), never a phone. `q` matches report id, road name, landmark, text. `page_size` ≤ 100 |
+| 12 | `GET /api/admin/reports?ward=&status=&kind=&issue_type=&q=&sort=newest\|oldest\|sla_due&page=&page_size=` | officer | **array** `[{id, created_at, age_hours, sla_due_at, status, kind, issue_type, road, flag, photo_url, citizen}]`; paging in headers `X-Total-Count`, `X-Page`, `X-Page-Size` (exposed to the browser via CORS). `citizen` is the pseudonym (or "Anonymous"), never a phone. `q` matches report id, road name, landmark, text. `page_size` ≤ 100 |
 | 13 | `GET /api/admin/reports/{id}` | officer | the full report (item 2) plus `citizen`, `confirm_photos[]`, `flags[]` (report's flag first, then the road's flags, each with `replies_count`), `work_orders[]` (linked one first), `duplicate_candidates[{id, created_at, status, issue_type, road_id, distance_m, reason}]`, `notices[]`, `allowed_next[]` |
 | 14 | `PATCH /api/admin/reports/{id}` `{status?, note?, duplicate_of?, rejection_reason?, repair_due_at?}` | officer | same as item 13. Illegal transition → 422 listing the allowed ones. `rejected` needs `rejection_reason`; `duplicate` needs `duplicate_of` (a chain is followed to the original). Every change writes an event |
 | 15 | `POST /api/admin/reports/{id}/notify-contractor` `{channel: email\|sms\|letter, message?, language?}` | officer | 201 `{id, report_id, channel, flag_id, work_order_id, contractor_id, contractor_name, message, generated_by: claude\|template\|officer, sent_by, created_at, delivery: "recorded"}` |
-| 16 | `GET /api/admin/flags?ward=&awaiting_reply=true&page=&page_size=` | officer | `{items[{flag_id, tier, detector, status_label, ward_code, road_id, road_name, work_order_id, contractor_id, contractor_name, rupees_at_stake, rule_text, replies_count, last_reply_at}], page, page_size, total}`, highest stakes first |
+| 16 | `GET /api/admin/flags?ward=&awaiting_reply=true&page=&page_size=` | officer | **array** `[{flag_id, tier, detector, status_label, ward_code, road_id, road_name, work_order_id, contractor_id, contractor_name, rupees_at_stake, rule_text, replies_count, last_reply_at}]`, highest stakes first; totals in `X-Total-Count` |
 | 16 | `POST /api/flags/{flag_id}/replies` `{author_role, author_name?, body}` | officer (flag's ward) | **now authenticated** (401 without a token, 403 outside your wards). `author_name` defaults to the officer's name. Use `author_role: contractor` to log a reply the contractor gave the ward office |
 
 Summary tile definitions:

@@ -73,15 +73,17 @@ def unauthorized(msg: str) -> HTTPException:
 
 
 def optional_citizen(creds: Optional[HTTPAuthorizationCredentials] = Depends(citizen_bearer)) -> Optional[dict]:
-    """None without an Authorization header; 401 if a token is sent but is not a valid citizen token."""
-    if creds is None:
+    """None without an Authorization header, or with an officer token (`adm_...`: the frontend sends its one session
+    token everywhere, so an officer filing a report files it anonymously). 401 for an invalid citizen token."""
+    if creds is None or creds.credentials.startswith(ADMIN_PREFIX):
         return None
     tok = creds.credentials
     if not tok.startswith(CITIZEN_PREFIX):
         raise unauthorized("invalid citizen token")
-    with get_engine().begin() as c:  # one statement: look up the token and record last_seen_at
-        r = c.execute(text("UPDATE citizens SET last_seen_at = now() WHERE token_hash = :h "
-                           "RETURNING citizen_id::text AS citizen_id, display_name, joined_at"),
+    with get_engine().begin() as c:  # token from POST /api/citizens or /api/auth/signup, or a login session
+        r = c.execute(text("UPDATE citizens SET last_seen_at = now() WHERE token_hash = :h OR citizen_id = "
+                           "(SELECT citizen_id FROM citizen_sessions WHERE token_hash = :h) "
+                           "RETURNING citizen_id::text AS citizen_id, display_name, joined_at, email"),
                       {"h": token_hash(tok)}).mappings().first()
     if r is None:
         raise unauthorized("invalid citizen token")
