@@ -31,6 +31,11 @@ def load(csv_dir):
         eng = engine()
         with eng.begin() as c:
             c.exec_driver_sql(feats_sql)
+            # Supabase exposes public views to the anon key. Run them as the caller (RLS applies) and make
+            # them read-only: v_ward_station is auto-updatable and would otherwise write through to wards.
+            for v in ["v_ward_station", "v_road_geo", "v_wo_context", "v_complaint_road", "v_road_static", "v_road_activity"]:
+                c.exec_driver_sql(f"ALTER VIEW {v} SET (security_invoker = true)")
+                c.exec_driver_sql(f"REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON {v} FROM anon, authenticated")
         q = lambda s: _yn(_floatify(pd.read_sql(s, eng)))
     else:
         import duckdb

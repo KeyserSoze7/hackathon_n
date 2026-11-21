@@ -44,7 +44,9 @@ Not built yet: `POST /api/draft-notice` (View 2) and `POST /api/citizen-query` (
 ## Changing an endpoint (e.g. View 2)
 - View 2 routes are the `/api/roads/...` and `/api/flags/...` functions in `api.py`.
 - SQL views they read are in `supabase/migrations/20261121000100_audit_views.sql` (`road_audit`, `road_timeline`, `flagged_queue`).
-  Change the schema with a **new** migration file rather than editing an applied one.
+  Change the schema with a **new** migration file rather than editing an applied one (all three are applied on Supabase).
+- Full schema at a glance (every table, view, constraint, RLS policy): `supabase/schema.sql`. Reference snapshot
+  dumped from Supabase; don't run it. Regenerate it after a schema change (command in its header).
 - Every route declares `response_model=` from `models.py`. Change the model with the SQL view/table it mirrors.
   Run with `STRICT_MODELS=1` while developing/testing: an undeclared or mistyped field then fails loudly (500)
   instead of being silently dropped from the response.
