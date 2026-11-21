@@ -27,11 +27,11 @@ def load(csv_dir):
     feats_sql = (HERE / "sql" / "01_features.sql").read_text()
     url = os.environ.get("DATABASE_URL")
     if url:
-        import sqlalchemy as sa
-        eng = sa.create_engine(url)
+        import sys; sys.path.insert(0, str(HERE)); from db import engine
+        eng = engine()
         with eng.begin() as c:
             c.exec_driver_sql(feats_sql)
-        q = lambda s: pd.read_sql(s, eng)
+        q = lambda s: _floatify(pd.read_sql(s, eng))
     else:
         import duckdb
         con = duckdb.connect()
@@ -44,6 +44,15 @@ def load(csv_dir):
     for t in ["wards", "work_orders", "rate_card", "roads"]:
         d[t] = q(f"SELECT * FROM {t}")
     return d, eng
+
+
+def _floatify(df):
+    """Postgres NUMERIC arrives as Python Decimal; XGBoost needs floats."""
+    from decimal import Decimal
+    for c in df.columns:
+        if df[c].dtype == object and df[c].map(lambda v: isinstance(v, Decimal)).any():
+            df[c] = df[c].astype(float)
+    return df
 
 
 def encode(df, cats):
@@ -217,6 +226,16 @@ def main():
         flat(roads).to_sql("v3_next_rupee", eng, if_exists="replace", index=False)
         pd.DataFrame(ward_alloc).to_sql("v3_ward_allocation", eng, if_exists="replace", index=False)
         jobs.to_sql("v3_job_expected_risk", eng, if_exists="replace", index=False)
+        with eng.begin() as c:  # JSON fields as jsonb so supabase-js returns objects, not strings
+            for tbl, rows in [("v3_contractor_scorecard", cards), ("v3_next_rupee", roads)]:
+                for k, v in rows[0].items():
+                    if isinstance(v, (dict, list, tuple)):
+                        c.exec_driver_sql(f'ALTER TABLE {tbl} ALTER COLUMN "{k}" TYPE jsonb USING "{k}"::jsonb')
+        raw = eng.raw_connection()   # raw cursor: the DO block uses %I, which must not be treated as a bind param
+        try:
+            raw.cursor().execute((HERE / "sql" / "03_security.sql").read_text()); raw.commit()
+        finally:
+            raw.close()
     print(json.dumps({"scorecard": meta_a, "allocation": {k: v for k, v in meta_b.items() if k != "method_failure_rates"}}, indent=2))
 
 

@@ -1,18 +1,30 @@
 # View 3 backend: fair scorecard (3A) + next-rupee planner (3B)
 
-## Run
+## Run locally (no database)
 ```bash
-pip install xgboost shap duckdb "scipy>=1.9" scikit-learn pandas sqlalchemy psycopg2-binary
-# local, no DB needed (DuckDB runs the same SQL on the CSVs)
-python view3_pipeline.py --csv-dir ../Claude-Impact-Labs-data-2/data
-# Supabase
-export DATABASE_URL=postgresql://postgres:<pw>@db.<ref>.supabase.co:5432/postgres
-python load_to_supabase.py --csv-dir ../Claude-Impact-Labs-data-2/data
-python view3_pipeline.py      # creates SQL views, trains, writes v3_* tables back
+pip install -r requirements.txt
+python view3_pipeline.py --csv-dir ../Claude-Impact-Labs-data-2/data     # DuckDB runs the same SQL on the CSVs
 ```
-Outputs: `out/contractors.json`, `out/next_rupee.json` (frontend contract plus extra fields),
-`out/ward_allocation.json`, `out/allocation_summary.json`, `out/job_expected_risk.csv`, `out/view3_model_meta.json`.
-`--budget 50000000` runs another city-wide scenario.
+
+## Supabase integration
+1. **Connection string:** Supabase → Connect → *Session pooler* URI (port 5432; works on IPv4, unlike the direct host).
+   URL-encode special characters in the password (`@` → `%40`).
+   `export DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"`
+2. **Load raw data:** `python load_to_supabase.py --csv-dir ../Claude-Impact-Labs-data-2/data` (13 tables, about a minute; safe to re-run).
+3. **Build results:** `python view3_pipeline.py` creates the feature views, trains, solves, and writes
+   `v3_contractor_scorecard`, `v3_next_rupee`, `v3_ward_allocation`, `v3_job_expected_risk`.
+   Nested fields are `jsonb`. RLS is switched on: `v3_*` tables are public **read-only**, raw tables are closed to the anon key.
+4. **Serve:**
+   - Read-only screens can query Supabase directly from the frontend:
+     `supabase.from('v3_ward_allocation').select('*').order('harm_avoided_per_next_lakh', {ascending:false})`
+   - The budget slider needs Python: `uvicorn api:app --port 8000`
+     - `GET  /api/v3/contractors`
+     - `GET  /api/v3/wards`
+     - `GET  /api/v3/next-rupee/{ward}` (e.g. `/api/v3/next-rupee/K/W`)
+     - `POST /api/v3/allocate {"ward_code":"K/W","budget_inr":500000}` → exact re-solve, about 0.01 s
+5. **Refresh** after any data change: re-run steps 2 and 3. The API picks up new inputs on restart.
+
+Tested end to end on Postgres 16 (load → pipeline → re-run → API).
 
 ## Split of work
 | Layer | Where | What |
